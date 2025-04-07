@@ -1,0 +1,45 @@
+{
+	"name": "@openPleb/backend",
+	"module": "index.ts",
+	"type": "module",
+	"version": "0.1.0",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"build": "bun build --compile --minify --sourcemap ./src/index.ts --outfile dist/mnt",
+		"dev": "bun run --watch src/index.ts",
+		"lint": "biome check",
+		"format": "biome check --write"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"@types/bun": "^1.2.8",
+		"drizzle-kit": "^0.30.6",
+		"tsx": "^4.19.3"
+	},
+	"peerDependencies": {
+		"typescript": "^5.7.3"
+	},
+	"dependencies": {
+		"@cashu/cashu-ts": "^2.4.1",
+		"@elysiajs/cookie": "^0.8.0",
+		"@elysiajs/cors": "^1.2.0",
+		"@elysiajs/cron": "^1.2.0",
+		"@elysiajs/jwt": "^1.2.0",
+		"@elysiajs/swagger": "^1.2.2",
+		"@getalby/sdk": "^3.9.0",
+		"@grotto/logysia": "^0.1.6",
+		"@lightningpolar/lnd-api": "^0.18.4-beta.rc1",
+		"@logtape/logtape": "^0.8.2",
+		"@node-rs/argon2": "^2.0.2",
+		"@oslojs/crypto": "^1.0.1",
+		"@oslojs/encoding": "^1.1.0",
+		"@scure/bip32": "^1.6.2",
+		"@scure/bip39": "^1.5.4",
+		"dotenv": "^16.4.7",
+		"drizzle-orm": "^0.38.4",
+		"elysia": "^1.2.25",
+		"elysia-rate-limit": "^4.3.0",
+		"light-bolt11-decoder": "^3.2.0",
+		"postgres": "^3.4.5"
+	}
+}

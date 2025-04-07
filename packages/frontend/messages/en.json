@@ -1,0 +1,10 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"hello_world": "Hello, {name} from en!",
+	"scan_a_X_qr": "Scan a {type} QR code to continue",
+	"loading_camera": "Loading camera...",
+	"camera_not_found": "Camera not found.",
+	"stop_scanning": "Stop scanning",
+	"t_copy": "Copy",
+	"t_copied": "Copied!"
+}
