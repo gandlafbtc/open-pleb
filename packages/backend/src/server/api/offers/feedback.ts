@@ -40,7 +40,7 @@ export const commitFeedback = async (
 	if (!res) {
 		return new Response("Invalid signature", { status: 401 });
 	}
-	if (!Object.values(OFFER_STATE).includes(feedbackData.status)) {
+	if (![OFFER_STATE.MARKED_WITH_ISSUE, OFFER_STATE.COMPLETED, OFFER_STATE.MARKED_UNRESPONSIVE].includes(feedbackData.status)) {
 		return new Response("Invalid status", { status: 400 });
 	}
 	const updatedOffer = await db

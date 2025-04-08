@@ -74,3 +74,28 @@ export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 export const css = (element: HTMLElement, style: any) => {
 	for (const property in style) element.style[property] = style[property];
 };
+
+export const getImgMeta = async (url: string): Promise<HTMLImageElement> => {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject();
+        img.src = url;
+    });
+}
+
+export function objectUrlToBase64(objectUrl, callback) {
+	const img = new Image();
+	img.onload = () => {
+		const canvas = document.createElement('canvas');
+		canvas.width = img.width;
+		canvas.height = img.height;
+
+		const ctx = canvas.getContext('2d');
+		ctx?.drawImage(img, 0, 0);
+
+		const base64String = canvas.toDataURL('image/png');
+		callback(base64String);
+	};
+	img.src = objectUrl;
+}
