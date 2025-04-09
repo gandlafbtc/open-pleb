@@ -79,5 +79,3 @@ Fiat banking usually doesn't offer open protocols that would allow us to make at
 1. navigate to `packages/common` and run `bun i && bun run db:push` to migrate the database schema
 2. navigate to `packages/backend` and run `bun i && bun run dev` to start the backend server
 3. navigate to `packages/frontend` and run `bun i  && bun run dev` to start the frontend development server
-
-
