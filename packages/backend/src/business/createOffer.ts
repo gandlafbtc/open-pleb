@@ -106,7 +106,6 @@ export const createOffer = async (offerData: OfferData): Promise<Offer> => {
 		pubkey,
 	};
 
-	// Insert the offer into the database and return the created offer
 	const offerResponse = await db
 		.insert(offerTable)
 		.values(insertOffer)
