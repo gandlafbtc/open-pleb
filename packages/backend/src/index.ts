@@ -69,5 +69,4 @@ const app = new Elysia()
 			.use(open),
 	)
 	.listen(Bun.env.PORT);
-
 log.info`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`;

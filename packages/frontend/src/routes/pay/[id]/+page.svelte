@@ -40,9 +40,11 @@
 				{formatCurrency(Math.ceil(decode(offer.invoice).sections[2].value / 1000), 'SAT')}
 			</p>
 		</div>
-		<div class="w-full rounded-md border p-2">
-			{@html encodeQR(offer?.invoice, 'svg')}
-		</div>
+		<a href="lightning:{offer.invoice}">
+			<div class="w-full rounded-md border p-2">
+				{@html encodeQR(offer?.invoice, 'svg')}
+			</div>
+		</a>
 		<CopiableToken token={offer?.invoice}></CopiableToken>
 	</div>
 {:else}

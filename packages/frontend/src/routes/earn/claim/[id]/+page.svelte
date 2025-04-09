@@ -6,7 +6,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import CopiableToken from '$lib/elements/CopiableToken.svelte';
 	import { ensureError } from '$lib/errors.js';
-	import { formatCurrency } from '$lib/helper';
+	import { formatCurrency, objectUrlToBase64 } from '$lib/helper';
 	import { keysStore } from '$lib/stores/persistent/keys.js';
 	import { dataStore } from '$lib/stores/session/data';
 	import { LoaderCircle, Trash, Upload } from 'lucide-svelte';
@@ -64,21 +64,6 @@
 		}
 		// upload the file to the server
 	};
-	function objectUrlToBase64(objectUrl, callback) {
-		const img = new Image();
-		img.onload = () => {
-			const canvas = document.createElement('canvas');
-			canvas.width = img.width;
-			canvas.height = img.height;
-
-			const ctx = canvas.getContext('2d');
-			ctx?.drawImage(img, 0, 0);
-
-			const base64String = canvas.toDataURL('image/png');
-			callback(base64String);
-		};
-		img.src = objectUrl;
-	}
 </script>
 
 <div>

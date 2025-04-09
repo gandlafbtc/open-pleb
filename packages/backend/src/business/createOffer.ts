@@ -84,7 +84,7 @@ export const createOffer = async (offerData: OfferData): Promise<Offer> => {
 	// This will return a Lightning invoice that the maker will pay
 	const res = await cashuMint.createMintQuote({
 		amount: totalAmount,
-		unit: "sats",
+		unit: "sat",
 	});
 
 	const insertOffer: InsertOffer = {

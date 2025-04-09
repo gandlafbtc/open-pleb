@@ -80,14 +80,18 @@
 					Full screen
 				</Button>
 				<img src={receipt.receiptImg} alt="" />
-				<div class="flex w-full flex-col items-center gap-2">
-					<Button disabled={isLoading} class="w-full" onclick={markPaymentSucceeded}>
-						If the payment was successful, click here!
-					</Button>
-					<Button disabled={isLoading} class="w-full" variant="link" onclick={markPaymentFailed}>
-						Someting went wrong with the payment
-					</Button>
-				</div>
+				{#if offer.status === OFFER_STATE.COMPLETED}
+					Offer completed! Thank you for using openPleb.
+				{:else}
+					<div class="flex w-full flex-col items-center gap-2">
+						<Button disabled={isLoading} class="w-full" onclick={markPaymentSucceeded}>
+							If the payment was successful, click here!
+						</Button>
+						<Button disabled={isLoading} class="w-full" variant="link" onclick={markPaymentFailed}>
+							Someting went wrong with the payment
+						</Button>
+					</div>
+				{/if}
 				{#if showFullScreen}
 					<div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80">
 						<!-- Close button -->
@@ -108,7 +112,7 @@
 				</p>
 				{#if offer.validForS && offer.paidAt && offer.validForS + offer.paidAt < Math.ceil(Date.now() / 1000)}
 					<div class="flex flex-col items-center gap-2">
-						<Button variant="link" onclick={markPaymentFailed}>
+						<Button disabled={isLoading} variant="link" onclick={markPaymentFailed}>
 							The payment has not completed yet...
 						</Button>
 					</div>

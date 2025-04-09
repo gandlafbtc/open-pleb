@@ -40,7 +40,7 @@ export const offers = (app: Elysia) =>
 					return await checkInvoicePaid(params.id);
 				} catch (error) {
 					const err = ensureError(error);
-					log.error("Error creating offer {error}", { error });
+					log.error("Error checking invoice offer {error}", { error });
 					return new Response(err.message, {
 						status: 500,
 					});
@@ -53,7 +53,7 @@ export const offers = (app: Elysia) =>
 						return await commitFeedback(params.id, { ...body });
 					} catch (error) {
 						const err = ensureError(error);
-						log.error("Error creating offer {error}", { error });
+						log.error("Error posting feedback {error}", { error });
 						return new Response(err.message, {
 							status: 500,
 						});
@@ -76,7 +76,7 @@ export const offers = (app: Elysia) =>
 						return await claimOffer(params.id, pubkey);
 					} catch (error) {
 						const err = ensureError(error);
-						log.error("Error creating offer {error}", { error });
+						log.error("Error posting claim {error}", { error });
 						return new Response(err.message, {
 							status: 500,
 						});
@@ -93,7 +93,7 @@ export const offers = (app: Elysia) =>
 					const receipt = await getReceipt(params.id);
 				} catch (error) {
 					const err = ensureError(error);
-					log.error("Error creating offer {error}", { error });
+					log.error("Error getting receipt {error}", { error });
 					return new Response(err.message, {
 						status: 500,
 					});
@@ -107,7 +107,7 @@ export const offers = (app: Elysia) =>
 						return await createReceipt(params.id, pubkey, receipt);
 					} catch (error) {
 						const err = ensureError(error);
-						log.error("Error creating offer {error}", { error });
+						log.error("Error posting receipt  {error}", { error });
 						return new Response(err.message, {
 							status: 500,
 						});

@@ -14,7 +14,6 @@ RUN bun build --compile --minify --sourcemap --target=bun-linux-x64 ./src/index.
 FROM base AS release
 
 ENV PORT=3003
-ENV DB_FILE_NAME=/app/data/local.db
 ENV LOG_FILE_NAME=/app/data/logs/app.log
 
 WORKDIR /app
