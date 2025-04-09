@@ -16,9 +16,9 @@ export const checkInvoiceState = async ( //check the invoice state
 		const offerResponse = await db
 			.update(offerTable)
 			.set({
-				status: OFFER_STATE.INVOICE_PAID, //update the offer status to invoice paid
-				validForS: 120, 				//valid for 2 minutes
-				paidAt: Math.floor(Date.now() / 1000), //set the paid at time to now
+				status: OFFER_STATE.INVOICE_PAID, 
+				validForS: 120, 				
+				paidAt: Math.floor(Date.now() / 1000), 
 			})
 			.where(eq(offerTable.id, offerId))
 			.returning();
