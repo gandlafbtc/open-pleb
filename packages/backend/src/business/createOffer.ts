@@ -90,7 +90,6 @@ export const createOffer = async (offerData: OfferData): Promise<Offer> => {
 		unit: "sats",
 	});
 	
-	// Prepare the data to be inserted into the offers table
 	const insertOffer: InsertOffer = {
 		createdAt: Math.ceil(Date.now() / 1000),
 		conversionRate,
