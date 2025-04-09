@@ -3,7 +3,7 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { log } from "../logger";
 
-if (!process.env.DATABASE_URL) { 
+if (!process.env.DATABASE_URL) {
 	log.error("DATABASE_URL environment variable is not set");
 	process.exit(1);
 }

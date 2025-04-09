@@ -51,21 +51,21 @@ export interface OfferData {
  */
 export const createOffer = async (offerData: OfferData): Promise<Offer> => {
 	const { amount, conversionRate, qrCode, pubkey } = offerData;
-	
+
 	const satsAmount = Math.ceil((100000000 / conversionRate) * amount);
-	
+
 	const platformFeePercentage = Math.ceil(
 		(satsAmount * Number.parseFloat(Bun.env.PUBLIC_PLATFORM_FEE_PERCENTAGE!)) /
 			100,
 	);
-	
+
 	const platformFeeFlatRate = Number.parseFloat(
 		Bun.env.PUBLIC_PLATFORM_FEE_FLAT_RATE!,
 	);
 	const takerFeeFlatRate = Number.parseFloat(
 		Bun.env.PUBLIC_TAKER_FEE_FLAT_RATE!,
 	);
-		
+
 	const takerFeePercentage = Math.ceil(
 		(satsAmount * Number.parseFloat(Bun.env.PUBLIC_TAKER_FEE_PERCENTAGE!)) /
 			100,
@@ -77,7 +77,7 @@ export const createOffer = async (offerData: OfferData): Promise<Offer> => {
 		takerFeePercentage +
 		platformFeeFlatRate +
 		takerFeeFlatRate;
-	
+
 	const cashuMint = new CashuMint(Bun.env.PUBLIC_MINT_URL!);
 
 	// Create a mint quote for the total amount
@@ -86,7 +86,7 @@ export const createOffer = async (offerData: OfferData): Promise<Offer> => {
 		amount: totalAmount,
 		unit: "sats",
 	});
-	
+
 	const insertOffer: InsertOffer = {
 		createdAt: Math.ceil(Date.now() / 1000),
 		conversionRate,
@@ -120,6 +120,6 @@ export const createOffer = async (offerData: OfferData): Promise<Offer> => {
 		command: "new-offer",
 		data: { offer: offerResponse[0] },
 	});
-	
+
 	return offerResponse[0];
 };
