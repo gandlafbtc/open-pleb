@@ -128,6 +128,5 @@ export const createOffer = async (offerData: OfferData): Promise<Offer> => {
 		data: { offer: offerResponse[0] },
 	});
 	
-	// Return the created offer
 	return offerResponse[0];
 };
