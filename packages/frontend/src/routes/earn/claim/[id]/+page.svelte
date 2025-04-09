@@ -64,7 +64,6 @@
 		}
 		// upload the file to the server
 	};
-
 </script>
 
 <div>

@@ -58,7 +58,7 @@
 			}
 			const data = await res.json();
 		} catch (error) {
-            const err = ensureError(error);
+			const err = ensureError(error);
 			console.error(err);
 			toast.error(err.message);
 		} finally {
@@ -81,30 +81,29 @@
 				</Button>
 				<img src={receipt.receiptImg} alt="" />
 				{#if offer.status === OFFER_STATE.COMPLETED}
-				  	Offer completed! Thank you for using openPleb.
+					Offer completed! Thank you for using openPleb.
 				{:else}
-				  
-				<div class="flex w-full flex-col items-center gap-2">
-					<Button disabled={isLoading}  class="w-full" onclick={markPaymentSucceeded}>
-						If the payment was successful, click here!
-					</Button>
-					<Button disabled={isLoading} class="w-full" variant="link" onclick={markPaymentFailed}>
-						Someting went wrong with the payment
-					</Button>
-				</div>
+					<div class="flex w-full flex-col items-center gap-2">
+						<Button disabled={isLoading} class="w-full" onclick={markPaymentSucceeded}>
+							If the payment was successful, click here!
+						</Button>
+						<Button disabled={isLoading} class="w-full" variant="link" onclick={markPaymentFailed}>
+							Someting went wrong with the payment
+						</Button>
+					</div>
 				{/if}
 				{#if showFullScreen}
-				<div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80">
-					<!-- Close button -->
-					<button
-					onclick={() => {
-						showFullScreen = false;
-					}}
+					<div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80">
+						<!-- Close button -->
+						<button
+							onclick={() => {
+								showFullScreen = false;
+							}}
 							class="absolute right-6 top-4 text-4xl text-white hover:text-gray-300">&times;</button
-							>
-							<img src={receipt.receiptImg} alt="" class="max-h-[100%] max-w-[100%] object-contain" />
-						</div>
-						{/if}
+						>
+						<img src={receipt.receiptImg} alt="" class="max-h-[100%] max-w-[100%] object-contain" />
+					</div>
+				{/if}
 			</div>
 		{:else}
 			<div class="flex flex-col items-center gap-2">
@@ -121,6 +120,5 @@
 				<LoaderCircle class="animate-spin"></LoaderCircle>
 			</div>
 		{/if}
-	{:else}
-	{/if}
+	{:else}{/if}
 </div>

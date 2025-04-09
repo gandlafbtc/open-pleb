@@ -7,13 +7,22 @@ COPY . .
 # build frontend
 WORKDIR /app/packages/frontend
 RUN bun install
+
+ENV PUBLIC_BACKEND_URL=http://localhost:3003
+ENV PUBLIC_PLATFORM_FEE_PERCENTAGE=1
+ENV PUBLIC_PLATFORM_FEE_FLAT_RATE=100
+ENV PUBLIC_TAKER_FEE_PERCENTAGE=1
+ENV PUBLIC_TAKER_FEE_FLAT_RATE=100
+ENV PUBLIC_MINT_URL=http://localhost:3338
+ENV PUBLIC_API_VERSION=v1
+
 RUN bun run build
 
 FROM base AS release
 WORKDIR /app
 COPY --from=install /app/packages/frontend/build /app
 
+
+
 EXPOSE 3000/tcp
 ENTRYPOINT ["bun","run","index.js"]
-
-

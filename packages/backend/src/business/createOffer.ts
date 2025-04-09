@@ -48,7 +48,7 @@ export const createOffer = async (offerData: OfferData): Promise<Offer> => {
 
 	const res = await cashuMint.createMintQuote({
 		amount: totalAmount,
-		unit: "sats",
+		unit: "sat",
 	});
 
 	const insertOffer: InsertOffer = {

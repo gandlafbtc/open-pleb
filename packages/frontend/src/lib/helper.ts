@@ -76,13 +76,13 @@ export const css = (element: HTMLElement, style: any) => {
 };
 
 export const getImgMeta = async (url: string): Promise<HTMLImageElement> => {
-    return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => resolve(img);
-        img.onerror = () => reject();
-        img.src = url;
-    });
-}
+	return new Promise((resolve, reject) => {
+		const img = new Image();
+		img.onload = () => resolve(img);
+		img.onerror = () => reject();
+		img.src = url;
+	});
+};
 
 export function objectUrlToBase64(objectUrl, callback) {
 	const img = new Image();

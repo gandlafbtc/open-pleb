@@ -1,6 +1,70 @@
 version: '3.8'
 
 services:
+  nutshell:
+    image: cashubtc/nutshell:0.16.4
+    container_name: nutshell
+    ports:
+      - "3338:3338"
+    environment:
+      MINT_LIGHTNING_BACKEND: FakeWallet
+      MINT_INPUT_FEE_PPK: 100
+      MINT_LISTEN_HOST: 0.0.0.0
+      MINT_LISTEN_PORT: 3338
+      MINT_PRIVATE_KEY: TEST_PRIVATE_KEY_OHH_YEAH_BABY
+    command: poetry run mint
+    networks:
+      - postgres-network
+    
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: openpleb-backend
+    restart: unless-stopped
+    environment:
+      PORT: 3003
+      DB_FILE_NAME: /app/data/local.db
+      LOG_FILE_NAME: /app/data/logs/app.log
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres
+      FRONTEND_URL: http://frontend:3000
+      PUBLIC_PLATFORM_FEE_PERCENTAGE: 1
+      PUBLIC_PLATFORM_FEE_FLAT_RATE: 100
+      PUBLIC_TAKER_FEE_PERCENTAGE: 1
+      PUBLIC_TAKER_FEE_FLAT_RATE: 100
+      PUBLIC_MINT_URL: http://nutshell:3338
+    ports:
+      - "3003:3003"
+    volumes:
+      - backend-data:/app/data
+    networks:
+      - postgres-network
+    depends_on:
+      - postgres
+      - nutshell
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: openpleb-frontend
+    restart: unless-stopped
+    environment:
+      PUBLIC_BACKEND_URL: http://backend:3003
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres
+      PUBLIC_PLATFORM_FEE_PERCENTAGE: 1
+      PUBLIC_PLATFORM_FEE_FLAT_RATE: 100
+      PUBLIC_TAKER_FEE_PERCENTAGE: 1
+      PUBLIC_TAKER_FEE_FLAT_RATE: 100
+      PUBLIC_MINT_URL: http://nutshell:3338
+      PUBLIC_API_VERSION: v1
+    ports:
+      - "3000:3000"
+    networks:
+      - postgres-network
+    depends_on:
+      - backend
+      
   postgres:
     image: postgres:15.3
     container_name: my-postgres-db
@@ -19,7 +83,7 @@ services:
     networks:
       - postgres-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U myuser -d mydatabase"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -52,6 +116,8 @@ volumes:
   postgres-data:
     driver: local
   pgadmin-data:
+    driver: local
+  backend-data:
     driver: local
 
 networks:
