@@ -5,7 +5,7 @@ import { OFFER_STATE } from "@openPleb/common/types";
 import { eq } from "drizzle-orm";
 import { eventEmitter } from "../events/emitter";
 
-export const checkInvoiceState = async ( //check the invoice state
+export const checkInvoiceState = async ( 
 	claim: MintQuote,
 	offerId: number,
 ): Promise<MintQuoteState> => {
