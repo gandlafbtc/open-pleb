@@ -58,6 +58,8 @@ The architecture contains 4 roles:
 
 ![flow](docs/flow.svg)
 
+
+
 ### Disputes
 
 Fiat banking usually doesn't offer open protocols that would allow us to make atomic swaps. Thus, we have to rely on participants to act in their best intrest, to preserve their bonds. Disputes are handled in the following way: 
@@ -79,3 +81,96 @@ Fiat banking usually doesn't offer open protocols that would allow us to make at
 1. navigate to `packages/common` and run `bun i && bun run db:push` to migrate the database schema
 2. navigate to `packages/backend` and run `bun i && bun run dev` to start the backend server
 3. navigate to `packages/frontend` and run `bun i  && bun run dev` to start the frontend development server
+
+
+## Environment Configuration
+
+OpenPleb requires several environment variables to be configured for proper operation. Below are instructions for configuring environment variables for both local development and Docker deployment.
+
+### Local Development (.env Files)
+
+For local development, you need to create `.env` files in each package directory by copying the corresponding `.env.example` files:
+
+```bash
+# For the backend
+cp packages/backend/.env.example packages/backend/.env
+
+# For the frontend
+cp packages/frontend/.env.example packages/frontend/.env
+
+# For common code
+cp packages/common/.env.example packages/common/.env
+```
+
+#### Backend Environment Variables
+
+The backend requires the following environment variables in `packages/backend/.env`:
+
+```
+DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/postgres
+FRONTEND_URL=localhost:5137
+PORT=3004
+LOG_FILE_NAME="../../data/logs/app.log"
+PUBLIC_PLATFORM_FEE_PERCENTAGE=1
+PUBLIC_PLATFORM_FEE_FLAT_RATE=100
+PUBLIC_TAKER_FEE_PERCENTAGE=1
+PUBLIC_TAKER_FEE_FLAT_RATE=100
+PUBLIC_MINT_URL=http://localhost:3003
+```
+
+#### Frontend Environment Variables
+
+The frontend requires the following environment variables in `packages/frontend/.env`:
+
+```
+PUBLIC_BACKEND_URL=http://localhost:3004
+DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/postgres
+PUBLIC_PLATFORM_FEE_PERCENTAGE=1
+PUBLIC_PLATFORM_FEE_FLAT_RATE=100
+PUBLIC_TAKER_FEE_PERCENTAGE=1
+PUBLIC_TAKER_FEE_FLAT_RATE=100
+PUBLIC_MINT_URL=http://localhost:3003
+PUBLIC_API_VERSION=v1
+```
+
+#### Common Environment Variables
+
+The common package requires the following environment variables in `packages/common/.env`:
+
+```
+DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/postgres
+```
+
+### Docker Deployment
+
+For Docker deployment, environment variables are configured in multiple places:
+
+#### 1. Docker Compose Configuration
+
+The `docker-compose.yml` file contains environment variables for each service. Here's a basic configuration:
+
+**Important notes for Docker Compose configuration:**
+- When working with Docker Compose, use service names as hostnames for internal service communication (e.g., `postgres`, `backend`, `frontend`, `nutshell`)
+- Ensure all services are on the same network
+
+#### 2. Dockerfile
+
+The `Dockerfile.frontend` file contains the environment variables for the frontend. 
+
+
+### Building and Running
+
+#### With Docker:
+
+```bash
+# Build and start all services
+docker compose up --build
+# OR just start all services without building again
+docker compose up
+
+# View logs
+docker compose logs -f
+
+# Stop all services
+docker compose down
+```
