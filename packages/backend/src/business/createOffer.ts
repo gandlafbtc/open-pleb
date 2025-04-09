@@ -113,8 +113,6 @@ export const createOffer = async (offerData: OfferData): Promise<Offer> => {
 		.values(insertOffer)
 		.returning();
 
-	// Store the mint quote details in the mintQuotes table
-	// This associates the quote with the offer for future reference
 	await db.insert(mintQuotesTable).values({
 		...res,
 		amount: totalAmount,
