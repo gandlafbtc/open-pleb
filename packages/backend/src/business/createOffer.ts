@@ -51,36 +51,33 @@ export interface OfferData {
  */
 export const createOffer = async (offerData: OfferData): Promise<Offer> => {
 	const { amount, conversionRate, qrCode, pubkey } = offerData;
-	// Convert the fiat amount to satoshis using the conversion rate
-	// 100000000 satoshis = 1 BTC
+	
 	const satsAmount = Math.ceil((100000000 / conversionRate) * amount);
-
-	// Calculate the platform fee based on percentage from environment variables
+	
 	const platformFeePercentage = Math.ceil(
 		(satsAmount * Number.parseFloat(Bun.env.PUBLIC_PLATFORM_FEE_PERCENTAGE!)) /
 			100,
 	);
-	// Get flat rate fees from environment variables
+	
 	const platformFeeFlatRate = Number.parseFloat(
 		Bun.env.PUBLIC_PLATFORM_FEE_FLAT_RATE!,
 	);
 	const takerFeeFlatRate = Number.parseFloat(
 		Bun.env.PUBLIC_TAKER_FEE_FLAT_RATE!,
 	);
-	// Calculate the taker fee based on percentage from environment variables		
+		
 	const takerFeePercentage = Math.ceil(
 		(satsAmount * Number.parseFloat(Bun.env.PUBLIC_TAKER_FEE_PERCENTAGE!)) /
 			100,
 	);
-	// Sum all fees and the original sats amount to get the total amount
-	// that will be requested from the maker
+
 	const totalAmount =
 		satsAmount +
 		platformFeePercentage +
 		takerFeePercentage +
 		platformFeeFlatRate +
 		takerFeeFlatRate;
-	// Initialize Cashu mint with URL from environment variables
+	
 	const cashuMint = new CashuMint(Bun.env.PUBLIC_MINT_URL!);
 
 	// Create a mint quote for the total amount
