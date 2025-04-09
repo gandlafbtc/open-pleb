@@ -50,7 +50,6 @@ export interface OfferData {
  * @returns Promise resolving to the created Offer object
  */
 export const createOffer = async (offerData: OfferData): Promise<Offer> => {
-	// Extract offer data parameters
 	const { amount, conversionRate, qrCode, pubkey } = offerData;
 	// Convert the fiat amount to satoshis using the conversion rate
 	// 100000000 satoshis = 1 BTC
