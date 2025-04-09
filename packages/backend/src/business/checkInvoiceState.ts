@@ -12,7 +12,7 @@ export const checkInvoiceState = async ( //check the invoice state
 	const mint = new CashuMint(Bun.env.PUBLIC_MINT_URL!);
 	const { state } = await mint.checkMintQuote(claim.quote);
 
-	if (state === MintQuoteState.PAID) { //if the invoice is paid, update the offer status
+	if (state === MintQuoteState.PAID) { 
 		const offerResponse = await db
 			.update(offerTable)
 			.set({
