@@ -8,5 +8,5 @@ if (!process.env.DATABASE_URL) {
 	process.exit(1);
 }
 
-const client = postgres(process.env.DATABASE_URL); // will use psql environment variables
-export const db = drizzle({ client, schema }); //
+const client = postgres(process.env.DATABASE_URL);
+export const db = drizzle({ client, schema });
