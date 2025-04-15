@@ -1,7 +1,7 @@
 import { get, writable } from 'svelte/store';
 import type { Claim, Offer, Receipt } from '@openPleb/common/db/schema';
 import { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL } from '$env/static/public';
-import { keysStore } from '../persistent/keys';
+import { keysStore } from 'cashu-wallet-engine';
 
 export interface Data {
 	offers: Offer[];

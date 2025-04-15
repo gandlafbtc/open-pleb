@@ -6,6 +6,7 @@ import type { OpenPlebDB } from './model';
 export const DB_VERSION = 3;
 export const DB_NAME = 'openpleb-db';
 
+// biome-ignore lint/complexity/noStaticOnlyClass: <explanation>
 export class DB {
 	private static _db: IDBPDatabase<OpenPlebDB> | undefined = undefined;
 
@@ -22,7 +23,7 @@ export class DB {
 		const db = await openDB<OpenPlebDB>(DB_NAME, DB_VERSION, {
 			upgrade: (db, oldVersion, newVersion, transaction, event) => {
 				if (!oldVersion) {
-					db.createObjectStore('encrypted-keys');
+					db.createObjectStore('encrypted-lnurl');
 				}
 			},
 			blocked: (currentVersion, blockedVersion, event) => {

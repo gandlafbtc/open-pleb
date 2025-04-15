@@ -1,5 +1,5 @@
 import { bytesToHex, randomBytes } from '@noble/hashes/utils';
 
-export let randDBKey = () => {
+export const randDBKey = () => {
 	return bytesToHex(randomBytes(8));
 };

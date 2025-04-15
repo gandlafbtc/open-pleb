@@ -8,10 +8,10 @@
 	import { toast } from 'svelte-sonner';
 	import { createNewOffer, type OfferResponse } from '../../actions';
 	import { goto } from '$app/navigation';
-	import { keysStore } from '$lib/stores/persistent/keys';
 	import Dropzone from 'svelte-file-dropzone';
 	import { decodeQR } from 'qr/decode.js';
 	import QrScanner from 'qr-scanner';
+	import { keysStore } from 'cashu-wallet-engine';
 
 	let isScanning = $state(true);
 	let scannedResult = $state('');

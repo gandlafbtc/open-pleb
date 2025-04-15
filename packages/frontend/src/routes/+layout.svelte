@@ -12,14 +12,23 @@
 	import { init } from '$lib/init';
 	import { browser } from '$app/environment';
 	import { LoaderCircle } from 'lucide-svelte';
+
+	import { init as initCashu, mintsStore } from "cashu-wallet-engine";
+	import { PUBLIC_MINT_URL } from '$env/static/public';
+	import TinyBondWallet from '$lib/elements/bond-wallet/TinyBondWallet.svelte';
+
 	const { children } = $props();
 
 	let isInit = $state(false);
 
 	onMount(() => {
 		if (browser) {
-			init().finally(() => {
+			initCashu().then(async () => {
+				await init()
+				await mintsStore.fetchMint(PUBLIC_MINT_URL)
 				isInit = true;
+			}).catch((error) => {
+				console.error('Error initializing Cashu:', error);
 			});
 		}
 		priceStore.refresh();
@@ -41,6 +50,9 @@
 			<header class="flex h-16 shrink-0 items-center justify-start gap-2 border-b px-4">
 				<Sidebar.Trigger class="-ml-1" />
 				<Separator orientation="vertical" class="mr-2 h-4" />
+				<div class="w-full flex items-end">
+					<TinyBondWallet></TinyBondWallet>
+				</div>
 			</header>
 			<ParaglideJS {i18n}>
 				<div class="flex h-full w-full flex-col items-center justify-center gap-2">

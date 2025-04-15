@@ -28,6 +28,7 @@
     "./db/types": "./src/db/types.ts",
     "./types": "./src/types.ts",
     "./errors": "./src/errors.ts",
-    "./conversion": "./src/conversion.ts"
+    "./conversion": "./src/conversion.ts",
+    "./lnurl": "./src/lnurl.ts"
   }
 }

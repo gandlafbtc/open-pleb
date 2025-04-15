@@ -1,8 +1,8 @@
 import { get } from 'svelte/store';
-import { keysStore } from './stores/persistent/keys';
 import { key } from './stores/session/key';
 import { dataStore } from './stores/session/data';
 import { reconnectWebSocket } from './stores/ws';
+import { lnurlStore } from './stores/persistent/lnurl';
 
 export const init = async () => {
 	await key.init();
@@ -16,9 +16,9 @@ const initData = async () => {
 };
 
 const initStores = async () => {
-	await keysStore.init();
+	await lnurlStore.init();
 };
 
 export const reencrypt = async () => {
-	await keysStore.reEncrypt();
+	await lnurlStore.reEncrypt();
 };

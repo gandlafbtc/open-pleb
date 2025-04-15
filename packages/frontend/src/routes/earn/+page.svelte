@@ -10,12 +10,11 @@
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { ensureError } from '$lib/errors.js';
 	import { formatCurrency } from '$lib/helper.js';
-	import { keysStore } from '$lib/stores/persistent/keys.js';
 	import { dataStore } from '$lib/stores/session/data';
-	import type { date } from 'drizzle-orm/mysql-core';
 	import { toast } from 'svelte-sonner';
 	import type { Offer } from '../../../../common/src/db/schema';
 	import { OFFER_STATE } from '@openPleb/common/types';
+	import { keysStore } from 'cashu-wallet-engine';
 
 	let isLoading = $state(false);
 	const id = Number.parseInt(page.params.id);

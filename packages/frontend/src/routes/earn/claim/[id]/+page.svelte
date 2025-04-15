@@ -7,8 +7,8 @@
 	import CopiableToken from '$lib/elements/CopiableToken.svelte';
 	import { ensureError } from '$lib/errors.js';
 	import { formatCurrency, objectUrlToBase64 } from '$lib/helper';
-	import { keysStore } from '$lib/stores/persistent/keys.js';
 	import { dataStore } from '$lib/stores/session/data';
+	import { keysStore } from 'cashu-wallet-engine';
 	import { LoaderCircle, Trash, Upload } from 'lucide-svelte';
 	import encodeQR from 'qr';
 	import Dropzone from 'svelte-file-dropzone';

@@ -29,6 +29,7 @@
 	import { priceStore } from '$lib/stores/price';
 	import { formatCurrency } from '$lib/helper';
 	import {
+	PUBLIC_BOND_PERCENTAGE,
 		PUBLIC_PLATFORM_FEE_FLAT_RATE,
 		PUBLIC_PLATFORM_FEE_PERCENTAGE,
 		PUBLIC_TAKER_FEE_FLAT_RATE,
@@ -80,6 +81,13 @@
 					{formatCurrency(Number.parseInt(PUBLIC_TAKER_FEE_FLAT_RATE), 'SAT')}
 				</Sidebar.MenuBadge>
 			</Sidebar.GroupLabel>
+			<Sidebar.GroupLabel
+			>Taker/Maker bond
+
+			<Sidebar.MenuBadge>
+				{PUBLIC_BOND_PERCENTAGE}%
+			</Sidebar.MenuBadge>
+		</Sidebar.GroupLabel>
 		</Sidebar.Group>
 		<!-- We create a Sidebar.Group for each parent. -->
 		{#each data.navMain as group (group.title)}

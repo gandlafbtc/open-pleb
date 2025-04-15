@@ -2,6 +2,6 @@
     "name": "@openPleb",
     "private": true,
     "workspaces": [
-      "packages/*"
+        "packages/*"
     ]
-  }
+}

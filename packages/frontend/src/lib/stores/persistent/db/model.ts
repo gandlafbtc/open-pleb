@@ -1,8 +1,8 @@
-import { type DBSchema } from 'idb';
+import type { DBSchema } from 'idb';
 import type { EncryptedStore } from './models/types';
 
 export interface OpenPlebDB extends DBSchema {
-	'encrypted-keys': {
+	'encrypted-lnurl': {
 		key: string;
 		value: EncryptedStore;
 	};

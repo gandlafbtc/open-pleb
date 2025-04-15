@@ -8,9 +8,9 @@
 	import { schnorr } from '@noble/curves/secp256k1';
 	import { toast } from 'svelte-sonner';
 	import { sha256 } from '@noble/hashes/sha256';
-	import { keysStore } from '$lib/stores/persistent/keys';
 	import { bytesToHex } from '@noble/hashes/utils';
 	import { ensureError } from '$lib/errors';
+	import { keysStore } from 'cashu-wallet-engine';
 	let showFullScreen = $state(false);
 	let isOpen = $state(false);
 	const id = Number.parseInt(page.params.id);

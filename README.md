@@ -10,8 +10,6 @@ This project is under construction, and we are working on it actively. It is not
 
 ### Progress
 
-_First prototype will be done without bonds_
-
 - [ ] `bond` creation (use cashu tokens as `bonds`, to ensure incentives for both parties are aligned)
     - [ ] Issue `bond` tokens
     - [ ] store and handle `bond` tokens locally
@@ -68,6 +66,7 @@ Fiat banking usually doesn't offer open protocols that would allow us to make at
 
 ## development setup
 
+
 ### requirements
 
 - bun.js
@@ -84,6 +83,9 @@ Fiat banking usually doesn't offer open protocols that would allow us to make at
 
 
 ## Environment Configuration
+
+**IMPORTANT**: WHEN RUNNING IN PRODUCTION, YOU NEED TO CONFIGURE THE ENVIRONMENT VARIABLES FOR YOUR OWN ENVIRONMENT! ESPACIALLY THE `DATABASE_URL` SHOULD BE CHANGED TO USE NON DEFAULT CREDENTIALS
+
 
 OpenPleb requires several environment variables to be configured for proper operation. Below are instructions for configuring environment variables for both local development and Docker deployment.
 
@@ -116,6 +118,8 @@ PUBLIC_PLATFORM_FEE_FLAT_RATE=100
 PUBLIC_TAKER_FEE_PERCENTAGE=1
 PUBLIC_TAKER_FEE_FLAT_RATE=100
 PUBLIC_MINT_URL=http://localhost:3003
+PUBLIC_BOND_PERCENTAGE=10
+
 ```
 
 #### Frontend Environment Variables
@@ -131,6 +135,8 @@ PUBLIC_TAKER_FEE_PERCENTAGE=1
 PUBLIC_TAKER_FEE_FLAT_RATE=100
 PUBLIC_MINT_URL=http://localhost:3003
 PUBLIC_API_VERSION=v1
+PUBLIC_BOND_PERCENTAGE=10
+
 ```
 
 #### Common Environment Variables

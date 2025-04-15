@@ -10,3 +10,6 @@ export type KeyPair = {
 	publicKey: string;
 	privateKey: string;
 };
+export type LNURL = {
+	address: string;
+};
