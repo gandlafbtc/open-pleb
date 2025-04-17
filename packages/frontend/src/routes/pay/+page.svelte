@@ -12,11 +12,15 @@
 	import { decodeQR } from 'qr/decode.js';
 	import QrScanner from 'qr-scanner';
 	import { keysStore } from 'cashu-wallet-engine';
+	import { priceStore } from '$lib/stores/price';
+	import { PUBLIC_BOND_PERCENTAGE, PUBLIC_PLATFORM_FEE_FLAT_RATE, PUBLIC_PLATFORM_FEE_PERCENTAGE, PUBLIC_TAKER_FEE_FLAT_RATE, PUBLIC_TAKER_FEE_PERCENTAGE } from '$env/static/public';
 
 	let isScanning = $state(true);
 	let scannedResult = $state('');
 	let manualInput = $state('');
 	let amount = $state(0);
+	let satsAmount = $derived(Math.ceil((100000000 / $priceStore) * amount))
+	let estimate = $derived(satsAmount + (Number.parseInt(PUBLIC_PLATFORM_FEE_FLAT_RATE)) + (Number.parseInt(PUBLIC_TAKER_FEE_FLAT_RATE)) + (satsAmount*0.01*Number.parseInt(PUBLIC_TAKER_FEE_PERCENTAGE)) + (satsAmount*0.01*Number.parseInt(PUBLIC_PLATFORM_FEE_PERCENTAGE)) + (satsAmount*0.01*Number.parseInt(PUBLIC_BOND_PERCENTAGE)))
 	let isLoading = $state(false);
 
 	let file = $state('');
@@ -105,6 +109,9 @@
 			<p class="text-xl font-bold">
 				{formatCurrency(amount, 'KRW')}
 			</p>
+			<p class="text-xl font-bold">
+				~ {formatCurrency(estimate, 'SAT')}
+			</p>
 			<p class="w-80 overflow-clip text-ellipsis text-muted-foreground lg:w-[600px]">
 				To {scannedResult}
 			</p>
@@ -118,7 +125,7 @@
 		>
 			<div class="flex w-full flex-col gap-2">
 				<Input type="number" placeholder="Amount" bind:value={amount} />
-				<FormButton type="submit" value="Pay">Confirm</FormButton>
+				<FormButton type="submit" value="Pay" disabled={!amount} >Confirm</FormButton>
 			</div>
 		</form>
 		<div></div>

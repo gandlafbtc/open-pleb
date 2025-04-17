@@ -83,6 +83,9 @@
 				<img src={receipt.receiptImg} alt="" />
 				{#if offer.status === OFFER_STATE.COMPLETED}
 					Offer completed! Thank you for using openPleb.
+				  
+				{:else if offer.status === OFFER_STATE.MARKED_WITH_ISSUE}
+					This offer has been flagged as unresolved. It will be reviewed by a moderator.
 				{:else}
 					<div class="flex w-full flex-col items-center gap-2">
 						<Button disabled={isLoading} class="w-full" onclick={markPaymentSucceeded}>
@@ -115,19 +118,22 @@
 					<div class="flex flex-col items-center gap-2">
 						<p>Offer expired.</p>
 						<div class="flex w-full flex-col items-center gap-10">
-							<Button disabled={isLoading} variant="outline" class="w-full" onclick={markPaymentSucceeded}>
+							<Button
+								disabled={isLoading}
+								variant="outline"
+								class="w-full"
+								onclick={markPaymentSucceeded}
+							>
 								If the payment was successful, click here!
 							</Button>
-							<Button disabled={isLoading} class="w-full"  onclick={markPaymentFailed}>
+							<Button disabled={isLoading} class="w-full" onclick={markPaymentFailed}>
 								Someting went wrong with the payment
 							</Button>
 						</div>
 					</div>
-					{:else}
+				{:else}
 					<LoaderCircle class="animate-spin"></LoaderCircle>
 				{/if}
-				  
-				  
 			</div>
 		{/if}
 	{:else}{/if}

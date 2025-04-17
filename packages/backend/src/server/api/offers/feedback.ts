@@ -29,6 +29,11 @@ export const commitFeedback = async (
 		return new Response("Offer not found", { status: 404 });
 	}
 	const offer = offers[0];
+
+	if ([OFFER_STATE.CANCELLED, OFFER_STATE.COMPLETED, OFFER_STATE.MARKED_UNRESPONSIVE, OFFER_STATE.MARKED_WITH_ISSUE].includes(offer.status)) {
+		return new Response(`Invalid offer state: ${offer.status}`, { status: 400 });
+	}
+
 	const message =
 		feedbackData.nonce +
 		feedbackData.feedback +
