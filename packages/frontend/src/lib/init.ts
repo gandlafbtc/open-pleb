@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 import { key } from './stores/session/key';
-import { dataStore } from './stores/session/data';
+import { dataStore } from './stores/session/data.svelte';
 import { reconnectWebSocket } from './stores/ws';
 import { lnurlStore } from './stores/persistent/lnurl';
 

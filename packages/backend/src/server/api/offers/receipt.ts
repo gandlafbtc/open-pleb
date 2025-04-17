@@ -55,6 +55,7 @@ export async function createReceipt(
 	eventEmitter.emit("socket-event", {
 		command: "new-receipt",
 		data: { receipt: result[0] },
+		pubkeys: [receipt.pubkey, offerResponse[0].pubkey],
 	});
 
 	return { receipt: result[0] };

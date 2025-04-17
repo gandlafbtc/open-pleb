@@ -4,10 +4,12 @@
 	import { page } from '$app/state';
 	import { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL } from '$env/static/public';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import Progress from '$lib/components/ui/progress/progress.svelte';
 	import CopiableToken from '$lib/elements/CopiableToken.svelte';
 	import { ensureError } from '$lib/errors.js';
 	import { formatCurrency, objectUrlToBase64 } from '$lib/helper';
-	import { dataStore } from '$lib/stores/session/data';
+	import { clock } from '$lib/stores/clock.svelte';
+	import { dataStore } from '$lib/stores/session/data.svelte';
 	import { keysStore } from 'cashu-wallet-engine';
 	import { LoaderCircle, Trash, Upload } from 'lucide-svelte';
 	import encodeQR from 'qr';
@@ -18,7 +20,9 @@
 	let file = $state('');
 
 	const id = Number.parseInt(page.params.id);
-	const offer = $derived($dataStore?.offers.find((o) => o.id === id));
+	const offer = $derived(dataStore.offers.find((o) => o.id === id));
+	const expiryPercentage = $derived((((offer?.validForS??0)+(offer?.createdAt??0)-$clock)/(offer?.validForS??0))*100)
+
 	const upload = async () => {
 		if (!file) {
 			toast.error('No file selected');
@@ -41,7 +45,7 @@
 								'Content-Type': 'application/json'
 							},
 							body: JSON.stringify({
-								pubkey: $keysStore[0]?.publicKey,
+								pubkey: $keysStore[0]?.publicKey.slice(2),
 								receipt: b64
 							})
 						}
@@ -68,6 +72,10 @@
 
 <div>
 	{#if offer}
+
+	<Progress value={expiryPercentage}>
+
+	</Progress>
 		<div class="flex w-80 flex-col gap-2">
 			{#if isPaid}
 				<p class="text-center text-xl font-bold">

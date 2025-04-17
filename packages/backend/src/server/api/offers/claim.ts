@@ -31,7 +31,7 @@ export const claimOffer = async (offerId: string, pubkey: string) => {
 	if (offer.status === OFFER_STATE.INVOICE_PAID) {
 		const offerResponse = await db
 			.update(offerTable)
-			.set({ status: "CLAIMED" })
+			.set({ status: "CLAIMED", validForS: 300 })
 			.where(eq(offerTable.id, id))
 			.returning();
 		const claim = await db
@@ -49,6 +49,7 @@ export const claimOffer = async (offerId: string, pubkey: string) => {
 		eventEmitter.emit("socket-event", {
 			command: "new-claim",
 			data: { claim: claim[0] },
+			pubkeys: [pubkey],
 		});
 		return { claim: claim[0] };
 	}

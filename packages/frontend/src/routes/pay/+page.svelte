@@ -24,7 +24,7 @@
 		try {
 			isLoading = true;
 			toast.promise(
-				createNewOffer({ amount: amount, qrCode: scannedResult, pubkey: $keysStore[0].publicKey }),
+				createNewOffer({ amount: amount, qrCode: scannedResult, pubkey: $keysStore[0].publicKey.slice(2)  }),
 				{
 					success: (data: OfferResponse) => {
 						console.log(data);

@@ -11,8 +11,8 @@ This project is under construction, and we are working on it actively. It is not
 ### Progress
 
 - [ ] `bond` creation (use cashu tokens as `bonds`, to ensure incentives for both parties are aligned)
-    - [ ] Issue `bond` tokens
-    - [ ] store and handle `bond` tokens locally
+    - [x] Issue `bond` tokens
+    - [x] store and handle `bond` tokens locally
 - [ ] `offer` creation
     - [x] `offer` creation UX (scan bank QR and enter amount)
     - [ ] `offer` validation (`bond`)
@@ -30,7 +30,7 @@ This project is under construction, and we are working on it actively. It is not
     - [x] receipt live updates
 - [ ] receipt aproval
     - [x] Approve receipt UX
-        - [x] Dispurse funds (cashu token)
+        - [x] Dispurse funds to local wallet (cashu token)
         - [ ] Dispurse funds (to ln adress)
     - [ ] Reject receipt UX
 - [ ] resolve conflicts

@@ -52,17 +52,23 @@ export const open = (app: Elysia) =>
 				});
 			}
 		})
-
 		.use(offers)
 		.ws("/ws", {
 			open: (ws) => {
+				const headers = ws.data.request.headers
+				const pubkey = JSON.parse(JSON.stringify(headers))['sec-websocket-protocol']
+				console.log(pubkey)
 				ws.subscribe("message");
 				sendPing(ws);
 				setInterval(async () => {
 					sendPing(ws);
 				}, 10000);
 				eventEmitter.on("socket-event", (e: SocketEventData) => {
-					log.debug("Sending socket event {e}", { e });
+					//if it's a pubkey event and it's not for this pubkey, ignore it
+					if (e.pubkeys?.length && !e.pubkeys.includes(pubkey)) {
+						return
+					}
+					log.debug("Sending socket event {e}", { e: e.command });
 					ws.send(e);
 				});
 			},

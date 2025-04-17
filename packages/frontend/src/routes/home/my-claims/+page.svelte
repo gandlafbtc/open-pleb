@@ -19,46 +19,11 @@
 		import { MediaQuery } from "svelte/reactivity";
 		import * as Pagination from "$lib/components/ui/pagination/index.js";
 	import type { Offer } from '@openPleb/common/db/schema';
-	import Progress from '$lib/components/ui/progress/progress.svelte';
-	import { clock } from '$lib/stores/clock.svelte';
+	import Badge from '$lib/components/ui/badge/badge.svelte';
 
-	let isLoading = $state(false);
 	const id = Number.parseInt(page.params.id);
-	const offers = $derived(dataStore.offers.filter((o) => o.status === OFFER_STATE.INVOICE_PAID));
-	const claimOffer = async (offer: Offer) => {
-		try {
-			isLoading = true;
-			const response = await fetch(
-				`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/offers/${offer.id}/claim`,
-				{
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					body: JSON.stringify({
-						pubkey: $keysStore[0]?.publicKey.slice(2)
-					})
-				}
-			);
-			if (!response.ok) {
-				throw new Error(await response.text());
-			}
-			const result = await response.json();
-			if (result.claim.pubkey !== $keysStore[0].publicKey.slice(2)) {
-				throw new Error('Offer is already claimed by another user.');
-			}
-			goto(`/earn/claim/${result.claim.offerId}`);
-			toast.success('Claimed offer successfully!');
-			isLoading = false;
-		} catch (error) {
-			const err = ensureError(error);
-			console.error(err);
-			toast.error(err.message);
-		} finally {
-			isLoading = false;
-		}
-	};
-
+	const offerIds = $derived(dataStore.claims.filter((c) => c.pubkey === $keysStore[0].publicKey.slice(2)).map(c=>c.offerId));
+	const offers = $derived([...dataStore.offers.filter(o=> offerIds.includes(o.id))]?.sort((a,b )=> b.createdAt - a.createdAt));
 		
 		const isDesktop = new MediaQuery("(min-width: 768px)");
 		
@@ -75,11 +40,10 @@
 </script>
 
 <p>
-	{offers?.length} offers available.
+	{offers?.length} offers.
 </p>
 {#if offers?.length}
 	{#each pageItems as offer}
-		{@const expiryPercentage = (((offer.validForS??0)+offer.createdAt-$clock)/(offer.validForS??0))*100}
 		<Card.Root class="w-80">
 			<Card.Header>
 				<Card.Title>Pay {formatCurrency(offer.amount, 'KRW')}</Card.Title>
@@ -100,15 +64,15 @@
 					)}
 				</p>
 			</Card.Content>
-			<Card.Footer class='gap-2 justify-between'>
-				<Button class="w-full" disabled={isLoading||expiryPercentage <= 0} onclick={() => claimOffer(offer)}
-					>Claim this offer</Button
-				>
-
-				<Progress value={expiryPercentage}>
-
-				</Progress>
+			<Card.Footer class="justify-between">
+				<Button href={`/earn/claim/${offer.id}`}> 
+					View
+				</Button>
+				<Badge>
+					{offer.status}
+				</Badge>
 			</Card.Footer>
+
 		</Card.Root>
 	{/each}
 	<Pagination.Root {count} {perPage} {siblingCount} bind:page={currentPage}>

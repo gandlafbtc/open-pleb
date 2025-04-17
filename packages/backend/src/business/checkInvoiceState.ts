@@ -11,13 +11,11 @@ export const checkInvoiceState = async (
 ): Promise<MintQuoteState> => {
 	const mint = new CashuMint(Bun.env.PUBLIC_MINT_URL!);
 	const { state } = await mint.checkMintQuote(claim.quote);
-
 	if (state === MintQuoteState.PAID) {
 		const offerResponse = await db
 			.update(offerTable)
 			.set({
 				status: OFFER_STATE.INVOICE_PAID,
-				validForS: 120,
 				paidAt: Math.floor(Date.now() / 1000),
 			})
 			.where(eq(offerTable.id, offerId))

@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import CopiableToken from '$lib/elements/CopiableToken.svelte';
-	import { dataStore } from '$lib/stores/session/data';
+	import { dataStore } from '$lib/stores/session/data.svelte';
 	import { Inspect, LoaderCircle, ReceiptSwissFranc } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	const id = Number.parseInt(page.params.id);
-	let receipt = $derived($dataStore?.receipts.find((r) => r.offerId === id));
+	let receipt = $derived(dataStore.receipts.find((r) => r.offerId === id));
 	onMount(() => {
 		if (!receipt) {
 			dataStore.fetchForId(page.params.id);

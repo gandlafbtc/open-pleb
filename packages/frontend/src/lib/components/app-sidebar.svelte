@@ -4,7 +4,7 @@
 		navMain: [
 			{
 				title: 'Apps',
-				url: '#',
+				url: '/',
 				items: [
 					{
 						title: 'Pay',
@@ -15,8 +15,22 @@
 						url: '/earn'
 					}
 				]
+			},
+			{
+				title: 'Home',
+				url: '/home',
+				items: [
+					{
+						title: 'My Offers',
+						url: '/home/my-offers'
+					},
+					{
+						title: 'My Claims',
+						url: '/home/my-claims'
+					}
+				]
 			}
-		]
+		],
 	};
 </script>
 

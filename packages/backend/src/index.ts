@@ -8,6 +8,7 @@ import { rateLimit } from "elysia-rate-limit";
 import { version } from "../package.json";
 import { log } from "./logger";
 import { open } from "./server/open";
+import { expireOffers } from "./jobs/expire";
 
 log.info`Starting OpenPleb version ${version}...`;
 
@@ -35,10 +36,12 @@ const app = new Elysia()
 	.use(
 		cron({
 			name: "jobs",
-			pattern: "*/1 * * * *",
+			// run every 5 seconds
+			pattern: '*/5 * * * * *', // every 5 seconds
+			// pattern: "*/1 * * * *",
 			// pattern: '*/10 * * * * *',
 			run() {
-				console.log("Running jobs...");
+				expireOffers()
 			},
 		}),
 	)

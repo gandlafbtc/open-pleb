@@ -89,6 +89,7 @@ export const createOffer = async (offerData: OfferData): Promise<Offer> => {
 
 	const insertOffer: InsertOffer = {
 		createdAt: Math.ceil(Date.now() / 1000),
+		validForS: 60,
 		conversionRate,
 		platformFeeFlatRate,
 		takerFeeFlatRate: Number.parseInt(Bun.env.PUBLIC_TAKER_FEE_FLAT_RATE!),

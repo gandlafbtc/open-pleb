@@ -32,6 +32,7 @@ export const offers = (app: Elysia) =>
 						qrCode: t.String(),
 						amount: t.Number({ minimum: 1 }),
 						pubkey: t.String(),
+						token: t.Optional(t.String()),
 					}),
 				},
 			)

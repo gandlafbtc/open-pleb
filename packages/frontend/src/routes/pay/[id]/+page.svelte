@@ -3,15 +3,15 @@
 	import { page } from '$app/state';
 	import { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL } from '$env/static/public';
 	import CopiableToken from '$lib/elements/CopiableToken.svelte';
-	import { dataStore } from '$lib/stores/session/data';
+	import { dataStore } from '$lib/stores/session/data.svelte';
 	import { LoaderCircle } from 'lucide-svelte';
 	import { decode } from 'light-bolt11-decoder';
 	import { encodeQR } from 'qr';
 	import { onMount } from 'svelte';
 	import { formatCurrency } from '$lib/helper';
 	const id = Number.parseInt(page.params.id);
-	const offer = $derived($dataStore?.offers.find((o) => o.id === id));
-
+	const offer = $derived(dataStore.offers.find((o) => o.id === id));
+	$inspect(offer);
 	onMount(() => {
 		const interval = setInterval(async () => {
 			if (!offer) {

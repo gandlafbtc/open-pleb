@@ -2,7 +2,7 @@
 	import { page } from '$app/state';
 	import { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL } from '$env/static/public';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import { dataStore } from '$lib/stores/session/data';
+	import { dataStore } from '$lib/stores/session/data.svelte';
 	import { OFFER_STATE } from '@openPleb/common/types';
 	import { LoaderCircle } from 'lucide-svelte';
 	import { schnorr } from '@noble/curves/secp256k1';
@@ -14,8 +14,9 @@
 	let showFullScreen = $state(false);
 	let isOpen = $state(false);
 	const id = Number.parseInt(page.params.id);
-	const receipt = $derived($dataStore?.receipts.find((r) => r.offerId === id));
-	const offer = $derived($dataStore?.offers.find((o) => o.id === id));
+	const receipt = $derived(dataStore.receipts.find((r) => r.offerId === id));
+	const offer = $derived(dataStore.offers.find((o) => o.id === id));
+	$inspect(receipt);
 
 	let isLoading = $state(false);
 
@@ -110,14 +111,23 @@
 				<p>
 					Waiting for receipt... {offer?.status}
 				</p>
-				{#if offer.validForS && offer.paidAt && offer.validForS + offer.paidAt < Math.ceil(Date.now() / 1000)}
+				{#if offer.status === OFFER_STATE.EXPIRED}
 					<div class="flex flex-col items-center gap-2">
-						<Button disabled={isLoading} variant="link" onclick={markPaymentFailed}>
-							The payment has not completed yet...
-						</Button>
+						<p>Offer expired.</p>
+						<div class="flex w-full flex-col items-center gap-10">
+							<Button disabled={isLoading} variant="outline" class="w-full" onclick={markPaymentSucceeded}>
+								If the payment was successful, click here!
+							</Button>
+							<Button disabled={isLoading} class="w-full"  onclick={markPaymentFailed}>
+								Someting went wrong with the payment
+							</Button>
+						</div>
 					</div>
+					{:else}
+					<LoaderCircle class="animate-spin"></LoaderCircle>
 				{/if}
-				<LoaderCircle class="animate-spin"></LoaderCircle>
+				  
+				  
 			</div>
 		{/if}
 	{:else}{/if}

@@ -51,7 +51,7 @@ export const commitFeedback = async (
 	}
 	const updatedOffer = await db
 		.update(offerTable)
-		.set({ feedback: feedbackData.feedback, status: feedbackData.status })
+		.set({ feedback: feedbackData.feedback, status: feedbackData.status }).where(eq(offerTable.id, id))
 		.returning();
 
 	if (!updatedOffer || updatedOffer.length === 0) {
@@ -122,16 +122,19 @@ export const commitFeedback = async (
 		const token = getEncodedToken({ mint: Bun.env.PUBLIC_MINT_URL!, proofs });
 		const updatedReceipts = await db
 			.update(receiptsTable)
-			.set({ reward: token })
+			.set({ reward: token }).where(eq(receiptsTable.offerId, id))
 			.returning();
 
 		if (updatedReceipts.length === 0) {
 			return new Response("Could not update receipt", { status: 400 });
 		}
 
+		const receipt =  updatedReceipts[0]
+
 		eventEmitter.emit("socket-event", {
 			command: "update-receipt",
-			data: { receipt: updatedReceipts[0] },
+			data: { receipt },
+			pubkeys: [receipt.pubkey, offer.pubkey]
 		});
 	}
 	return updatedOffer[0];
