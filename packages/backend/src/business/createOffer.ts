@@ -65,42 +65,35 @@ export const createOffer = async (offerData: OfferData): Promise<Offer> => {
 	const takerFeeFlatRate = Number.parseFloat(
 		Bun.env.PUBLIC_TAKER_FEE_FLAT_RATE!,
 	);
+	const bondFlatRate = Number.parseFloat(
+		Bun.env.PUBLIC_BOND_FLAT_RATE!,
+	);
 
 	const takerFeePercentage = Math.ceil(
 		(satsAmount * Number.parseFloat(Bun.env.PUBLIC_TAKER_FEE_PERCENTAGE!)) /
 			100,
 	);
-
-	const totalAmount =
-		satsAmount +
-		platformFeePercentage +
-		takerFeePercentage +
-		platformFeeFlatRate +
-		takerFeeFlatRate;
-
-	const cashuMint = new CashuMint(Bun.env.PUBLIC_MINT_URL!);
-
-	// Create a mint quote for the total amount
-	// This will return a Lightning invoice that the maker will pay
-	const res = await cashuMint.createMintQuote({
-		amount: totalAmount,
-		unit: "sat",
-	});
+	const bondPercentage = Math.ceil(
+		(satsAmount * Number.parseFloat(Bun.env.PUBLIC_BOND_PERCENTAGE!)) /
+			100,
+	);
+	
 
 	const insertOffer: InsertOffer = {
 		createdAt: Math.ceil(Date.now() / 1000),
-		validForS: 60,
+		validForS: 120,
 		conversionRate,
 		platformFeeFlatRate,
 		takerFeeFlatRate: Number.parseInt(Bun.env.PUBLIC_TAKER_FEE_FLAT_RATE!),
-		currency: "KRW",
+		currency: Bun.env.PUBLIC_CURRENCY!,
 		platformFeePercentage,
 		takerFeePercentage,
+		bondFlatRate,
+		bondPercentage,
 		satsAmount,
 		status: OFFER_STATE.CREATED,
 		amount,
 		qrCode,
-		invoice: res.request,
 		pubkey,
 	};
 
@@ -108,12 +101,6 @@ export const createOffer = async (offerData: OfferData): Promise<Offer> => {
 		.insert(offerTable)
 		.values(insertOffer)
 		.returning();
-
-	await db.insert(mintQuotesTable).values({
-		...res,
-		amount: totalAmount,
-		offerId: offerResponse[0].id,
-	});
 
 	// Emit a socket event to notify clients about the new offer
 	// This enables real-time updates in the UI

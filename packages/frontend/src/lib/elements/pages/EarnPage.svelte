@@ -4,7 +4,7 @@
 	import {
 		PUBLIC_API_VERSION,
 		PUBLIC_BACKEND_URL,
-		PUBLIC_TAKER_FEE_PERCENTAGE
+		PUBLIC_CURRENCY,
 	} from '$env/static/public';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card/index.js';
@@ -19,8 +19,8 @@
 		import { MediaQuery } from "svelte/reactivity";
 		import * as Pagination from "$lib/components/ui/pagination/index.js";
 	import type { Offer } from '@openPleb/common/db/schema';
-	import Progress from '$lib/components/ui/progress/progress.svelte';
 	import { clock } from '$lib/stores/clock.svelte';
+	import Expiry from '$lib/elements/Expiry.svelte';
 
 	let isLoading = $state(false);
 	const id = Number.parseInt(page.params.id);
@@ -82,7 +82,7 @@
 		{@const expiryPercentage = (((offer.validForS??0)+offer.createdAt-$clock)/(offer.validForS??0))*100}
 		<Card.Root class="w-80">
 			<Card.Header>
-				<Card.Title>Pay {formatCurrency(offer.amount, 'KRW')}</Card.Title>
+				<Card.Title>Pay {formatCurrency(offer.amount, PUBLIC_CURRENCY)}</Card.Title>
 				<Card.Description
 					>For {formatCurrency(
 						(offer.satsAmount ?? 0) +
@@ -104,10 +104,8 @@
 				<Button class="w-full" disabled={isLoading||expiryPercentage <= 0} onclick={() => claimOffer(offer)}
 					>Claim this offer</Button
 				>
+				<Expiry {offer}></Expiry>
 
-				<Progress value={expiryPercentage}>
-
-				</Progress>
 			</Card.Footer>
 		</Card.Root>
 	{/each}

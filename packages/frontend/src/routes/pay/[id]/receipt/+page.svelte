@@ -11,6 +11,7 @@
 	import { bytesToHex } from '@noble/hashes/utils';
 	import { ensureError } from '$lib/errors';
 	import { keysStore } from 'cashu-wallet-engine';
+	import Expiry from '$lib/elements/Expiry.svelte';
 	let showFullScreen = $state(false);
 	let isOpen = $state(false);
 	const id = Number.parseInt(page.params.id);
@@ -110,6 +111,7 @@
 				{/if}
 			</div>
 		{:else}
+			<Expiry {offer}></Expiry>
 			<div class="flex flex-col items-center gap-2">
 				<p>
 					Waiting for receipt... {offer?.status}

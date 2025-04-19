@@ -3,3 +3,9 @@ export type SocketEventData = {
 	data: unknown;
 	pubkeys?: string[];
 };
+
+export const InternalProofState = {
+	PENDING: "PENDING",
+	SPENT: "SPENT",
+	UNSPENT: "UNSPENT",
+};

@@ -117,7 +117,7 @@ export const commitFeedback = async (
 			mintQuotes[0].amount,
 			mintQuotes[0].quote,
 			{
-				pubkey: receipts[0].pubkey,
+				pubkey: `02${receipts[0].pubkey}`,
 				// outputAmounts: {
 				//     sendAmounts,
 				//     keepAmounts

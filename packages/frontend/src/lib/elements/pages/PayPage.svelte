@@ -4,23 +4,23 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import SimpleScanner from '$lib/elements/SimpleScanner.svelte';
 	import { ensureError } from '$lib/errors';
-	import { delay, formatCurrency, getImgMeta, objectUrlToBase64 } from '$lib/helper';
+	import { formatCurrency, getImgMeta } from '$lib/helper';
 	import { toast } from 'svelte-sonner';
-	import { createNewOffer, type OfferResponse } from '../../actions';
 	import { goto } from '$app/navigation';
 	import Dropzone from 'svelte-file-dropzone';
-	import { decodeQR } from 'qr/decode.js';
 	import QrScanner from 'qr-scanner';
 	import { keysStore } from 'cashu-wallet-engine';
 	import { priceStore } from '$lib/stores/price';
-	import { PUBLIC_BOND_PERCENTAGE, PUBLIC_PLATFORM_FEE_FLAT_RATE, PUBLIC_PLATFORM_FEE_PERCENTAGE, PUBLIC_TAKER_FEE_FLAT_RATE, PUBLIC_TAKER_FEE_PERCENTAGE } from '$env/static/public';
+	import { PUBLIC_BOND_FLAT_RATE, PUBLIC_BOND_PERCENTAGE, PUBLIC_CURRENCY, PUBLIC_PLATFORM_FEE_FLAT_RATE, PUBLIC_PLATFORM_FEE_PERCENTAGE, PUBLIC_TAKER_FEE_FLAT_RATE, PUBLIC_TAKER_FEE_PERCENTAGE } from '$env/static/public';
+	import { createNewOffer, type OfferResponse } from '$lib/actions';
 
 	let isScanning = $state(true);
 	let scannedResult = $state('');
 	let manualInput = $state('');
 	let amount = $state(0);
 	let satsAmount = $derived(Math.ceil((100000000 / $priceStore) * amount))
-	let estimate = $derived(satsAmount + (Number.parseInt(PUBLIC_PLATFORM_FEE_FLAT_RATE)) + (Number.parseInt(PUBLIC_TAKER_FEE_FLAT_RATE)) + (satsAmount*0.01*Number.parseInt(PUBLIC_TAKER_FEE_PERCENTAGE)) + (satsAmount*0.01*Number.parseInt(PUBLIC_PLATFORM_FEE_PERCENTAGE)) + (satsAmount*0.01*Number.parseInt(PUBLIC_BOND_PERCENTAGE)))
+	let estimate = $derived(satsAmount + (Number.parseInt(PUBLIC_PLATFORM_FEE_FLAT_RATE)) + (Number.parseInt(PUBLIC_TAKER_FEE_FLAT_RATE)) + (satsAmount*0.01*Number.parseInt(PUBLIC_TAKER_FEE_PERCENTAGE)) + (satsAmount*0.01*Number.parseInt(PUBLIC_PLATFORM_FEE_PERCENTAGE)))
+	let bondEstimate = $derived(satsAmount*0.01*Number.parseInt(PUBLIC_BOND_PERCENTAGE)+Number.parseInt(PUBLIC_BOND_FLAT_RATE))
 	let isLoading = $state(false);
 
 	let file = $state('');
@@ -107,10 +107,13 @@
 		<p class="font-bold">Step 2: Enter amount to pay</p>
 		<div class="flex flex-col items-center gap-2">
 			<p class="text-xl font-bold">
-				{formatCurrency(amount, 'KRW')}
+				{formatCurrency(amount, PUBLIC_CURRENCY)}
 			</p>
 			<p class="text-xl font-bold">
 				~ {formatCurrency(estimate, 'SAT')}
+			</p>
+			<p class="text text-muted-foreground font-bold">
+				+ ~ {formatCurrency(bondEstimate, 'SAT')} Bond
 			</p>
 			<p class="w-80 overflow-clip text-ellipsis text-muted-foreground lg:w-[600px]">
 				To {scannedResult}

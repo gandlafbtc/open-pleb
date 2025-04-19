@@ -32,7 +32,6 @@ const handleSocketCommand = (data: { command: string; data: any }) => {
 			dataStore.updateOffer(data?.data?.offer);
 			break;
 		case 'update-receipt':
-			console.log('Updating receipt');
 			dataStore.updateReceipt(data?.data?.receipt);
 			break;
 		default:

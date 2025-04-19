@@ -16,6 +16,9 @@
 	import { init as initCashu, mintsStore } from "cashu-wallet-engine";
 	import { PUBLIC_MINT_URL } from '$env/static/public';
 	import TinyBondWallet from '$lib/elements/bond-wallet/TinyBondWallet.svelte';
+	import PayEarnToggle from '$lib/elements/PayEarnToggle.svelte';
+	import { appMode } from '$lib/stores/local/mode';
+	import Button from '$lib/components/ui/button/button.svelte';
 
 	const { children } = $props();
 
@@ -44,14 +47,19 @@
 
 <Toaster richColors closeButton />
 {#if isInit}
+	{#if $appMode !== undefined}
+	  
 	<Sidebar.Provider>
 		<AppSidebar />
 		<Sidebar.Inset>
 			<header class="flex h-16 shrink-0 items-center justify-start gap-2 border-b px-4">
 				<Sidebar.Trigger class="-ml-1" />
 				<Separator orientation="vertical" class="mr-2 h-4" />
-				<div class="w-full flex items-end">
+				<div class="w-full flex items-end justify-between">
 					<TinyBondWallet></TinyBondWallet>
+					<div>
+						<PayEarnToggle></PayEarnToggle>
+					</div>
 				</div>
 			</header>
 			<ParaglideJS {i18n}>
@@ -61,6 +69,15 @@
 			</ParaglideJS>
 		</Sidebar.Inset>
 	</Sidebar.Provider>
+
+	{:else}
+	<div class="flex flex-col gap-2">
+		<p>Choose what you want to do</p>
+		<Button onclick={()=> appMode.set('pay')}>Pay</Button>
+		<Button onclick={()=> appMode.set('earn')}>Earn</Button>
+	</div>
+	
+	{/if}
 {:else}
 	<div class="flex h-screen w-screen items-center justify-center">
 		<LoaderCircle class="animate-spin"></LoaderCircle>

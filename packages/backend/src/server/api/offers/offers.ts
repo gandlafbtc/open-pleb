@@ -7,6 +7,7 @@ import { claimOffer } from "./claim";
 import { commitFeedback } from "./feedback";
 import { postOffer } from "./post";
 import { createReceipt, getReceipt } from "./receipt";
+import { createInvoice } from "./createInvoice";
 
 export const offers = (app: Elysia) =>
 	app.group("/offers", (app) =>
@@ -42,6 +43,17 @@ export const offers = (app: Elysia) =>
 				} catch (error) {
 					const err = ensureError(error);
 					log.error("Error checking invoice offer {error}", { error });
+					return new Response(err.message, {
+						status: 500,
+					});
+				}
+			})
+			.get("/:id/createinvoice", async ({ params }) => {
+				try {
+					return await createInvoice(params.id);
+				} catch (error) {
+					const err = ensureError(error);
+					log.error("Error creating invoice for offer {error}", { error });
 					return new Response(err.message, {
 						status: 500,
 					});

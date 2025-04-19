@@ -2,7 +2,7 @@
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL } from '$env/static/public';
+	import { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL, PUBLIC_CURRENCY } from '$env/static/public';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Progress from '$lib/components/ui/progress/progress.svelte';
 	import CopiableToken from '$lib/elements/CopiableToken.svelte';
@@ -129,7 +129,7 @@
 			{:else}
 				<p class="text-center text-xl font-bold">
 					Pay
-					{formatCurrency(offer.amount, 'KRW')}
+					{formatCurrency(offer.amount, PUBLIC_CURRENCY)}
 					to
 				</p>
 				<div class="w-full rounded-md border p-2">

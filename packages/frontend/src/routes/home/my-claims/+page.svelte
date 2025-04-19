@@ -4,6 +4,7 @@
 	import {
 		PUBLIC_API_VERSION,
 		PUBLIC_BACKEND_URL,
+		PUBLIC_CURRENCY,
 		PUBLIC_TAKER_FEE_PERCENTAGE
 	} from '$env/static/public';
 	import Button from '$lib/components/ui/button/button.svelte';
@@ -46,7 +47,7 @@
 	{#each pageItems as offer}
 		<Card.Root class="w-80">
 			<Card.Header>
-				<Card.Title>Pay {formatCurrency(offer.amount, 'KRW')}</Card.Title>
+				<Card.Title>Pay {formatCurrency(offer.amount, PUBLIC_CURRENCY)}</Card.Title>
 				<Card.Description
 					>For {formatCurrency(
 						(offer.satsAmount ?? 0) +

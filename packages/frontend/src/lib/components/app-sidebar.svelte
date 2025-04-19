@@ -1,25 +1,15 @@
 <script lang="ts" module>
 	const data = {
-		versions: ['1.0.0'],
 		navMain: [
+
 			{
-				title: 'Apps',
+				title: '',
 				url: '/',
 				items: [
 					{
-						title: 'Pay',
-						url: '/pay'
+						title: 'Home',
+						url: '/'
 					},
-					{
-						title: 'Earn',
-						url: '/earn'
-					}
-				]
-			},
-			{
-				title: 'Home',
-				url: '/home',
-				items: [
 					{
 						title: 'My Offers',
 						url: '/home/my-offers'
@@ -43,7 +33,9 @@
 	import { priceStore } from '$lib/stores/price';
 	import { formatCurrency } from '$lib/helper';
 	import {
+	PUBLIC_BOND_FLAT_RATE,
 	PUBLIC_BOND_PERCENTAGE,
+		PUBLIC_CURRENCY,
 		PUBLIC_PLATFORM_FEE_FLAT_RATE,
 		PUBLIC_PLATFORM_FEE_PERCENTAGE,
 		PUBLIC_TAKER_FEE_FLAT_RATE,
@@ -55,7 +47,7 @@
 
 <Sidebar.Root {...restProps} bind:ref>
 	<Sidebar.Header>
-		<VersionSwitcher versions={data.versions} defaultVersion={data.versions[0]} />
+		<VersionSwitcher />
 	</Sidebar.Header>
 	<Sidebar.Content>
 		<Sidebar.Group>
@@ -64,7 +56,7 @@
 
 				<Sidebar.MenuBadge>
 					1 BTC =
-					{formatCurrency($priceStore, 'KRW')}
+					{formatCurrency($priceStore, PUBLIC_CURRENCY)}
 				</Sidebar.MenuBadge>
 			</Sidebar.GroupLabel>
 			<Sidebar.GroupLabel
@@ -96,12 +88,18 @@
 				</Sidebar.MenuBadge>
 			</Sidebar.GroupLabel>
 			<Sidebar.GroupLabel
-			>Taker/Maker bond
+			>Taker/Maker bond percentage
 
 			<Sidebar.MenuBadge>
 				{PUBLIC_BOND_PERCENTAGE}%
 			</Sidebar.MenuBadge>
 		</Sidebar.GroupLabel>
+		<Sidebar.GroupLabel
+		>Taker/Maker bond flat
+		<Sidebar.MenuBadge>
+			{formatCurrency(Number.parseInt(PUBLIC_BOND_FLAT_RATE), 'SAT')}
+		</Sidebar.MenuBadge>
+	</Sidebar.GroupLabel>
 		</Sidebar.Group>
 		<!-- We create a Sidebar.Group for each parent. -->
 		{#each data.navMain as group (group.title)}

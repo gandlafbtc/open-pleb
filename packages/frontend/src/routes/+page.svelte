@@ -1,9 +1,13 @@
 <script>
 	import Button from '$lib/components/ui/button/button.svelte';
+	import EarnPage from '$lib/elements/pages/EarnPage.svelte';
+	import PayPage from '$lib/elements/pages/PayPage.svelte';
+	import { appMode } from '$lib/stores/local/mode';
 </script>
 
-<div class="flex flex-col gap-2">
-	<p>Choose what you want to do</p>
-	<Button href="/pay">Pay</Button>
-	<Button href="/earn">Earn</Button>
-</div>
+{#if $appMode === 'pay'}
+	<PayPage></PayPage>
+{:else if $appMode === "earn"}
+	<EarnPage></EarnPage>
+  
+{/if}
