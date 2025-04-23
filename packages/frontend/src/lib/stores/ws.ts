@@ -3,22 +3,17 @@ import { dataStore } from './session/data.svelte';
 import { browser } from '$app/environment';
 import { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL } from '$env/static/public';
 import { keysStore } from 'cashu-wallet-engine';
+import { appMode } from './local/mode';
 export let socket: undefined | WebSocket;
 
-const createPingStore = () => {
-	const store = writable<{ ping: string }>();
 
-	return { ...store };
-};
-
-export const pingStore = createPingStore();
 const handleSocketCommand = (data: { command: string; data: any }) => {
-	if (!data.command || data.command === 'ping') {
-		const pingData = data.data as { ping: string };
-		pingStore.set(pingData);
-		return;
-	}
+
 	switch (data.command) {
+		case 'ping': {
+			dataStore.updateConnections(data?.data)
+			break
+		}
 		case 'new-offer':
 			dataStore.newOffer(data?.data?.offer);
 			break;
@@ -61,13 +56,16 @@ export const reconnectWebSocket = () => {
 		reconnectWebSocket();
 	}, 5000);
 	if (socket === undefined || socket.readyState === WebSocket.CLOSED) {
-		socket = new WebSocket(`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/ws`, get(keysStore)[0]?.publicKey.slice(2));
+		socket = new WebSocket(`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/ws`, get(keysStore)[0]?.publicKey);
 		socket.onopen = () => {
 			if (wsInterval) {
 				clearInterval(wsInterval);
 			}
 			wsInterval = setInterval(() => {
-				socket?.send(JSON.stringify({ command: 'pong', data: {} })); // send some text to server
+				socket?.send(JSON.stringify({ command: 'pong', data: {
+					pubkey: get(keysStore)[0]?.publicKey,
+					mode: get(appMode)
+				} }));
 			}, 5000);
 		};
 		socket.onmessage = (message) => {

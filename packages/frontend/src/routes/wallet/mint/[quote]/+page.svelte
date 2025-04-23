@@ -4,7 +4,7 @@
 	import CopiableToken from "$lib/elements/CopiableToken.svelte";
 	import { formatCurrency } from "$lib/helper";
 	import { MintQuoteState } from "@cashu/cashu-ts";
-	import { mintQuotesStore } from "cashu-wallet-engine";
+	import { mintQuotesStore } from "@gandlaf21/cashu-wallet-engine";
 	import { CheckCircle, LoaderCircle } from "lucide-svelte";
 	import encodeQR from "qr";
 

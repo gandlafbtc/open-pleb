@@ -5,6 +5,7 @@
 		PUBLIC_API_VERSION,
 		PUBLIC_BACKEND_URL,
 		PUBLIC_CURRENCY,
+		PUBLIC_MINT_URL,
 	} from '$env/static/public';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card/index.js';
@@ -13,7 +14,7 @@
 	import { dataStore } from '$lib/stores/session/data.svelte';
 	import { toast } from 'svelte-sonner';
 	import { OFFER_STATE } from '@openPleb/common/types';
-	import { keysStore } from 'cashu-wallet-engine';
+	import { keysStore, proofsStore, sendEcash } from 'cashu-wallet-engine';
 	import ChevronLeft from "@lucide/svelte/icons/chevron-left";
 		import ChevronRight from "@lucide/svelte/icons/chevron-right";
 		import { MediaQuery } from "svelte/reactivity";
@@ -21,12 +22,22 @@
 	import type { Offer } from '@openPleb/common/db/schema';
 	import { clock } from '$lib/stores/clock.svelte';
 	import Expiry from '$lib/elements/Expiry.svelte';
+	import { getEncodedToken } from "@cashu/cashu-ts";
 
 	let isLoading = $state(false);
 	const id = Number.parseInt(page.params.id);
 	const offers = $derived(dataStore.offers.filter((o) => o.status === OFFER_STATE.INVOICE_PAID));
 	const claimOffer = async (offer: Offer) => {
 		try {
+			const proofsAmount= $proofsStore.reduce((acc, proof) => acc + proof.amount, 0);
+			const bondAmount= offer.bondFlatRate+offer.bondPercentage
+			if (proofsAmount< bondAmount) {
+				toast.warning("Token balance too low to claim this offer.");
+				return
+			}
+
+			const bond = await sendEcash(PUBLIC_MINT_URL, bondAmount)
+
 			isLoading = true;
 			const response = await fetch(
 				`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/offers/${offer.id}/claim`,
@@ -36,7 +47,8 @@
 						'Content-Type': 'application/json'
 					},
 					body: JSON.stringify({
-						pubkey: $keysStore[0]?.publicKey.slice(2)
+						pubkey: $keysStore[0]?.publicKey,
+						bond: getEncodedToken({ mint: PUBLIC_MINT_URL, proofs: bond.send}) 
 					})
 				}
 			);
@@ -44,7 +56,7 @@
 				throw new Error(await response.text());
 			}
 			const result = await response.json();
-			if (result.claim.pubkey !== $keysStore[0].publicKey.slice(2)) {
+			if (result.claim.pubkey !== $keysStore[0].publicKey) {
 				throw new Error('Offer is already claimed by another user.');
 			}
 			goto(`/earn/claim/${result.claim.offerId}`);

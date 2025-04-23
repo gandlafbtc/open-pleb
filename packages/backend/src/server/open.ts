@@ -8,6 +8,7 @@ import { log } from "../logger";
 import type { SocketEventData } from "../types";
 import { getData, getDataForId } from "./api/data";
 import { offers } from "./api/offers/offers";
+import { takerMakerData } from "../dynamic/takersMakers";
 
 export const open = (app: Elysia) =>
 	app
@@ -57,7 +58,6 @@ export const open = (app: Elysia) =>
 			open: (ws) => {
 				const headers = ws.data.request.headers
 				const pubkey = JSON.parse(JSON.stringify(headers))['sec-websocket-protocol']
-				console.log(pubkey)
 				ws.subscribe("message");
 				sendPing(ws);
 				setInterval(async () => {
@@ -86,7 +86,8 @@ export const open = (app: Elysia) =>
 const sendPing = async (ws: ElysiaWS) => {
 	try {
 		const pingData: PingData = {
-			ping: "ping",
+			takers: takerMakerData.takers.length,
+			makers: takerMakerData.makers.length,
 		};
 		ws.send({ command: "ping", data: pingData });
 		// log.debug(`sent websocket ping {pingData}`, {pingData} )
@@ -102,12 +103,39 @@ const sendPing = async (ws: ElysiaWS) => {
 		});
 	}
 };
+
+const handlePong = (data: { pubkey: string; mode: string }) => {
+	const newEntry = {
+		pubkey: data.pubkey,
+		ts: Date.now(),
+	}
+	if (data.mode === "pay") {
+		const i = takerMakerData.makers.findIndex((maker) => maker.pubkey === data.pubkey);
+		if (i !== -1) {
+			takerMakerData.makers.splice(i, 1, newEntry);
+		}
+		else {
+			takerMakerData.makers.push(newEntry);
+		}
+	}
+	else if (data.mode === "earn") {
+		const i = takerMakerData.takers.findIndex((taker) => taker.pubkey === data.pubkey);
+		if (i !== -1) {
+			takerMakerData.takers.splice(i, 1, newEntry);
+		}
+		else {
+			takerMakerData.takers.push(newEntry);
+		}
+	}
+}
+
 const handleCommand = async (message: { command: string; data: unknown }) => {
 	switch (message.command) {
 		case "command": {
 			break;
 		}
 		case "pong":
+			handlePong(message.data as {pubkey: string, mode: string});
 			break;
 		default:
 			log.warn("Unknown websocket command {message}", { message });

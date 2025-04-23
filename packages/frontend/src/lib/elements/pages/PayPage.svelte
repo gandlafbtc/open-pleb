@@ -28,10 +28,9 @@
 		try {
 			isLoading = true;
 			toast.promise(
-				createNewOffer({ amount: amount, qrCode: scannedResult, pubkey: $keysStore[0].publicKey.slice(2)  }),
+				createNewOffer({ amount: amount, qrCode: scannedResult, pubkey: $keysStore[0].publicKey  }),
 				{
 					success: (data: OfferResponse) => {
-						console.log(data);
 						goto(`/pay/${data.id}`);
 						return 'Offer created successfully';
 					},
@@ -51,8 +50,7 @@
 
 <div class="flex h-[600px] w-80 flex-col items-center justify-between gap-2 xl:w-[600px]">
 	{#if !scannedResult && isScanning === true}
-		<p class="font-bold">Step 1: Scan Qr Code to Pay</p>
-		<SimpleScanner bind:isScanning whatToScan="zero pay" {scannedResult}></SimpleScanner>
+		<SimpleScanner bind:isScanning whatToScan="FIAT" {scannedResult}></SimpleScanner>
 		<div class="relative flex w-full items-center py-5">
 			<div class="flex-grow border-t border-muted"></div>
 			<span class="mx-4 flex-shrink text-muted-foreground">OR</span>
@@ -90,7 +88,6 @@
 						try {
 							// Decode QR from the file
 							const result = await QrScanner.scanImage(blob, {});
-							console.log(result);
 							scannedResult = result;
 							isScanning = false;
 						} catch (error) {
@@ -99,12 +96,12 @@
 						}
 					}}
 				>
-					Use Image
+					Use Image from storage
 				</Dropzone>
 			</div>
 		</div>
 	{:else if scannedResult}
-		<p class="font-bold">Step 2: Enter amount to pay</p>
+		<p class="font-bold">Enter amount to pay</p>
 		<div class="flex flex-col items-center gap-2">
 			<p class="text-xl font-bold">
 				{formatCurrency(amount, PUBLIC_CURRENCY)}
@@ -128,7 +125,7 @@
 		>
 			<div class="flex w-full flex-col gap-2">
 				<Input type="number" placeholder="Amount" bind:value={amount} />
-				<FormButton type="submit" value="Pay" disabled={!amount} >Confirm</FormButton>
+				<FormButton type="submit" value="Pay" disabled={!amount} >Create offer ({formatCurrency(estimate+bondEstimate, 'SAT')})</FormButton>
 			</div>
 		</form>
 		<div></div>

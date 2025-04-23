@@ -5,7 +5,7 @@
     import Input from "$lib/components/ui/input/input.svelte";
 	import { ensureError } from "$lib/errors";
 	import { formatCurrency } from "$lib/helper";
-	import { createMintQuote, mintQuotesStore, mintsStore } from "cashu-wallet-engine";
+	import { createMintQuote, mintQuotesStore, mintsStore } from "@gandlaf21/cashu-wallet-engine";
 	import { Banknote, LoaderCircle } from "lucide-svelte";
 	import { toast } from "svelte-sonner";
     let amount = $state(0)

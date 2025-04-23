@@ -23,7 +23,7 @@
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 
 	const id = Number.parseInt(page.params.id);
-	const offerIds = $derived(dataStore.claims.filter((c) => c.pubkey === $keysStore[0].publicKey.slice(2)).map(c=>c.offerId));
+	const offerIds = $derived(dataStore.claims.filter((c) => c.pubkey === $keysStore[0].publicKey).map(c=>c.offerId));
 	const offers = $derived([...dataStore.offers.filter(o=> offerIds.includes(o.id))]?.sort((a,b )=> b.createdAt - a.createdAt));
 		
 		const isDesktop = new MediaQuery("(min-width: 768px)");

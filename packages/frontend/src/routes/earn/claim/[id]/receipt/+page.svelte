@@ -24,7 +24,7 @@
 	const claim = async () => {
 		try {
 			isLoading = true;
-			const received = await receiveEcash(receipt?.reward??'', {privkey: $keysStore[0].privateKey})
+			await receiveEcash(receipt?.reward??'', {privkey: $keysStore[0].privateKey})
 			toast.success("received!")
 		} catch (error) {
 			const err = ensureError(error);

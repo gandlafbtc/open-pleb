@@ -45,7 +45,7 @@
 								'Content-Type': 'application/json'
 							},
 							body: JSON.stringify({
-								pubkey: $keysStore[0]?.publicKey.slice(2),
+								pubkey: $keysStore[0]?.publicKey,
 								receipt: b64
 							})
 						}
@@ -54,7 +54,6 @@
 						throw new Error(await response.text());
 					}
 					const result = await response.json();
-					console.log(result);
 					toast.success('Receipt uploaded successfully!');
 					goto(`/earn/claim/${result.receipt.offerId}/receipt`);
 				} catch (error) {

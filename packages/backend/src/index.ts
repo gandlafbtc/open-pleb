@@ -9,6 +9,7 @@ import { version } from "../package.json";
 import { log } from "./logger";
 import { open } from "./server/open";
 import { expireOffers } from "./jobs/expire";
+import { updateConnected } from "./jobs/updateConnected";
 
 log.info`Starting OpenPleb version ${version}...`;
 
@@ -35,13 +36,21 @@ const app = new Elysia()
 	)
 	.use(
 		cron({
-			name: "jobs",
+			name: "expire-offers",
 			// run every 5 seconds
-			pattern: '*/5 * * * * *', // every 5 seconds
-			// pattern: "*/1 * * * *",
-			// pattern: '*/10 * * * * *',
+			pattern: '*/5 * * * * *',
 			run() {
 				expireOffers()
+			},
+		}),
+	)
+	.use(
+		cron({
+			name: "update-connections",
+			// run every 10 seconds
+			pattern: '*/10 * * * * *', 
+			run() {
+				updateConnected()
 			},
 		}),
 	)

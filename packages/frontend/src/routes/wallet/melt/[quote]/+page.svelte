@@ -4,7 +4,7 @@
 	import CopiableToken from "$lib/elements/CopiableToken.svelte";
 	import { ensureError } from "$lib/errors";
 	import { formatCurrency } from "$lib/helper";
-	import { checkMeltQuote, meltProofs, meltQuotesStore } from "cashu-wallet-engine";
+	import { checkMeltQuote, meltProofs, meltQuotesStore } from "@gandlaf21/cashu-wallet-engine";
 	import { toast } from "svelte-sonner";
     import { MeltQuoteState } from "@cashu/cashu-ts";
 	import { EXPIRED } from "../../../../../../../../cashu/cashu-wallet-engine/dist/db/models/types";

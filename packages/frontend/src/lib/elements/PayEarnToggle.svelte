@@ -2,7 +2,7 @@
 
 	import * as Tabs from "$lib/components/ui/tabs";
 	import { appMode } from "$lib/stores/local/mode";
-	import { settingsStore } from "cashu-wallet-engine";
+	import { settingsStore } from "@gandlaf21/cashu-wallet-engine";
 	import { Check, EyeClosed } from "lucide-svelte";
 
     let value = $derived($appMode);

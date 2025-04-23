@@ -1,22 +1,27 @@
 import { get, writable } from "svelte/store";
 import type { Claim, Offer, Receipt } from "@openPleb/common/db/schema";
 import { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL } from "$env/static/public";
-import { keysStore } from "cashu-wallet-engine";
+import { keysStore } from "@gandlaf21/cashu-wallet-engine";
 
 export interface Data {
 	offers: Offer[];
 	claims: Claim[];
 	receipts: Receipt[];
+	takers: number,
+	makers: number
 }
 
 export const createDataStore = () => {
 	let offers: Offer[] = $state([])
 	let claims: Claim[]  = $state([])
 	let receipts: Receipt[]  = $state([])
+	let takers: number  = $state(0)
+	let makers: number  = $state(0)
+
 	const init = async () => {
 		const response = await fetch(
 			`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/data/${
-				get(keysStore)[0]?.publicKey.slice(2)
+				get(keysStore)[0]?.publicKey
 			}`,
 		);
 		const data: Data = await response.json();
@@ -66,7 +71,6 @@ export const createDataStore = () => {
 		const index = receipts.findIndex((r) => r.id === receipt.id);
 		if (index !== -1) {
 			receipts[index] = receipt;
-			console.log('Updating receipt', receipt);
 
 		} else {
 			receipts.push(receipt);
@@ -82,11 +86,17 @@ export const createDataStore = () => {
 		}
 	};
 
+	const updateConnections = (data: {takers: number, makers:number}) => {
+		makers = data.makers;
+		takers = data.takers;
+	}	
 
 	return {
-		offers,
-		receipts,
-		claims,
+		get offers() {return offers},
+		get receipts() {return receipts},
+		get claims() {return claims},
+		get takers() {return takers},
+		get makers() {return makers},
 		init,
 		newOffer,
 		updateOffer,
@@ -94,6 +104,7 @@ export const createDataStore = () => {
 		newClaim,
 		fetchForId,
 		updateReceipt,
+		updateConnections
 	};
 };
 

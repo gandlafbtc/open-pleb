@@ -41,6 +41,7 @@
 		PUBLIC_TAKER_FEE_FLAT_RATE,
 		PUBLIC_TAKER_FEE_PERCENTAGE
 	} from '$env/static/public';
+	import { dataStore } from '$lib/stores/session/data.svelte';
 
 	let { ref = $bindable(null), ...restProps }: ComponentProps<typeof Sidebar.Root> = $props();
 </script>
@@ -52,13 +53,44 @@
 	<Sidebar.Content>
 		<Sidebar.Group>
 			<Sidebar.GroupLabel
-				>Conversion
-
+				>Takers
 				<Sidebar.MenuBadge>
-					1 BTC =
-					{formatCurrency($priceStore, PUBLIC_CURRENCY)}
+					<div class='flex gap-2 items-center'>
+	
+						<div class="rounded-full {dataStore.takers?"bg-green-500":"bg-red-500"} w-1 h-1">
+							
+						</div>
+						<p>
+	
+							{dataStore.takers}
+						</p>
+					</div>
 				</Sidebar.MenuBadge>
 			</Sidebar.GroupLabel>
+			<Sidebar.GroupLabel
+			>Makers
+
+			<Sidebar.MenuBadge>
+				<div class='flex gap-2 items-center'>
+
+					<div class="rounded-full {dataStore.makers?"bg-green-500":"bg-red-500"} w-1 h-1">
+						
+					</div>
+					<p>
+
+						{dataStore.makers}
+					</p>
+				</div>
+			</Sidebar.MenuBadge>
+		</Sidebar.GroupLabel>
+		<Sidebar.GroupLabel
+		>Conversion
+
+		<Sidebar.MenuBadge>
+			1 BTC =
+			{formatCurrency($priceStore, PUBLIC_CURRENCY)}
+		</Sidebar.MenuBadge>
+	</Sidebar.GroupLabel>
 			<Sidebar.GroupLabel
 				>Platform fee percentage
 

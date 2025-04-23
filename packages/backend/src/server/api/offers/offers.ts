@@ -85,8 +85,8 @@ export const offers = (app: Elysia) =>
 				"/:id/claim",
 				async ({ params, body }) => {
 					try {
-						const { pubkey } = body;
-						return await claimOffer(params.id, pubkey);
+						const { pubkey, bond } = body;
+						return await claimOffer(params.id, pubkey, bond);
 					} catch (error) {
 						const err = ensureError(error);
 						log.error("Error posting claim {error}", { error });
@@ -98,6 +98,7 @@ export const offers = (app: Elysia) =>
 				{
 					body: t.Object({
 						pubkey: t.String(),
+						bond: t.String(),
 					}),
 				},
 			)

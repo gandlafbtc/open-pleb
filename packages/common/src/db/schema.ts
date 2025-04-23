@@ -34,7 +34,7 @@ export const mintQuotesTable = pgTable('mint_quotes', {
 
 export const proofsTable = pgTable('proofs', {
 	identifier: integer().primaryKey().generatedAlwaysAsIdentity(),
-	id: text('secret').notNull(),
+	id: text('id').notNull(),
 	secret: text('secret').notNull(),
 	C: text('c').notNull(),
 	amount: integer('amount').notNull(),
@@ -67,7 +67,8 @@ export const receiptsTable = pgTable('receipts', {
 	pubkey: text('pubkey').notNull(),
   receiptImg: text('receipt_img').notNull(),
   offerId: integer("offer_id").references(() => offerTable.id).notNull().unique(),
-  reward: text('reward')
+  reward: text('reward'),
+  refund: text('refund')
 });
 
 export type MintQuote = typeof mintQuotesTable.$inferSelect;

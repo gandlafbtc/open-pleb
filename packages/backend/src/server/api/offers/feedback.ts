@@ -1,16 +1,20 @@
-import { getEncodedToken } from "@cashu/cashu-ts";
+import { CheckStateEnum, getEncodedToken, OutputData, type Proof } from "@cashu/cashu-ts";
 import { schnorr } from "@noble/curves/secp256k1";
 import { sha256 } from "@noble/hashes/sha256";
 import { db } from "@openPleb/common/db";
 import {
 	mintQuotesTable,
 	offerTable,
+	proofsTable,
 	receiptsTable,
+	type InsertProof,
 } from "@openPleb/common/db/schema";
 import { OFFER_STATE } from "@openPleb/common/types";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { wallet } from "../../../cashu/wallet";
 import { eventEmitter } from "../../../events/emitter";
+import { getAproxAmount, parseSecret } from "../../../cashu/helper";
+import { InternalProofState } from "../../../types";
 export const commitFeedback = async (
 	offerId: string,
 	feedbackData: {
@@ -30,18 +34,29 @@ export const commitFeedback = async (
 	}
 	const offer = offers[0];
 
-	if ([OFFER_STATE.CANCELLED, OFFER_STATE.COMPLETED, OFFER_STATE.MARKED_UNRESPONSIVE, OFFER_STATE.MARKED_WITH_ISSUE].includes(offer.status)) {
-		return new Response(`Invalid offer state: ${offer.status}`, { status: 400 });
+	if (
+		[
+			OFFER_STATE.COMPLETED,
+			OFFER_STATE.MARKED_UNRESPONSIVE,
+			OFFER_STATE.MARKED_WITH_ISSUE,
+		].includes(offer.status)
+	) {
+		return new Response(`Invalid offer state: ${offer.status}`, {
+			status: 400,
+		});
 	}
 
-	const message =
-		feedbackData.nonce +
+	const message = feedbackData.nonce +
 		feedbackData.feedback +
 		feedbackData.status +
 		offerId +
 		offer.invoice;
 	const messageHash = sha256(message);
-	const res = schnorr.verify(feedbackData.signature, messageHash, offer.pubkey);
+	const res = schnorr.verify(
+		feedbackData.signature,
+		messageHash,
+		offer.pubkey,
+	);
 	if (!res) {
 		return new Response("Invalid signature", { status: 401 });
 	}
@@ -56,7 +71,8 @@ export const commitFeedback = async (
 	}
 	const updatedOffer = await db
 		.update(offerTable)
-		.set({ feedback: feedbackData.feedback, status: feedbackData.status }).where(eq(offerTable.id, id))
+		.set({ feedback: feedbackData.feedback, status: feedbackData.status })
+		.where(eq(offerTable.id, id))
 		.returning();
 
 	if (!updatedOffer || updatedOffer.length === 0) {
@@ -85,61 +101,142 @@ export const commitFeedback = async (
 			return new Response("No receipts found", { status: 404 });
 		}
 
-		// const sendAmount = offer.satsAmount + offer.takerFeeFlatRate + offer.takerFeePercentage
-		// const keepAmount = offer.platformFeeFlatRate + offer.platformFeePercentage
 
-		// const keys = await wallet.getKeys()
-		// const availableAmountsStrings = Object.keys(keys.keys)
-		// const availableAmounts = availableAmountsStrings.map(Number).sort((a, b) => b-a);
 
-		// const sendAmounts: number[] = []
-		// const keepAmounts: number[] = []
-
-		// let i = 0;
-
-		// while (sendAmount > sendAmounts.reduce((acc, curr) => acc + curr, 0)) {
-		//     const diff = sendAmount - sendAmounts.reduce((acc, curr) => acc + curr, 0)
-		//     if (availableAmounts[i]<=diff) {
-		//         sendAmounts.push(availableAmounts[i])
-		//     }
-		//     i++
-		// }
-
-		// while (keepAmount > keepAmounts.reduce((acc, curr) => acc + curr, 0)) {
-		//     const diff = keepAmount - keepAmounts.reduce((acc, curr) => acc + curr, 0)
-		//     if (availableAmounts[i]<=diff) {
-		//         keepAmounts.push(availableAmounts[i])
-		//         i++
-		//     }
-		// }
-
-		const proofs = await wallet.mintProofs(
-			mintQuotes[0].amount,
-			mintQuotes[0].quote,
-			{
-				pubkey: `02${receipts[0].pubkey}`,
-				// outputAmounts: {
-				//     sendAmounts,
-				//     keepAmounts
-				// }
-			},
+		const proofsFromDb = await db.select().from(proofsTable).where(
+			and(
+				eq(proofsTable.state, CheckStateEnum.UNSPENT),
+				eq(proofsTable.offerId, id),
+			),
 		);
-		const token = getEncodedToken({ mint: Bun.env.PUBLIC_MINT_URL!, proofs });
+
+		const proofs: Proof[] = proofsFromDb.map((p) => {
+			return {
+				secret: p.secret,
+				amount: p.amount,
+				id: p.id,
+				C: p.C,
+			};
+		});
+
+		const sendAmount = offer.satsAmount + offer.takerFeeFlatRate +
+			offer.takerFeePercentage + offer.bondFlatRate +
+			offer.bondPercentage;
+		const keepAmount = offer.platformFeeFlatRate +
+			offer.platformFeePercentage;
+		const makerBondAmount = offer.bondFlatRate + offer.bondPercentage;
+
+		const keys = await wallet.getKeys()
+		// const availableAmountsStrings = Object.keys(keys.keys)
+		// const availableAmounts = availableAmountsStrings.map(s=> Number.parseInt(s)).sort((a, b) => b-a);
+
+		// const fillBucketWithAmounts = (targetAmount: number, availableAmts: number[]): number[] => {
+		// 	const amounts: number[] = [];
+		// 	let amountsSum = 0;
+		// 	for (const amount of availableAmts) {
+		// 		if (targetAmount-amountsSum >= amount) {
+		// 			amounts.push(amount)
+		// 			amountsSum += amount
+		// 			if (amountsSum >= targetAmount) {
+		// 				break;
+		// 			}
+		// 		}
+
+		// 	}
+		// 	return amounts
+		// };
+
+		const makerPub = `02${offer.pubkey}`
+		const takerPub = `02${receipts[0].pubkey}`
+		const makerBondAmountOutputData = OutputData.createP2PKData(
+			{
+				pubkey: makerPub,
+				//todo add refund
+			},
+			makerBondAmount,
+			keys
+		)
+
+
+		const sendAmountOutputData  = OutputData.createP2PKData(
+			{
+				pubkey: takerPub,
+			},
+			sendAmount,
+			keys
+		)
+
+		const {keep, send} = await wallet.send(makerBondAmount+sendAmount, proofs, {outputData: {
+			send: [...makerBondAmountOutputData, ...sendAmountOutputData],
+		}})
+
+
+
+		const proofsToInsert: InsertProof[] = [...keep, ...send].map((p) => {
+			return {
+				id: p.id,
+				C: p.C,
+				amount: p.amount,
+				secret: p.secret,
+				offerId: id,
+				state: InternalProofState.PENDING,
+			}
+		})
+
+		await db.insert(proofsTable).values(proofsToInsert)
+		
+		const rewardProofs = send.filter((p) => {
+			//check secrets for lock
+			try {
+				const secret = parseSecret(p.secret);
+				if (secret[0] === "P2PK" && secret[1].data===takerPub) {
+					return true;
+				}
+				return false
+			} catch {
+				return false
+			}
+		});
+
+
+		const refundProofs = send.filter((p) => {
+			//check secrets for lock
+			try {
+				const secret = parseSecret(p.secret);
+				if (secret[0] === "P2PK" && secret[1].data===makerPub) {
+					return true;
+				}
+				return false
+			} catch {
+				return false
+			}
+		});
+
+		const refundToken = getEncodedToken({
+			mint: Bun.env.PUBLIC_MINT_URL!,
+			proofs: refundProofs,
+		});
+
+		const rewardToken = getEncodedToken({
+			mint: Bun.env.PUBLIC_MINT_URL!,
+			proofs: rewardProofs,
+		});
+
 		const updatedReceipts = await db
 			.update(receiptsTable)
-			.set({ reward: token }).where(eq(receiptsTable.offerId, id))
+			.set({ reward: rewardToken, refund: refundToken }).where(eq(receiptsTable.offerId, id))
 			.returning();
 
 		if (updatedReceipts.length === 0) {
 			return new Response("Could not update receipt", { status: 400 });
 		}
 
-		const receipt =  updatedReceipts[0]
+		const receipt = updatedReceipts[0];
 
 		eventEmitter.emit("socket-event", {
 			command: "update-receipt",
 			data: { receipt },
-			pubkeys: [receipt.pubkey, offer.pubkey]
+			pubkeys: [receipt.pubkey, offer.pubkey],
 		});
 	}
 	return updatedOffer[0];

@@ -24,7 +24,7 @@
 			);
 			const data = await res.json();
 
-			if (data.state === 'PAID') {
+			if (data.state === 'PAID' || data.state === 'ISSUED') {
 				clearInterval(interval);
 				goto(`/pay/${offer.id}/receipt`);
 			}

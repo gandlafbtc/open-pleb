@@ -7,7 +7,6 @@ const createPriceStore = () => {
 		try {
 			const response = await fetch(`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/conversion`);
 			const data = await response.json();
-			console.log(response);
 			store.set(data.conversion);
 		} catch (error) {
 			console.error(error);

@@ -18,13 +18,12 @@ export const checkInvoiceState = async (
 		const proofs = await wallet.mintProofs(quote.amount, quote.quote, {
 			// maybe lock to server pubkey?	
 		})
-		const proofsToInsert: InsertProof[] = proofs.map((p,i) => {
+		const proofsToInsert: InsertProof[] = proofs.map((p) => {
 			return {
-				id: p.secret,
+				id: p.id,
 				C: p.C,
-				amount: quote.amount,
+				amount: p.amount,
 				secret: p.secret,
-				identifier: i + 1,
 				offerId,
 				state: InternalProofState.UNSPENT,
 			}

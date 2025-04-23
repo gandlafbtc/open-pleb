@@ -1,6 +1,6 @@
 <script lang="ts">
 import { formatCurrency } from "$lib/helper";
-import { mnemonicStore, proofsStore } from "cashu-wallet-engine";
+import { mnemonicStore, proofsStore } from "@gandlaf21/cashu-wallet-engine";
 
     import Keyboard from "@lucide/svelte/icons/keyboard";
     import * as Dialog from "$lib/components/ui/dialog/index.js";
@@ -15,9 +15,9 @@ import { mnemonicStore, proofsStore } from "cashu-wallet-engine";
    </script>
    
    <div class="relative">
-    <div class="absolute p-0.5 rounded-full bg-purple-500 text-purple-200 right-0 top-0 -mt-2 -mr-12">
+    <div class="absolute p-0.5 rounded-full bg-purple-500 text-purple-200 right-0 top-0 -mt-2 -mr-8">
         <p class="text-xs px-2 text-nowrap">
-                Bond tokens
+                Tokens
         </p>
     </div>
 
@@ -28,7 +28,7 @@ import { mnemonicStore, proofsStore } from "cashu-wallet-engine";
     >
     <DropdownMenu.Content class="w-56">
      <DropdownMenu.Group>
-      <DropdownMenu.GroupHeading>Bond tokens</DropdownMenu.GroupHeading>
+      <DropdownMenu.GroupHeading>Tokens</DropdownMenu.GroupHeading>
       <DropdownMenu.Separator />
       <DropdownMenu.Group>
         <a href="/wallet/mint">

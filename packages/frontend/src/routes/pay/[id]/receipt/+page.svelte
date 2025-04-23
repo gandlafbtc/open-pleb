@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL } from '$env/static/public';
+	import { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL, PUBLIC_MINT_URL } from '$env/static/public';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { dataStore } from '$lib/stores/session/data.svelte';
 	import { OFFER_STATE } from '@openPleb/common/types';
@@ -10,8 +10,10 @@
 	import { sha256 } from '@noble/hashes/sha256';
 	import { bytesToHex } from '@noble/hashes/utils';
 	import { ensureError } from '$lib/errors';
-	import { keysStore } from 'cashu-wallet-engine';
+	import { getWalletWithUnit, keysStore, mintsStore, receiveEcash } from 'cashu-wallet-engine';
 	import Expiry from '$lib/elements/Expiry.svelte';
+	import { getDecodedToken, CheckStateEnum } from '@cashu/cashu-ts';
+
 	let showFullScreen = $state(false);
 	let isOpen = $state(false);
 	const id = Number.parseInt(page.params.id);
@@ -67,6 +69,44 @@
 			isLoading = false;
 		}
 	};
+
+	const claim = async () => {
+		try {
+			isLoading = true;
+			await receiveEcash(receipt?.refund??'', {privkey: $keysStore[0].privateKey})
+			toast.success("received!")
+		} catch (error) {
+			const err = ensureError(error);
+					console.error(err);
+					toast.error(err.message);
+		}
+		finally {
+			isLoading = false;
+		}
+	}
+
+	const checkIfRedeemed = async (refund: string) => {
+		try {
+			const token = getDecodedToken(refund)
+			const wallet = await getWalletWithUnit($mintsStore, PUBLIC_MINT_URL, "sat")
+			const states = await wallet.checkProofsStates(token.proofs);
+			const spentOrPending = states.find(s=> s.state===CheckStateEnum.PENDING || s.state===CheckStateEnum.SPENT)
+
+			if (spentOrPending) {
+				toast.success("Reward already redeemed!")
+				return;
+			}
+			claim()
+
+		} catch (error) {
+			return
+		}
+	}
+	$effect(() => {
+		if (receipt?.refund) {
+			checkIfRedeemed(receipt?.refund);
+		}
+	})
 </script>
 
 <div>
@@ -126,10 +166,10 @@
 								class="w-full"
 								onclick={markPaymentSucceeded}
 							>
-								If the payment was successful, click here!
+								Payment OK (reclaim Bond)
 							</Button>
 							<Button disabled={isLoading} class="w-full" onclick={markPaymentFailed}>
-								Someting went wrong with the payment
+								Payment Failed (open dispute)
 							</Button>
 						</div>
 					</div>

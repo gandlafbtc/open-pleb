@@ -13,7 +13,7 @@
 	import { browser } from '$app/environment';
 	import { LoaderCircle } from 'lucide-svelte';
 
-	import { init as initCashu, mintsStore } from "cashu-wallet-engine";
+	import { init as initCashu, mintsStore } from "@gandlaf21/cashu-wallet-engine";
 	import { PUBLIC_MINT_URL } from '$env/static/public';
 	import TinyBondWallet from '$lib/elements/bond-wallet/TinyBondWallet.svelte';
 	import PayEarnToggle from '$lib/elements/PayEarnToggle.svelte';
@@ -71,11 +71,23 @@
 	</Sidebar.Provider>
 
 	{:else}
-	<div class="flex flex-col gap-2">
-		<p>Choose what you want to do</p>
-		<Button onclick={()=> appMode.set('pay')}>Pay</Button>
-		<Button onclick={()=> appMode.set('earn')}>Earn</Button>
+	<div class="flex h-screen w-screen items-center justify-center">
+
+	<div class="flex flex-col gap-2 w-80 xl:w-[600px] items-center justify-center">
+		<p class='text-xl font-bold'>
+			Welcome to OpenPleb. Here you can: 
+		</p>
+		<p>
+			1. Pay bank QRs with Bitcoin. 
+		</p>
+		<p>
+			2. Earn Bitcoin for paying Bank QRs. 
+		</p>
+		<p>Choose what you want to do. (You can change this later)</p>
+		<Button onclick={()=> appMode.set('pay')} class='w-full mt-5' variant="outline">Pay Bank QR</Button>
+		<Button onclick={()=> appMode.set('earn')} class="w-full mt-5" variant="outline">Earn Bitcoin</Button>
 	</div>
+</div>
 	
 	{/if}
 {:else}
