@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { copyTextToClipboard } from '$lib/helper';
-	import { t_copied, t_copy } from '$lib/paraglide/messages';
 
 	import { Copy } from 'lucide-svelte';
 	interface Props {
@@ -33,11 +32,11 @@
 			class="flex w-24 items-center justify-center rounded-md bg-background p-2 text-center text-sm"
 		>
 			{#if copied}
-				<div class="flex items-center gap-2 text-center">{t_copied()}</div>
+				<div class="flex items-center gap-2 text-center">copied!</div>
 			{:else}
 				<div class="flex items-center gap-2">
 					<Copy class="h-5 w-5"></Copy>
-					{t_copy()}
+					copy
 				</div>
 			{/if}
 		</div>
