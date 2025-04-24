@@ -34,7 +34,7 @@
 						goto(`/pay/${data.id}`);
 						return 'Offer created successfully';
 					},
-					error: 'Failed to create offer',
+					error: (e)=> {return `Failed to create offer: ${e.message}`},
 					loading: 'Creating offer...'
 				}
 			);

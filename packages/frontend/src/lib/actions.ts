@@ -19,7 +19,6 @@ export type OfferResponse = {
 };
 
 export const createNewOffer = async (offer: Offer): Promise<OfferResponse> => {
-	try {
 		const response = await fetch(`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/offers`, {
 			method: 'POST',
 			headers: {
@@ -28,13 +27,10 @@ export const createNewOffer = async (offer: Offer): Promise<OfferResponse> => {
 			body: JSON.stringify(offer)
 		});
 		if (!response.ok) {
-			throw new Error('Failed to create offer');
+			throw new Error(await response.text());
 		}
 		const data = await response.json();
 		return data.offer;
-	} catch (error) {
-		throw error;
-	}
 };
 
 
