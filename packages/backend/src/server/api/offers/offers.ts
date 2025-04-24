@@ -8,6 +8,7 @@ import { commitFeedback } from "./feedback";
 import { postOffer } from "./post";
 import { createReceipt, getReceipt } from "./receipt";
 import { createInvoice } from "./createInvoice";
+import { payWithTokens } from "./payWithTokens";
 
 export const offers = (app: Elysia) =>
 	app.group("/offers", (app) =>
@@ -99,6 +100,26 @@ export const offers = (app: Elysia) =>
 					body: t.Object({
 						pubkey: t.String(),
 						bond: t.String(),
+					}),
+				},
+			)
+			.post(
+				"/:id/paywithtoken",
+				async ({ params, body }) => {
+					try {
+						const { token } = body;
+						return await payWithTokens(params.id, token);
+					} catch (error) {
+						const err = ensureError(error);
+						log.error("Error posting claim {error}", { error });
+						return new Response(err.message, {
+							status: 500,
+						});
+					}
+				},
+				{
+					body: t.Object({
+						token: t.String(),
 					}),
 				},
 			)

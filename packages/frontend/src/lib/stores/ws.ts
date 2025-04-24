@@ -29,6 +29,9 @@ const handleSocketCommand = (data: { command: string; data: any }) => {
 		case 'update-receipt':
 			dataStore.updateReceipt(data?.data?.receipt);
 			break;
+			case 'update-claim':
+				dataStore.updateClaim(data?.data?.claim);
+				break;
 		default:
 	}
 };

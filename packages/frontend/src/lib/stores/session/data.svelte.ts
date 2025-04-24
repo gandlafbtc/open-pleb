@@ -104,6 +104,7 @@ export const createDataStore = () => {
 		newClaim,
 		fetchForId,
 		updateReceipt,
+		updateClaim,
 		updateConnections
 	};
 };

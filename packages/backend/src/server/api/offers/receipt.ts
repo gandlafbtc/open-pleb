@@ -45,7 +45,7 @@ export async function createReceipt(
 
 	const offerResponse = await db
 		.update(offerTable)
-		.set({ status: OFFER_STATE.RECEIPT_SUBMITTED })
+		.set({ status: OFFER_STATE.RECEIPT_SUBMITTED, validForS: 500 })
 		.where(eq(offerTable.id, id))
 		.returning();
 	eventEmitter.emit("socket-event", {

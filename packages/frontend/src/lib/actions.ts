@@ -1,4 +1,9 @@
-import { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL } from '$env/static/public';
+import { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL, PUBLIC_MINT_URL } from '$env/static/public';
+import { getWalletWithUnit, keysStore, mintsStore, receiveEcash } from '@gandlaf21/cashu-wallet-engine';
+import { toast } from 'svelte-sonner';
+import { get } from 'svelte/store';
+import { ensureError } from './errors';
+import { CheckStateEnum, getDecodedToken } from '@cashu/cashu-ts';
 
 export type Offer = {
 	amount: number;
@@ -31,3 +36,35 @@ export const createNewOffer = async (offer: Offer): Promise<OfferResponse> => {
 		throw error;
 	}
 };
+
+
+const doClaim = async (token:string) => {
+	try {
+		await receiveEcash(token, {privkey: get(keysStore)[0].privateKey})
+		toast.success("received!")
+	} catch (error) {
+		const err = ensureError(error);
+				console.error(err);
+				toast.error(err.message);
+	}
+	finally {
+	}
+}
+
+export const checkIfRedeemed = async (reward: string) => {
+	try {
+		const token = getDecodedToken(reward)
+		const wallet = await getWalletWithUnit(get(mintsStore), PUBLIC_MINT_URL, "sat")
+		const states = await wallet.checkProofsStates(token.proofs);
+		const spentOrPending = states.find(s=> s.state===CheckStateEnum.PENDING || s.state===CheckStateEnum.SPENT)
+
+		if (spentOrPending) {
+			toast.success("Reward already redeemed!")
+			return;
+		}
+		doClaim(reward)
+
+	} catch (error) {
+		return
+	}
+}

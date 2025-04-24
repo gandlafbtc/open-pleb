@@ -37,8 +37,7 @@
 </script>
 
 {#if offer?.invoice}
-	<Expiry {offer}></Expiry>
-	<div class="flex w-80 flex-col gap-2">
+	<div class="flex w-full flex-col gap-2">
 		<div class=" flex w-full flex-col items-center justify-center gap-2">
 			<p class="text-xl font-bold">Step 3: Pay Invoice</p>
 			<p>

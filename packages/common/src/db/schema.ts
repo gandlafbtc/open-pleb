@@ -20,7 +20,8 @@ export const offerTable = pgTable('offers', {
 	validForS: integer('valid_for_s'),
 	currency: text('currency'),
 	feedback: text('feedback'),
-	description: text('description')
+	description: text('description'),
+	refund: text('refund')
 });
 
 export const mintQuotesTable = pgTable('mint_quotes', {
@@ -58,7 +59,8 @@ export const claimsTable = pgTable('claims', {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   createdAt: integer('created_at').notNull(),
   pubkey: text('pubkey').notNull(),
-  offerId: integer("offer_id").references(() => offerTable.id).notNull().unique()
+  offerId: integer("offer_id").references(() => offerTable.id).notNull().unique(),
+  reward: text('reward'),
 });
 
 export const receiptsTable = pgTable('receipts', {
@@ -67,8 +69,6 @@ export const receiptsTable = pgTable('receipts', {
   pubkey: text('pubkey').notNull(),
   receiptImg: text('receipt_img').notNull(),
   offerId: integer("offer_id").references(() => offerTable.id).notNull().unique(),
-  reward: text('reward'),
-  refund: text('refund')
 });
 
 export type MintQuote = typeof mintQuotesTable.$inferSelect;

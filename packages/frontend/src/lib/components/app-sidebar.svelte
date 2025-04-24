@@ -1,32 +1,7 @@
-<script lang="ts" module>
-	const data = {
-		navMain: [
-
-			{
-				title: '',
-				url: '/',
-				items: [
-					{
-						title: 'Home',
-						url: '/'
-					},
-					{
-						title: 'My Offers',
-						url: '/home/my-offers'
-					},
-					{
-						title: 'My Claims',
-						url: '/home/my-claims'
-					}
-				]
-			}
-		],
-	};
-</script>
 
 <script lang="ts">
 	import VersionSwitcher from '$lib/components/version-switcher.svelte';
-	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
+	import * as Sidebar from '$lib/components/ui/sidebar/index';
 	import type { ComponentProps } from 'svelte';
 	import { page } from '$app/state';
 	import { Group } from 'lucide-svelte';
@@ -42,6 +17,32 @@
 		PUBLIC_TAKER_FEE_PERCENTAGE
 	} from '$env/static/public';
 	import { dataStore } from '$lib/stores/session/data.svelte';
+	import { appMode } from '$lib/stores/local/mode';
+	import { OFFER_STATE } from '@openPleb/common/types';
+
+	const data = $derived({
+		navMain: [
+
+			{
+				title: '',
+				url: '/',
+				items: [
+					{
+						title: $appMode==="pay" ? 'Pay' : 'Offers',
+						url: '/'
+					},
+					{
+						title: 'My Offers',
+						url: '/home/my-offers'
+					},
+					{
+						title: 'My Claims',
+						url: '/home/my-claims'
+					}
+				]
+			}
+		],
+	})
 
 	let { ref = $bindable(null), ...restProps }: ComponentProps<typeof Sidebar.Root> = $props();
 </script>
@@ -146,6 +147,11 @@
 										<a href={item.url} {...props}>{item.title}</a>
 									{/snippet}
 								</Sidebar.MenuButton>
+								{#if item.title==="Offers"}
+									<Sidebar.MenuBadge>
+										{dataStore.offers.filter((offer) => offer.status === OFFER_STATE.INVOICE_PAID).length}
+									</Sidebar.MenuBadge>
+								{/if}
 							</Sidebar.MenuItem>
 						{/each}
 					</Sidebar.Menu>

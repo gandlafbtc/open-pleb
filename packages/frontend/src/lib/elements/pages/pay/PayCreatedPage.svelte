@@ -7,6 +7,7 @@
 	import { proofsStore, sendEcash } from "@gandlaf21/cashu-wallet-engine";
 	import type { Offer } from "@openPleb/common/db/schema";
 	import { toast } from "svelte-sonner";
+	import {	getEncodedToken  } from "@cashu/cashu-ts";
 
     interface Props {offer: Offer; totalSats: number; bondTotalSats: number}
     
@@ -39,20 +40,20 @@
 			}
 			const {send} = await sendEcash(PUBLIC_MINT_URL, totalSats+bondTotalSats)
 			const res = await fetch(
-				`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/offers/${offer.id}/paywithtokens`,
+				`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/offers/${offer.id}/paywithtoken`,
 			{
 				method: "POST",
 					headers: {
 						"Content-Type": "application/json",
 					},
 				body: JSON.stringify({
-					proofs: send,
+					token: getEncodedToken({mint: PUBLIC_MINT_URL, proofs: send}),
 				}),
 			})
             if (!res.ok) {
                 throw new Error(await res.text());
             }
-            toast.success('Invoice created successfully');
+            toast.success('Paid!');
         } catch (error) {
             const err = ensureError(error);
 			console.error(err);
@@ -63,9 +64,7 @@
         }
 	};
 </script>
-<div class="flex flex-col gap-2 items-center w-80 xl:w-[600px]">
-	<Expiry {offer}></Expiry>
-	
+<div class="flex flex-col gap-2 items-center w-full">
 	<p class="text-lg font-bold">
 		To list this offer, pay 
 	</p>

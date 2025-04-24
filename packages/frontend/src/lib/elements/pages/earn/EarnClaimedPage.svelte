@@ -66,7 +66,7 @@
 </script>
 
 {#if claim?.pubkey && claim.pubkey === $keysStore[0]?.publicKey}
-<div class="flex w-80 flex-col gap-2">
+<div class="flex flex-col gap-2 w-full">
 	{#if isPaid}
 		<p class="text-center text-xl font-bold">
 			Upload a screenshot of the receipt to verify the payment.
@@ -82,7 +82,7 @@
 					>
 						<Trash class="text-white "></Trash>
 					</button>
-					<img id="receiptImage" src={file} alt="" class="" />
+					<img id="receiptImage" src={file} alt="" class="rounded-md p-10" />
 				</div>
 			{:else}
 				<Dropzone

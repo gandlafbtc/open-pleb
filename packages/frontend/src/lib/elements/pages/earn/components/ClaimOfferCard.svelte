@@ -73,7 +73,11 @@
 
 <Card.Root class="w-80">
     <Card.Header>
-        <Card.Title>Pay {formatCurrency(offer.amount, PUBLIC_CURRENCY)}</Card.Title>
+        <Card.Title>
+			<a href={`/earn/${offer.id}`}>
+				Pay {formatCurrency(offer.amount, PUBLIC_CURRENCY)}
+			</a>
+		</Card.Title>
         <Card.Description
             >For {formatCurrency(
                 (offer.satsAmount ?? 0) +
@@ -91,9 +95,9 @@
             )}
         </p>
     </Card.Content>
-    <Card.Footer class='gap-2 justify-between'>
+    <Card.Footer class='flex flex-col gap-2 justify-between'>
         <Button class="w-full" disabled={isLoading||expiryPercentage <= 0} onclick={() => claimOffer(offer)}
-            >Claim this offer</Button
+            >Claim this offer ({formatCurrency(offer.bondFlatRate+offer.bondPercentage, "SAT")} Bond)</Button
         >
         <Expiry {offer}></Expiry>
 

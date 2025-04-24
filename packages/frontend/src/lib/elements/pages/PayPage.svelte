@@ -106,13 +106,13 @@
 			<p class="text-xl font-bold">
 				{formatCurrency(amount, PUBLIC_CURRENCY)}
 			</p>
-			<p class="text-xl font-bold">
+			<p class="text-xl font-bold  text-muted-foreground">
 				~ {formatCurrency(estimate, 'SAT')}
 			</p>
 			<p class="text text-muted-foreground font-bold">
 				+ ~ {formatCurrency(bondEstimate, 'SAT')} Bond
 			</p>
-			<p class="w-80 overflow-clip text-ellipsis text-muted-foreground lg:w-[600px]">
+			<p class="overflow-clip text-ellipsis text-muted-foreground break-all ">
 				To {scannedResult}
 			</p>
 		</div>

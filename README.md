@@ -10,21 +10,22 @@ This project is under construction, and we are working on it actively. It is not
 
 ### Progress
 
-- [ ] `bond` creation (use cashu tokens as `bonds`, to ensure incentives for both parties are aligned)
+- [x] `bond` creation (use cashu tokens as `bonds`, to ensure incentives for both parties are aligned)
     - [x] Issue `bond` tokens
     - [x] store and handle `bond` tokens locally
-- [ ] `offer` creation
+- [x] `offer` creation
     - [x] `offer` creation UX (scan bank QR and enter amount)
-    - [ ] `offer` validation (`bond`)
+    - [x] `offer` validation (`bond`)
     - [x] Lightning payment & validation
-    - [ ] Mint and store ecash 
+    - [x] Mint and store ecash 
     - [x] List `offer` and persistence
     - [x] `offer` live updates
-- [ ] Claiming offers
-    - [ ] claim UX (select `offer`)
-    - [ ] claim validation (`bond`)
-    - [ ] claim expiry
-- [ ] paying `offer`
+    - [ ] `offer` expiry
+- [x] Claiming offers
+    - [x] claim UX (select `offer`)
+    - [x] claim validation (`bond`)
+    - [] claim expiry
+- [x] paying `offer`
     - [x] display payment details (payment out-of-band)
     - [x] upload receipt UX
     - [x] receipt live updates
