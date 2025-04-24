@@ -66,7 +66,7 @@
 				</p>
 			</Card.Content>
 			<Card.Footer class="justify-between">
-				<Button href={`/earn/claim/${offer.id}`}> 
+				<Button href={`/earn/${offer.id}`}> 
 					View
 				</Button>
 				<Badge>

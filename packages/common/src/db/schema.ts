@@ -63,8 +63,8 @@ export const claimsTable = pgTable('claims', {
 
 export const receiptsTable = pgTable('receipts', {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
-	createdAt: integer('created_at').notNull(),
-	pubkey: text('pubkey').notNull(),
+  createdAt: integer('created_at').notNull(),
+  pubkey: text('pubkey').notNull(),
   receiptImg: text('receipt_img').notNull(),
   offerId: integer("offer_id").references(() => offerTable.id).notNull().unique(),
   reward: text('reward'),

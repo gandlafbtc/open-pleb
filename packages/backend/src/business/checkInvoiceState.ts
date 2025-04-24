@@ -34,7 +34,7 @@ export const checkInvoiceState = async (
 			throw new Error("Offer not found");
 		}
 		const offer = offers[0];
-		if (offer.status !== OFFER_STATE.CREATED) {
+		if (offer.status !== OFFER_STATE.INVOICE_CREATED) {
 			throw new Error("Invalid offer status");
 		}
 		const offerResponse = await db

@@ -1,7 +1,6 @@
 import { db } from "@openPleb/common/db";
 import { mintQuotesTable, offerTable } from "@openPleb/common/db/schema";
 import { eq } from "drizzle-orm";
-import { wallet } from "../../../cashu/wallet";
 import { CashuMint } from "@cashu/cashu-ts";
 import { OFFER_STATE } from "@openPleb/common/types";
 import { eventEmitter } from "../../../events/emitter";
@@ -57,7 +56,7 @@ export const createInvoice = async (id: string) => {
 
     const offerResponse = await db
     .update(offerTable)
-    .set({ invoice: res.request }).where(eq(offerTable.id, offerId))
+    .set({ invoice: res.request, status: OFFER_STATE.INVOICE_CREATED }).where(eq(offerTable.id, offerId))
     .returning();
 
     await db.insert(mintQuotesTable).values({

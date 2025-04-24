@@ -3,20 +3,23 @@ import {
 	claimsTable,
 	offerTable,
 	receiptsTable,
+	type Offer,
 } from "@openPleb/common/db/schema";
 import { OFFER_STATE } from "@openPleb/common/types";
 import { eq, inArray, or } from "drizzle-orm";
 
 export const getData = async (pubkey: string) => {
-	const offers = await db
+	const res = await db
 		.select()
-		.from(offerTable)
+		.from(offerTable).fullJoin(claimsTable, eq(claimsTable.offerId, offerTable.id))
 		.where(
 			or(
+				eq(claimsTable.pubkey, pubkey),
 				eq(offerTable.pubkey, pubkey),
 				eq(offerTable.status, OFFER_STATE.INVOICE_PAID),
 			),
 		);
+	const offers: Offer[] = res.flatMap((o) => o.offers??[]);
 	const offerIds = offers.map((o) => o.id);
 	const claims = await db
 		.select()

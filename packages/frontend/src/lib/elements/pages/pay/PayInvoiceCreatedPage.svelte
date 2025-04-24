@@ -10,8 +10,12 @@
 	import { onMount } from 'svelte';
 	import { formatCurrency } from '$lib/helper';
 	import Expiry from '$lib/elements/Expiry.svelte';
-	const id = Number.parseInt(page.params.id);
-	const offer = $derived(dataStore.offers.find((o) => o.id === id));
+	import type { Offer } from '@openPleb/common/db/schema';
+
+    interface Props {offer: Offer}
+    
+    let {offer}: Props = $props();
+
 	$inspect(offer);
 	onMount(() => {
 		const interval = setInterval(async () => {
@@ -26,7 +30,6 @@
 
 			if (data.state === 'PAID' || data.state === 'ISSUED') {
 				clearInterval(interval);
-				goto(`/pay/${offer.id}/receipt`);
 			}
 		}, 5000);
 		return () => clearInterval(interval);

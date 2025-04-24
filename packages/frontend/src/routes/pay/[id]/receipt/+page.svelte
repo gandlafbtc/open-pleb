@@ -124,7 +124,6 @@
 				<img src={receipt.receiptImg} alt="" />
 				{#if offer.status === OFFER_STATE.COMPLETED}
 					Offer completed! Thank you for using openPleb.
-				  
 				{:else if offer.status === OFFER_STATE.MARKED_WITH_ISSUE}
 					This offer has been flagged as unresolved. It will be reviewed by a moderator.
 				{:else}

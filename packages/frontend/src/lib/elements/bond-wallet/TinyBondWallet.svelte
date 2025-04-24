@@ -1,13 +1,12 @@
 <script lang="ts">
-import { formatCurrency } from "$lib/helper";
 import { mnemonicStore, proofsStore } from "@gandlaf21/cashu-wallet-engine";
 
-    import Keyboard from "@lucide/svelte/icons/keyboard";
     import * as Dialog from "$lib/components/ui/dialog/index.js";
     
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     import { buttonVariants } from "$lib/components/ui/button/index.js";
 	import { Banknote, Download, Sprout, Upload, Zap } from "lucide-svelte";
+	import NumberFlow from "@number-flow/svelte";
 
     let isShowSeed= $state(false)
 	let isHide = $state(true);
@@ -15,16 +14,18 @@ import { mnemonicStore, proofsStore } from "@gandlaf21/cashu-wallet-engine";
    </script>
    
    <div class="relative">
-    <div class="absolute p-0.5 rounded-full bg-purple-500 text-purple-200 right-0 top-0 -mt-2 -mr-8">
+    <div class="absolute p-0.5 rounded-full bg-orange-500 text-orange-100 right-0 top-0 -mt-2 -mr-8">
         <p class="text-xs px-2 text-nowrap">
                 Tokens
         </p>
     </div>
 
    <DropdownMenu.Root>
-    <DropdownMenu.Trigger class={buttonVariants({ variant: "outline" })}
-     >{formatCurrency($proofsStore.reduce((acc, proof) => acc + proof.amount, 0), "SAT")}
-     </DropdownMenu.Trigger
+    <DropdownMenu.Trigger class={buttonVariants({ variant: "outline" }) + "border border-orange-500"}
+     >
+     <NumberFlow format={{ notation: 'compact', minimumFractionDigits: 2  ,maximumFractionDigits: 2}} value={$proofsStore.reduce((acc, proof) => acc + proof.amount, 0)} />
+        sat
+        </DropdownMenu.Trigger
     >
     <DropdownMenu.Content class="w-56">
      <DropdownMenu.Group>
