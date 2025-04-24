@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { i18n } from '$lib/i18n';
-	import { ParaglideJS } from '@inlang/paraglide-sveltekit';
+	// import { ParaglideJS } from '@inlang/paraglide-sveltekit';
 	import '../app.css';
 	import AppSidebar from '$lib/components/app-sidebar.svelte';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
@@ -64,11 +63,11 @@
 					</div>
 				</div>
 			</header>
-			<ParaglideJS {i18n}>
+			<!-- <ParaglideJS {i18n}> -->
 				<div class="flex h-full w-full flex-col items-center justify-center gap-2">
 					{@render children()}
 				</div>
-			</ParaglideJS>
+			<!-- </ParaglideJS> -->
 		</Sidebar.Inset>
 	</Sidebar.Provider>
 
