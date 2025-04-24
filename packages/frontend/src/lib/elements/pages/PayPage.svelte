@@ -9,7 +9,7 @@
 	import { goto } from '$app/navigation';
 	import Dropzone from 'svelte-file-dropzone';
 	import QrScanner from 'qr-scanner';
-	import { keysStore } from 'cashu-wallet-engine';
+	import { keysStore } from '@gandlaf21/cashu-wallet-engine';
 	import { priceStore } from '$lib/stores/price';
 	import { PUBLIC_BOND_FLAT_RATE, PUBLIC_BOND_PERCENTAGE, PUBLIC_CURRENCY, PUBLIC_PLATFORM_FEE_FLAT_RATE, PUBLIC_PLATFORM_FEE_PERCENTAGE, PUBLIC_TAKER_FEE_FLAT_RATE, PUBLIC_TAKER_FEE_PERCENTAGE } from '$env/static/public';
 	import { createNewOffer, type OfferResponse } from '$lib/actions';

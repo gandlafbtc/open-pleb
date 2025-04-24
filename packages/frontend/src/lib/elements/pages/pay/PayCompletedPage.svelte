@@ -5,7 +5,7 @@
 	import { dataStore } from '$lib/stores/session/data.svelte';
 	import { toast } from 'svelte-sonner';
 	import { ensureError } from '$lib/errors';
-	import { getWalletWithUnit, keysStore, mintsStore, receiveEcash } from 'cashu-wallet-engine';
+	import { getWalletWithUnit, keysStore, mintsStore, receiveEcash } from '@gandlaf21/cashu-wallet-engine';
 	import { getDecodedToken, CheckStateEnum } from '@cashu/cashu-ts';
 	import type { Offer } from '@openPleb/common/db/schema';
 	import { checkIfRedeemed } from '$lib/actions';

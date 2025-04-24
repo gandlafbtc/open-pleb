@@ -7,7 +7,7 @@
 	import { sha256 } from '@noble/hashes/sha256';
 	import { bytesToHex } from '@noble/hashes/utils';
 	import { ensureError } from '$lib/errors';
-	import {  keysStore } from 'cashu-wallet-engine';
+	import {  keysStore } from '@gandlaf21/cashu-wallet-engine';
 	import type { Offer } from '@openPleb/common/db/schema';
 
     interface Props {offer: Offer}

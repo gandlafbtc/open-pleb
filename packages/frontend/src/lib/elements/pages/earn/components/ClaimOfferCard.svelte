@@ -11,7 +11,7 @@
 	import { ensureError } from '$lib/errors.js';
 	import { formatCurrency } from '$lib/helper.js';
 	import { toast } from 'svelte-sonner';
-	import { keysStore, proofsStore, sendEcash } from 'cashu-wallet-engine';
+	import { keysStore, proofsStore, sendEcash } from '@gandlaf21/cashu-wallet-engine';
 	import type { Offer } from '@openPleb/common/db/schema';
 	import { clock } from '$lib/stores/clock.svelte';
 	import Expiry from '$lib/elements/Expiry.svelte';

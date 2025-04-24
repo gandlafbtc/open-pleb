@@ -14,7 +14,7 @@
 	import { dataStore } from '$lib/stores/session/data.svelte';
 	import { toast } from 'svelte-sonner';
 	import { OFFER_STATE } from '@openPleb/common/types';
-	import { keysStore } from 'cashu-wallet-engine';
+	import { keysStore } from '@gandlaf21/cashu-wallet-engine';
 	import ChevronLeft from "@lucide/svelte/icons/chevron-left";
 		import ChevronRight from "@lucide/svelte/icons/chevron-right";
 		import { MediaQuery } from "svelte/reactivity";

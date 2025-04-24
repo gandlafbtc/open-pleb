@@ -7,7 +7,7 @@
 	import { formatCurrency, objectUrlToBase64 } from '$lib/helper';
 	import { dataStore } from '$lib/stores/session/data.svelte';
 	import type { Claim, Offer } from '@openPleb/common/db/schema';
-	import { keysStore } from 'cashu-wallet-engine';
+	import { keysStore } from '@gandlaf21/cashu-wallet-engine';
 	import { LoaderCircle, Trash, Upload } from 'lucide-svelte';
 	import encodeQR from 'qr';
 	import Dropzone from 'svelte-file-dropzone';

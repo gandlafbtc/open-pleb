@@ -2,7 +2,7 @@ import { get, writable } from 'svelte/store';
 import { dataStore } from './session/data.svelte';
 import { browser } from '$app/environment';
 import { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL } from '$env/static/public';
-import { keysStore } from 'cashu-wallet-engine';
+import { keysStore } from '@gandlaf21/cashu-wallet-engine';
 import { appMode } from './local/mode';
 export let socket: undefined | WebSocket;
 

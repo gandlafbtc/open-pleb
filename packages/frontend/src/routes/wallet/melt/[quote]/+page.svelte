@@ -1,13 +1,11 @@
 <script lang="ts">
 	import { page } from "$app/state";
 	import Button from "$lib/components/ui/button/button.svelte";
-	import CopiableToken from "$lib/elements/CopiableToken.svelte";
 	import { ensureError } from "$lib/errors";
 	import { formatCurrency } from "$lib/helper";
 	import { checkMeltQuote, meltProofs, meltQuotesStore } from "@gandlaf21/cashu-wallet-engine";
 	import { toast } from "svelte-sonner";
     import { MeltQuoteState } from "@cashu/cashu-ts";
-	import { EXPIRED } from "../../../../../../../../cashu/cashu-wallet-engine/dist/db/models/types";
 	import { CheckCircle, LoaderCircle, Zap } from "lucide-svelte";
 
     const {quote} = page.params
@@ -73,7 +71,7 @@
         Confirm
     </Button>
       
-    {:else if currentQuote?.state ===  EXPIRED.EXPIRED}
+    {:else if currentQuote?.state ===  "EXPIRED"}
         <p>Quote has Expired</p>
     {:else if currentQuote?.state === MeltQuoteState.PAID}
         <p>{formatCurrency(currentQuote?.amount??0, "SAT")} payment completed!</p>
