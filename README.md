@@ -20,20 +20,21 @@ This project is under construction, and we are working on it actively. It is not
     - [x] Mint and store ecash 
     - [x] List `offer` and persistence
     - [x] `offer` live updates
-    - [ ] `offer` expiry
+    - [x] `offer` expiry
 - [x] Claiming offers
     - [x] claim UX (select `offer`)
     - [x] claim validation (`bond`)
-    - [] claim expiry
+    - [x] claim expiry
 - [x] paying `offer`
     - [x] display payment details (payment out-of-band)
     - [x] upload receipt UX
     - [x] receipt live updates
-- [ ] receipt aproval
+- [x] receipt aproval
     - [x] Approve receipt UX
         - [x] Dispurse funds to local wallet (cashu token)
         - [ ] Dispurse funds (to ln adress)
     - [ ] Reject receipt UX
+    - [ ] open dispute
 - [ ] resolve conflicts
     - [ ] Handle bonds
     - [ ] Handle inflight funds
