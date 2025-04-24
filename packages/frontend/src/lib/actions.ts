@@ -1,10 +1,11 @@
-import { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL, PUBLIC_MINT_URL } from '$env/static/public';
+import { env } from '$env/dynamic/public';
 import { getWalletWithUnit, keysStore, mintsStore, receiveEcash } from '@gandlaf21/cashu-wallet-engine';
 import { toast } from 'svelte-sonner';
 import { get } from 'svelte/store';
 import { ensureError } from './errors';
 import { CheckStateEnum, getDecodedToken } from '@cashu/cashu-ts';
 
+const { PUBLIC_BACKEND_URL, PUBLIC_API_VERSION } = env;
 export type Offer = {
 	amount: number;
 	qrCode: string;

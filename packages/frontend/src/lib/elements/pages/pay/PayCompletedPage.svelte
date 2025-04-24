@@ -1,12 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { PUBLIC_MINT_URL } from '$env/static/public';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { dataStore } from '$lib/stores/session/data.svelte';
-	import { toast } from 'svelte-sonner';
-	import { ensureError } from '$lib/errors';
-	import { getWalletWithUnit, keysStore, mintsStore, receiveEcash } from '@gandlaf21/cashu-wallet-engine';
-	import { getDecodedToken, CheckStateEnum } from '@cashu/cashu-ts';
 	import type { Offer } from '@openPleb/common/db/schema';
 	import { checkIfRedeemed } from '$lib/actions';
 

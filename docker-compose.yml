@@ -1,21 +1,4 @@
-version: '3.8'
-
 services:
-  nutshell:
-    image: cashubtc/nutshell:0.16.4
-    container_name: nutshell
-    ports:
-      - "3338:3338"
-    environment:
-      MINT_LIGHTNING_BACKEND: FakeWallet
-      MINT_INPUT_FEE_PPK: 0
-      MINT_LISTEN_HOST: 0.0.0.0
-      MINT_LISTEN_PORT: 3338
-      MINT_PRIVATE_KEY: TEST_PRIVATE_KEY_OHH_YEAH_BABY
-    command: poetry run mint
-    networks:
-      - postgres-network
-    
   backend:
     build:
       context: .
@@ -42,7 +25,6 @@ services:
       - postgres-network
     depends_on:
       - postgres
-      - nutshell
 
   frontend:
     build:
@@ -50,6 +32,18 @@ services:
       dockerfile: Dockerfile.frontend
     container_name: openpleb-frontend
     restart: unless-stopped
+    environment:
+      PUBLIC_BACKEND_URL: http://localhost:3003
+      PUBLIC_PLATFORM_FEE_PERCENTAGE: 0
+      PUBLIC_PLATFORM_FEE_FLAT_RATE: 100
+      PUBLIC_TAKER_FEE_PERCENTAGE: 2
+      PUBLIC_TAKER_FEE_FLAT_RATE: 100
+      PUBLIC_MINT_URL: http://localhost:3338
+      PUBLIC_API_VERSION: v1
+      PUBLIC_BOND_PERCENTAGE: 10
+      PUBLIC_BOND_FLAT_RATE: 500
+      PUBLIC_CURRENCY: KRW
+      PUBLIC_MAX_FIAT_AMOUNT: 100000
     ports:
       - "3000:3000"
     networks:

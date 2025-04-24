@@ -4,21 +4,22 @@
 	import * as Sidebar from '$lib/components/ui/sidebar/index';
 	import type { ComponentProps } from 'svelte';
 	import { page } from '$app/state';
-	import { Group } from 'lucide-svelte';
 	import { priceStore } from '$lib/stores/price';
 	import { formatCurrency } from '$lib/helper';
 	import {
-	PUBLIC_BOND_FLAT_RATE,
+	env } from '$env/dynamic/public';
+	import { dataStore } from '$lib/stores/session/data.svelte';
+	import { appMode } from '$lib/stores/local/mode';
+	import { OFFER_STATE } from '@openPleb/common/types';
+
+	const {PUBLIC_BOND_FLAT_RATE,
 	PUBLIC_BOND_PERCENTAGE,
 		PUBLIC_CURRENCY,
 		PUBLIC_PLATFORM_FEE_FLAT_RATE,
 		PUBLIC_PLATFORM_FEE_PERCENTAGE,
 		PUBLIC_TAKER_FEE_FLAT_RATE,
 		PUBLIC_TAKER_FEE_PERCENTAGE
-	} from '$env/static/public';
-	import { dataStore } from '$lib/stores/session/data.svelte';
-	import { appMode } from '$lib/stores/local/mode';
-	import { OFFER_STATE } from '@openPleb/common/types';
+	}	= env;
 
 	const data = $derived({
 		navMain: [

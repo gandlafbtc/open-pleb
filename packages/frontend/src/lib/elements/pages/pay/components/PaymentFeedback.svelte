@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL } from '$env/static/public';
+	import { env} from '$env/dynamic/public';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { OFFER_STATE } from '@openPleb/common/types';
 	import { schnorr } from '@noble/curves/secp256k1';
@@ -9,6 +9,8 @@
 	import { ensureError } from '$lib/errors';
 	import {  keysStore } from '@gandlaf21/cashu-wallet-engine';
 	import type { Offer } from '@openPleb/common/db/schema';
+
+    const { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL } = env;
 
     interface Props {offer: Offer}
     

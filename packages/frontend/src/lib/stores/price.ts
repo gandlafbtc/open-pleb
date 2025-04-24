@@ -1,6 +1,7 @@
-import { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL } from '$env/static/public';
+import { env} from '$env/dynamic/public';
 import { writable } from 'svelte/store';
 
+const { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL } = env;
 const createPriceStore = () => {
 	const store = writable<number>(0);
 	const refresh = async () => {

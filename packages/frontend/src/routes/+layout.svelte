@@ -14,11 +14,13 @@
 	import { LoaderCircle } from 'lucide-svelte';
 
 	import { init as initCashu, mintsStore } from "@gandlaf21/cashu-wallet-engine";
-	import { PUBLIC_MINT_URL } from '$env/static/public';
+	import { env} from '$env/dynamic/public';
 	import TinyBondWallet from '$lib/elements/bond-wallet/TinyBondWallet.svelte';
 	import PayEarnToggle from '$lib/elements/PayEarnToggle.svelte';
 	import { appMode } from '$lib/stores/local/mode';
 	import Button from '$lib/components/ui/button/button.svelte';
+
+	const {PUBLIC_MINT_URL } = env;
 
 	const { children } = $props();
 

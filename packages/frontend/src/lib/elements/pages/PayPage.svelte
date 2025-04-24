@@ -11,8 +11,10 @@
 	import QrScanner from 'qr-scanner';
 	import { keysStore } from '@gandlaf21/cashu-wallet-engine';
 	import { priceStore } from '$lib/stores/price';
-	import { PUBLIC_BOND_FLAT_RATE, PUBLIC_BOND_PERCENTAGE, PUBLIC_CURRENCY, PUBLIC_PLATFORM_FEE_FLAT_RATE, PUBLIC_PLATFORM_FEE_PERCENTAGE, PUBLIC_TAKER_FEE_FLAT_RATE, PUBLIC_TAKER_FEE_PERCENTAGE } from '$env/static/public';
+	import { env } from '$env/dynamic/public';
 	import { createNewOffer, type OfferResponse } from '$lib/actions';
+
+	const {PUBLIC_BOND_FLAT_RATE, PUBLIC_BOND_PERCENTAGE, PUBLIC_CURRENCY, PUBLIC_PLATFORM_FEE_FLAT_RATE, PUBLIC_PLATFORM_FEE_PERCENTAGE, PUBLIC_TAKER_FEE_FLAT_RATE, PUBLIC_TAKER_FEE_PERCENTAGE } = env;
 
 	let isScanning = $state(true);
 	let scannedResult = $state('');

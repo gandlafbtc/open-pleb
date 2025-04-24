@@ -1,16 +1,14 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { page } from '$app/state';
-	import { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL } from '$env/static/public';
+	import { env } from '$env/dynamic/public';
 	import CopiableToken from '$lib/elements/CopiableToken.svelte';
-	import { dataStore } from '$lib/stores/session/data.svelte';
 	import { LoaderCircle } from 'lucide-svelte';
 	import { decode } from 'light-bolt11-decoder';
 	import { encodeQR } from 'qr';
 	import { onMount } from 'svelte';
 	import { formatCurrency } from '$lib/helper';
-	import Expiry from '$lib/elements/Expiry.svelte';
 	import type { Offer } from '@openPleb/common/db/schema';
+
+	const { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL } = env;
 
     interface Props {offer: Offer}
     

@@ -1,6 +1,6 @@
 <script>
 	import { goto } from "$app/navigation";
-	import { PUBLIC_MINT_URL } from "$env/static/public";
+	import { env } from "$env/dynamic/public";
 	import Badge from "$lib/components/ui/badge/badge.svelte";
 	import FormButton from "$lib/components/ui/form/form-button.svelte";
 import Input from "$lib/components/ui/input/input.svelte";
@@ -12,6 +12,9 @@ import Input from "$lib/components/ui/input/input.svelte";
 	import { decode } from "light-bolt11-decoder";
 	import { Check, LoaderCircle, QrCode, Scan } from "lucide-svelte";
 	import { toast } from "svelte-sonner";
+    
+    const {PUBLIC_MINT_URL} = env;
+
     let invoiceOrAddress = $state(""); 
     let isLoading = $state(false);
     let amount = $state(0);

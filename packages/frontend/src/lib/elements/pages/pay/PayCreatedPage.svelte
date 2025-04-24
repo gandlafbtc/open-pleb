@@ -1,13 +1,14 @@
 <script lang="ts">
-	import { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL, PUBLIC_MINT_URL } from "$env/static/public";
+	import { env } from "$env/dynamic/public";
 	import { Button } from "$lib/components/ui/button";
-	import Expiry from "$lib/elements/Expiry.svelte";
 	import { ensureError } from "$lib/errors";
 	import { formatCurrency } from "$lib/helper";
 	import { proofsStore, sendEcash } from "@gandlaf21/cashu-wallet-engine";
 	import type { Offer } from "@openPleb/common/db/schema";
 	import { toast } from "svelte-sonner";
 	import {	getEncodedToken  } from "@cashu/cashu-ts";
+
+	const {PUBLIC_API_VERSION, PUBLIC_BACKEND_URL, PUBLIC_MINT_URL} = env;
 
     interface Props {offer: Offer; totalSats: number; bondTotalSats: number}
     

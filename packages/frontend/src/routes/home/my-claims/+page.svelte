@@ -1,26 +1,20 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import {
-		PUBLIC_API_VERSION,
-		PUBLIC_BACKEND_URL,
-		PUBLIC_CURRENCY,
-		PUBLIC_TAKER_FEE_PERCENTAGE
-	} from '$env/static/public';
+		env
+	} from '$env/dynamic/public';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card/index.js';
-	import { ensureError } from '$lib/errors.js';
 	import { formatCurrency } from '$lib/helper.js';
 	import { dataStore } from '$lib/stores/session/data.svelte';
-	import { toast } from 'svelte-sonner';
-	import { OFFER_STATE } from '@openPleb/common/types';
 	import { keysStore } from '@gandlaf21/cashu-wallet-engine';
 	import ChevronLeft from "@lucide/svelte/icons/chevron-left";
 		import ChevronRight from "@lucide/svelte/icons/chevron-right";
 		import { MediaQuery } from "svelte/reactivity";
 		import * as Pagination from "$lib/components/ui/pagination/index.js";
-	import type { Offer } from '@openPleb/common/db/schema';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
+
+	const {PUBLIC_CURRENCY} = env;
 
 	const id = Number.parseInt(page.params.id);
 	const offerIds = $derived(dataStore.claims.filter((c) => c.pubkey === $keysStore[0].publicKey).map(c=>c.offerId));

@@ -1,11 +1,12 @@
 import { get, writable } from 'svelte/store';
 import { dataStore } from './session/data.svelte';
 import { browser } from '$app/environment';
-import { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL } from '$env/static/public';
+import { env } from '$env/dynamic/public';
 import { keysStore } from '@gandlaf21/cashu-wallet-engine';
 import { appMode } from './local/mode';
 export let socket: undefined | WebSocket;
 
+const {PUBLIC_API_VERSION, PUBLIC_BACKEND_URL} = env;
 
 const handleSocketCommand = (data: { command: string; data: any }) => {
 

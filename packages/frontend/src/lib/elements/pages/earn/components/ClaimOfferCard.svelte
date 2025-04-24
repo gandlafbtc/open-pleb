@@ -1,11 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import {
-		PUBLIC_API_VERSION,
-		PUBLIC_BACKEND_URL,
-		PUBLIC_CURRENCY,
-		PUBLIC_MINT_URL,
-	} from '$env/static/public';
+	import { env
+	} from '$env/dynamic/public';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { ensureError } from '$lib/errors.js';
@@ -16,6 +12,12 @@
 	import { clock } from '$lib/stores/clock.svelte';
 	import Expiry from '$lib/elements/Expiry.svelte';
 	import { getEncodedToken } from "@cashu/cashu-ts";
+
+	const {
+		PUBLIC_API_VERSION,
+		PUBLIC_BACKEND_URL,
+		PUBLIC_CURRENCY,
+		PUBLIC_MINT_URL} = env 
 
     interface Props {offer: Offer}
     

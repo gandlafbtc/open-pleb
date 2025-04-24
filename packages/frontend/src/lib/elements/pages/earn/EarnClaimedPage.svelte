@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL, PUBLIC_CURRENCY } from '$env/static/public';
+	import { env } from '$env/dynamic/public';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import CopiableToken from '$lib/elements/CopiableToken.svelte';
 	import { ensureError } from '$lib/errors.js';
@@ -13,6 +13,8 @@
 	import Dropzone from 'svelte-file-dropzone';
 	import { toast } from 'svelte-sonner';
 	
+    const { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL, PUBLIC_CURRENCY} = env;
+
     interface Props {offer:Offer}
     
     let {offer}: Props = $props();
