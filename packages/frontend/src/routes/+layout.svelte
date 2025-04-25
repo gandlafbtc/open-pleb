@@ -18,6 +18,8 @@
 	import PayEarnToggle from '$lib/elements/PayEarnToggle.svelte';
 	import { appMode } from '$lib/stores/local/mode';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import InstallPrompt from '$lib/elements/InstallPrompt.svelte';
+	import PushNotification from '$lib/elements/PushNotification.svelte';
 
 	const {PUBLIC_MINT_URL } = env;
 
@@ -47,6 +49,8 @@
 </script>
 
 <Toaster richColors closeButton />
+<InstallPrompt />
+<PushNotification />
 {#if isInit}
 	{#if $appMode !== undefined}
 	<Sidebar.Provider>

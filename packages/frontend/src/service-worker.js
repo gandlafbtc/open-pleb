@@ -1,6 +1,52 @@
 /// <reference types="@sveltejs/kit" />
 import { build, files, version } from '$service-worker';
 
+// Push notification handler
+self.addEventListener('push', (event) => {
+  try {
+    const data = event.data.json(); // Assuming the server sends JSON
+    
+    // Use template if available, otherwise use provided data directly
+    const title = data.title;
+    const options = {
+      body: data.body,
+      icon: '/openpleb.svg',
+      badge: '/maskable-icon.png',
+      data: data.data || {}
+    };
+    
+    
+    event.waitUntil(
+      self.registration.showNotification(title, options)
+    );
+  } catch (error) {
+    console.error('Error displaying notification:', error);
+  }
+});
+
+// Handle notification clicks
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  
+  
+  event.waitUntil(
+    clients.matchAll({type: 'window'}).then((clientList) => {
+      // Check if there's already a window open
+      for (const client of clientList) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          client.navigate("/");
+          return client.focus();
+        }
+      }
+      // If no window is open, open a new one
+      if (clients.openWindow) {
+        return clients.openWindow("/");
+      }
+    })
+  );
+});
+
+
 // Create a unique cache name for this deployment
 const CACHE = `cache-${version}`;
 

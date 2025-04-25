@@ -10,6 +10,11 @@ import { log } from "./logger";
 import { open } from "./server/open";
 import { expireOffers } from "./jobs/expire";
 import { updateConnected } from "./jobs/updateConnected";
+import * as webpush from "@negrel/webpush";
+import { encodeBase64Url } from "@std/encoding/base64url";
+import { subscribers } from "./dynamic/subscribers";
+import { db } from "./db/db";
+import { subscriptionsTable } from "@openPleb/common/db/schema";
 
 log.info`Starting OpenPleb version ${version}...`;
 
@@ -38,6 +43,24 @@ for (const envVar of requiredEnvVars) {
   }
 }
 
+const exportedVapidKeys = JSON.parse(await Bun.file("./vapid.json").text());
+const vapidKeys = await webpush.importVapidKeys(exportedVapidKeys, {
+  extractable: false,
+});
+const appServer = await webpush.ApplicationServer.new({
+	contactInformation: "mailto:gandlaf@proton.me",
+	vapidKeys,
+  });
+
+  const loadSubscribersFromDBIntoMemory = async () => {
+	  const subscriptions = await db.select().from(subscriptionsTable);
+	  for (const subscription of subscriptions) {
+		  const parsedSubscription = JSON.parse(subscription.subscription);
+		  const subscriber = appServer.subscribe(parsedSubscription);
+		  subscribers.push(subscriber);
+		}
+	}
+	await loadSubscribersFromDBIntoMemory()
 const app = new Elysia()
 	.use(
 		logger({
@@ -86,14 +109,58 @@ const app = new Elysia()
 			},
 		}),
 	)
+	.use(
+		cors({
+			// origin: process.env.FRONTEND_URL,
+		}),
+	)
 	.group("/api/v1", (app) =>
 		app
-			.use(
-				cors({
-					// origin: process.env.FRONTEND_URL,
-				}),
-			)
 			.use(open),
 	)
+	.get('/vapid',async ()=> {
+		const publicKey = encodeBase64Url(
+			await crypto.subtle.exportKey(
+			  "raw",
+			  vapidKeys.publicKey,
+			),
+		  );
+		  return { publicKey }
+	})
+	.post("/subscribe", async ({ body })=> {
+		      // Retrieve subscription.
+			  const {subscription} = body;
+			  // You can store it in a DB to reuse it later.
+			  // ...
+				console.log(subscription);
+
+				await db.insert(subscriptionsTable).values({
+					subscription: JSON.stringify(subscription),
+					createdAt: Math.ceil(Date.now()/1000),
+				})
+			  // Create a subscriber object.
+			  const subscriber = appServer.subscribe(subscription);
+			
+			  // Send notification.
+			  await subscriber.pushTextMessage(
+				JSON.stringify({ title: "You will now receive notifications on new offers from openPleb!" }),
+				{},
+			  );
+
+			  subscribers.push(subscriber);
+		
+			  // OK.
+			  return new Response();
+	})
 	.listen(Bun.env.PORT);
-log.info`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`;
+
+
+	log.info`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`;
+	// {
+	// 	endpoint: "https://jmt17.google.com/fcm/send/erIfvI2IcE8:APA91bGYnnPHCO4bXMDEzhNdesJnEgL7ZVcIb5LkN54swkTz7Hx-fsSXvqOw7W8GvcuUFRYbZEMLfOrJQNRtMcCJ-ov-7a9MM_TlY2k4vIXOD5b0jhxeK3ZmVHWtZ2KTqeIKtnFUFQb_",
+	// 	expirationTime: null,
+	// 	keys: {
+	// 	  p256dh: "BGqRojoWb8fiMbeF4ZtuuUdSFaeFvn3aYwDqo7cCiaM44gvYz4Xnaup9UAr5aVN9sFH5Q4UYgjW6VrsZvHoldF0",
+	// 	  auth: "qSaQnyMw6ZnEeaV0Qv569Q",
+	// 	},
+	//   }

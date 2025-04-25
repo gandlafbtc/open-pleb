@@ -71,6 +71,13 @@ export const receiptsTable = pgTable('receipts', {
   offerId: integer("offer_id").references(() => offerTable.id).notNull().unique(),
 });
 
+export const subscriptionsTable = pgTable('subscriptions', {
+	id: integer().primaryKey().generatedAlwaysAsIdentity(),
+	createdAt: integer('created_at').notNull(),
+	subscription: text('subscription').notNull().unique(),
+	type: text('type')
+})
+
 export type MintQuote = typeof mintQuotesTable.$inferSelect;
 export type Claim = typeof claimsTable.$inferSelect;
 export type Offer = typeof offerTable.$inferSelect;

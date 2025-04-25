@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import { eventEmitter } from "../events/emitter";
 import { wallet } from "../cashu/wallet";
 import { InternalProofState } from "../types";
+import { notifyNewOfferSubs } from "../dynamic/subscribers";
 
 export const checkInvoiceState = async (
 	quote: MintQuote,
@@ -49,6 +50,8 @@ export const checkInvoiceState = async (
 			command: "update-offer",
 			data: { offer: offerResponse[0] },
 		});
+		notifyNewOfferSubs(offer)
 	}
+
 	return state;
 };
