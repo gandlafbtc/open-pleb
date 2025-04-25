@@ -115,34 +115,79 @@ cp packages/common/.env.example packages/common/.env
 The backend requires the following environment variables in `packages/backend/.env`:
 
 ```
+# Database connection string
 DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/postgres
+
+# Frontend URL for CORS and other connectivity
 FRONTEND_URL=localhost:5137
+
+# Port on which the backend server will listen
 PORT=3004
+
+# Log file location
 LOG_FILE_NAME="../../data/logs/app.log"
+
+# Seed phrase for Cashu wallet - KEEP THIS SECRET
+CASHU_SEED_PHRASE="because oxygen subway review excuse elder coconut kingdom govern scrub enact minimum"
+
+# Platform fee settings
 PUBLIC_PLATFORM_FEE_PERCENTAGE=1
 PUBLIC_PLATFORM_FEE_FLAT_RATE=100
-PUBLIC_TAKER_FEE_PERCENTAGE=1
-PUBLIC_TAKER_FEE_FLAT_RATE=100
-PUBLIC_MINT_URL=http://localhost:3003
-PUBLIC_BOND_PERCENTAGE=10
 
+# Taker fee settings
+PUBLIC_TAKER_FEE_PERCENTAGE=2
+PUBLIC_TAKER_FEE_FLAT_RATE=100
+
+# Bond settings
+PUBLIC_BOND_PERCENTAGE=10
+PUBLIC_BOND_FLAT_RATE=500
+
+# Mint service URL
+PUBLIC_MINT_URL=http://localhost:3338
+
+# Currency settings
+PUBLIC_CURRENCY=KRW
+
+# Maximum fiat amount allowed
+PUBLIC_MAX_FIAT_AMOUNT=100000
 ```
+
+All these environment variables are required and checked at application startup. The service will not start if any of these variables are missing.
 
 #### Frontend Environment Variables
 
 The frontend requires the following environment variables in `packages/frontend/.env`:
 
 ```
+# Backend API URL
 PUBLIC_BACKEND_URL=http://localhost:3004
+
+# Database connection string
 DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/postgres
+
+# Platform fee settings
 PUBLIC_PLATFORM_FEE_PERCENTAGE=1
 PUBLIC_PLATFORM_FEE_FLAT_RATE=100
-PUBLIC_TAKER_FEE_PERCENTAGE=1
-PUBLIC_TAKER_FEE_FLAT_RATE=100
-PUBLIC_MINT_URL=http://localhost:3003
-PUBLIC_API_VERSION=v1
-PUBLIC_BOND_PERCENTAGE=10
 
+# Taker fee settings
+PUBLIC_TAKER_FEE_PERCENTAGE=2
+PUBLIC_TAKER_FEE_FLAT_RATE=100
+
+# Bond settings
+PUBLIC_BOND_PERCENTAGE=10
+PUBLIC_BOND_FLAT_RATE=500
+
+# Mint service URL
+PUBLIC_MINT_URL=http://localhost:3338
+
+# API version
+PUBLIC_API_VERSION=v1
+
+# Currency settings
+PUBLIC_CURRENCY=KRW
+
+# Maximum fiat amount allowed
+PUBLIC_MAX_FIAT_AMOUNT=100000
 ```
 
 #### Common Environment Variables
