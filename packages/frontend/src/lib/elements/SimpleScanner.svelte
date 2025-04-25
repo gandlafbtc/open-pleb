@@ -39,9 +39,6 @@
 		} else {
 			cams = [];
 		}
-		setTimeout(() => {
-			onScanSuccess({cornerPoints: [], data: 'asdfasdfasdf'});
-		}, 2000); 
 	});
 
 	onDestroy(() => {
