@@ -65,7 +65,101 @@
 		}
 		// upload the file to the server
 	};
-</script>
+	function downloadSvgAsJpeg(svgElement: SVGElement, fileName: string, options = { quality: 0.95, scale: 50 }): void {
+  // Clone the SVG to avoid modifying the original
+  const svgClone = svgElement.cloneNode(true) as SVGElement;
+  
+  // Get SVG dimensions from viewBox or attributes
+  let width: number;
+  let height: number;
+  
+  if (svgClone.getAttribute('viewBox')) {
+    const viewBox = svgClone.getAttribute('viewBox')?.split(' ').map(Number);
+    width = viewBox?.[2] || svgElement.getBoundingClientRect().width;
+    height = viewBox?.[3] || svgElement.getBoundingClientRect().height;
+  } else {
+    // Try to get width and height attributes, fallback to getBoundingClientRect
+    width = parseFloat(svgClone.getAttribute('width') || '') || svgElement.getBoundingClientRect().width;
+    height = parseFloat(svgClone.getAttribute('height') || '') || svgElement.getBoundingClientRect().height;
+  }
+  
+  // Set explicit dimensions on the SVG clone
+  svgClone.setAttribute('width', width.toString());
+  svgClone.setAttribute('height', height.toString());
+  
+  // Create a canvas element
+  const canvas = document.createElement('canvas');
+  
+  // Set canvas size with scaling for better quality
+  canvas.width = width * options.scale;
+  canvas.height = height * options.scale;
+  
+  // Get canvas context
+  const context = canvas.getContext('2d');
+  
+  if (!context) {
+    console.error('Canvas 2D context not available');
+    return;
+  }
+  
+  // Set white background
+  context.fillStyle = 'white';
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  
+  // Scale the context for higher resolution
+  context.scale(options.scale, options.scale);
+  
+  // Get SVG data with correct dimensions
+  const svgData = new XMLSerializer().serializeToString(svgClone);
+  
+  // Create a blob for the SVG
+  const svgBlob = new Blob([svgData], { type: 'image/svg+xml' });
+  const url = URL.createObjectURL(svgBlob);
+  
+  // Create an image element
+  const img = new Image();
+  
+  // Set up image loading handler
+  img.onload = () => {
+    // Draw the image to the canvas - using full dimensions
+    context.drawImage(img, 0, 0, width, height);
+    
+    // Convert canvas to JPEG
+    canvas.toBlob(
+      (blob) => {
+        if (blob) {
+          // Create a download link
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = fileName || 'image.jpeg';
+          
+          // Trigger download
+          document.body.appendChild(link);
+          link.click();
+          
+          // Clean up
+          document.body.removeChild(link);
+          URL.revokeObjectURL(link.href);
+        }
+      },
+      'image/jpeg',
+      options.quality
+    );
+    
+    // Clean up
+    URL.revokeObjectURL(url);
+  };
+  
+  // Handle error
+  img.onerror = (error) => {
+    console.error('Error loading SVG:', error);
+    URL.revokeObjectURL(url);
+  };
+  
+  // Set the image source to the SVG URL
+  img.src = url;
+}
+	</script>
 
 {#if claim?.pubkey && claim.pubkey === $keysStore[0]?.publicKey}
 <div class="flex flex-col gap-2 w-full">
@@ -124,10 +218,22 @@
 			{formatCurrency(offer.amount, PUBLIC_CURRENCY)}
 			to
 		</p>
-		<div class="w-full rounded-md border p-2">
+		<div class="w-full rounded-md border p-2" id="qr-code-container">
 			{@html encodeQR(offer.qrCode, 'svg')}
 		</div>
-		<CopiableToken token={offer.qrCode}></CopiableToken>
+		<div class="flex gap-2 items-center">
+			<div class="w-full">
+
+				<CopiableToken token={offer.qrCode}></CopiableToken>
+			</div>
+			<Button class="w-full" size='lg' variant='ghost' onclick={()=> {
+				if (browser) {
+					downloadSvgAsJpeg(document.getElementById('qr-code-container')?.firstChild, 'qr.jpg')
+				}
+			}}>
+				Download as Image
+			</Button>
+		</div>
 		<Button
 			class="mt-10"
 			onclick={() => {

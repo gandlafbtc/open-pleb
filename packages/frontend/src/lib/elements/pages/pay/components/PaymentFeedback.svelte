@@ -9,6 +9,7 @@
 	import { ensureError } from '$lib/errors';
 	import {  keysStore } from '@gandlaf21/cashu-wallet-engine';
 	import type { Offer } from '@openPleb/common/db/schema';
+	import * as Dialog  from '$lib/components/ui/dialog';
 
     const { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL } = env;
 
@@ -17,6 +18,7 @@
     let {offer}: Props = $props();
 
     let isLoading = $state(false)
+    let isShow = $state(false)
 
     	const markPaymentFailed = async () => {
 		await commitFeedback('Payment failed', OFFER_STATE.MARKED_WITH_ISSUE);
@@ -70,7 +72,29 @@
     <Button disabled={isLoading} class="w-full" onclick={markPaymentSucceeded}>
         If the payment was successful, click here!
     </Button>
-    <Button disabled={isLoading} class="w-full" variant="link" onclick={markPaymentFailed}>
+    <Button disabled={isLoading} class="w-full" variant="link" onclick={() => (isShow = true)}>
         Someting went wrong with the payment
     </Button>
 </div>
+
+<Dialog.Root bind:open={isShow}>
+    <Dialog.Content>
+     <Dialog.Header>
+      <Dialog.Title class="text-destructive">
+		Reporting Payment as failed!
+	  </Dialog.Title>
+      <Dialog.Description>
+		You are about to report this payment as failed. It will be investigated by the operators and a decision will be made based on the evidence provided.
+		If ruled against you, your bond will be forfeited.
+      </Dialog.Description>
+     </Dialog.Header>
+	 <Dialog.Footer>
+		 <Button variant="outline" disabled={isLoading} class="w-full" onclick={() => (isShow = false)}>
+			 Close
+		 </Button>
+		 <Button disabled={isLoading} variant="destructive"  class="w-full" onclick={markPaymentFailed}>
+			 Confirm Payment failure
+		 </Button>
+	 </Dialog.Footer>
+    </Dialog.Content>
+   </Dialog.Root>
