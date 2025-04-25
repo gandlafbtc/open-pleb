@@ -13,14 +13,29 @@ import { updateConnected } from "./jobs/updateConnected";
 
 log.info`Starting OpenPleb version ${version}...`;
 
-if (!Bun.env.PORT) {
-	log.error("No PORT environment variable set");
-	process.exit(1);
-}
+// Check all required environment variables before starting the service
+const requiredEnvVars = [
+  'PORT',
+  'FRONTEND_URL',
+  'DATABASE_URL',
+  'CASHU_SEED_PHRASE',
+  'LOG_FILE_NAME',
+  'PUBLIC_PLATFORM_FEE_PERCENTAGE',
+  'PUBLIC_PLATFORM_FEE_FLAT_RATE',
+  'PUBLIC_TAKER_FEE_PERCENTAGE',
+  'PUBLIC_TAKER_FEE_FLAT_RATE',
+  'PUBLIC_MINT_URL',
+  'PUBLIC_BOND_PERCENTAGE',
+  'PUBLIC_BOND_FLAT_RATE',
+  'PUBLIC_CURRENCY',
+  'PUBLIC_MAX_FIAT_AMOUNT'
+];
 
-if (!Bun.env.FRONTEND_URL) {
-	log.error("No FRONTEND_URL environment variable set");
-	process.exit(1);
+for (const envVar of requiredEnvVars) {
+  if (!Bun.env[envVar]) {
+    log.error(`No ${envVar} environment variable set`);
+    process.exit(1);
+  }
 }
 
 const app = new Elysia()

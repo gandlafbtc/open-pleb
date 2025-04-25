@@ -17,7 +17,7 @@
 			checkIfRedeemed(offer?.refund);
 		}
 	})
-</script>
+</script> 
 
 <div>
 		{#if receipt}

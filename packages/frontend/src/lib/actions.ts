@@ -5,7 +5,7 @@ import { get } from 'svelte/store';
 import { ensureError } from './errors';
 import { CheckStateEnum, getDecodedToken } from '@cashu/cashu-ts';
 
-const { PUBLIC_BACKEND_URL, PUBLIC_API_VERSION } = env;
+const { PUBLIC_BACKEND_URL, PUBLIC_API_VERSION, PUBLIC_MINT_URL } = env;
 export type Offer = {
 	amount: number;
 	qrCode: string;
@@ -37,12 +37,14 @@ export const createNewOffer = async (offer: Offer): Promise<OfferResponse> => {
 
 const doClaim = async (token:string) => {
 	try {
+		const t = getDecodedToken(token)
+		console.log(t)
 		await receiveEcash(token, {privkey: get(keysStore)[0].privateKey})
 		toast.success("received!")
 	} catch (error) {
 		const err = ensureError(error);
-				console.error(err);
-				toast.error(err.message);
+		console.error(err);
+		toast.error(err.message);
 	}
 	finally {
 	}

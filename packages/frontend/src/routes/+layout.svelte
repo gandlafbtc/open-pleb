@@ -49,7 +49,6 @@
 <Toaster richColors closeButton />
 {#if isInit}
 	{#if $appMode !== undefined}
-	  
 	<Sidebar.Provider>
 		<AppSidebar />
 		<Sidebar.Inset>

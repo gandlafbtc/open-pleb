@@ -71,7 +71,7 @@ let latest = $derived(
 );
 </script>
 {#if showScanner}
-    <SimpleScanner isScanning={showScanner} bind:scannedResult={invoiceOrAddress}> </SimpleScanner>
+    <SimpleScanner bind:isScanning={showScanner} bind:scannedResult={invoiceOrAddress}> </SimpleScanner>
 {/if}
 <form class="flex flex-col gap-2 w-80 xl:w-[600px]" onsubmit={event => {event.preventDefault(); handleMelt()}}>
     <p class="text-center mb-5">

@@ -52,7 +52,7 @@
 
 <div class="flex h-[600px] w-80 flex-col items-center justify-between gap-2 xl:w-[600px]">
 	{#if !scannedResult && isScanning === true}
-		<SimpleScanner bind:isScanning whatToScan="FIAT" {scannedResult}></SimpleScanner>
+		<SimpleScanner bind:isScanning whatToScan="FIAT" bind:scannedResult></SimpleScanner>
 		<div class="relative flex w-full items-center py-5">
 			<div class="flex-grow border-t border-muted"></div>
 			<span class="mx-4 flex-shrink text-muted-foreground">OR</span>
