@@ -66,6 +66,10 @@ Fiat banking usually doesn't offer open protocols that would allow us to make at
 
 ![dispute flow](docs/dispute.svg)
 
+### Offer status
+
+![status flow](docs/status-flow.svg)
+
 ## development setup
 
 
