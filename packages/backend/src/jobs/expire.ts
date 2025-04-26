@@ -39,7 +39,7 @@ export const expireOffers = async () => {
 				break;
 			}
 			case OFFER_STATE.CLAIMED: {
-				//refund and refund taker bond
+				//refund and refund taker bond?
 				await expireOfferInvoicePaid(offer);
 				break;
 			}

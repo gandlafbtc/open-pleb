@@ -37,6 +37,8 @@ export const expireOfferInvoicePaid = async (offer: Offer) => {
 		offer.satsAmount +
 		offer.takerFeeFlatRate +
 		offer.takerFeePercentage +
+        offer.platformFeeFlatRate +
+        offer.platformFeePercentage +
 		offer.bondFlatRate +
 		offer.bondPercentage;
 
