@@ -8,15 +8,15 @@ export const getAmountForTokenSet = (tokens: Array<Proof>): number => {
 };
 
 export const parseSecret = (secret: string | Uint8Array): Secret => {
-    try {
-        let internalSecret = secret;
-        if (internalSecret instanceof Uint8Array) {
-            internalSecret = new TextDecoder().decode(internalSecret);
-        }
-        return JSON.parse(internalSecret);
-    } catch (e) {
-        throw new Error("can't parse secret");
-    }
+	try {
+		let internalSecret = secret;
+		if (internalSecret instanceof Uint8Array) {
+			internalSecret = new TextDecoder().decode(internalSecret);
+		}
+		return JSON.parse(internalSecret);
+	} catch (e) {
+		throw new Error("can't parse secret");
+	}
 };
 
 export const getAproxAmount = (
@@ -62,7 +62,10 @@ export const getAproxAmount = (
 		}
 	}
 
-	if (amount > getAmountForTokenSet(exactProofs) + getAmountForTokenSet(lastClosest)) {
+	if (
+		amount >
+		getAmountForTokenSet(exactProofs) + getAmountForTokenSet(lastClosest)
+	) {
 		return [];
 	}
 	return [...exactProofs, ...lastClosest];

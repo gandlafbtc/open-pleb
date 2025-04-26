@@ -38,13 +38,6 @@
 			});
 		}
 		priceStore.refresh();
-		const interval = setInterval(() => {
-			priceStore.refresh();
-		}, 10000);
-
-		return () => {
-			clearInterval(interval);
-		};
 	});
 </script>
 

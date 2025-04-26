@@ -1,9 +1,9 @@
 export type TakerMaker = {
-    pubkey: string;
-    ts: number; 
-}
+	pubkey: string;
+	ts: number;
+};
 
-export const takerMakerData: {takers: TakerMaker[], makers: TakerMaker[]}  = {
-  takers: [],
-  makers: []
+export const takerMakerData: { takers: TakerMaker[]; makers: TakerMaker[] } = {
+	takers: [],
+	makers: [],
 };

@@ -3,12 +3,12 @@ import { ensureError } from "@openPleb/common/errors";
 import type { PingData } from "@openPleb/common/types";
 import type Elysia from "elysia";
 import type { ElysiaWS } from "elysia/ws";
+import { takerMakerData } from "../dynamic/takersMakers";
 import { eventEmitter } from "../events/emitter";
 import { log } from "../logger";
 import type { SocketEventData } from "../types";
 import { getData, getDataForId } from "./api/data";
 import { offers } from "./api/offers/offers";
-import { takerMakerData } from "../dynamic/takersMakers";
 
 export const open = (app: Elysia) =>
 	app
@@ -56,8 +56,10 @@ export const open = (app: Elysia) =>
 		.use(offers)
 		.ws("/ws", {
 			open: (ws) => {
-				const headers = ws.data.request.headers
-				const pubkey = JSON.parse(JSON.stringify(headers))['sec-websocket-protocol']
+				const headers = ws.data.request.headers;
+				const pubkey = JSON.parse(JSON.stringify(headers))[
+					"sec-websocket-protocol"
+				];
 				ws.subscribe("message");
 				sendPing(ws);
 				setInterval(async () => {
@@ -66,7 +68,7 @@ export const open = (app: Elysia) =>
 				eventEmitter.on("socket-event", (e: SocketEventData) => {
 					//if it's a pubkey event and it's not for this pubkey, ignore it
 					if (e.pubkeys?.length && !e.pubkeys.includes(pubkey)) {
-						return
+						return;
 					}
 					log.debug("Sending socket event {e}", { e: e.command });
 					ws.send(e);
@@ -88,12 +90,12 @@ const sendPing = async (ws: ElysiaWS) => {
 		const pingData: PingData = {
 			takers: takerMakerData.takers.length,
 			makers: takerMakerData.makers.length,
-			price: await getConversionRate()
+			price: await getConversionRate(),
 		};
 		ws.send({ command: "ping", data: pingData });
 	} catch (error) {
 		const err = ensureError(error);
-		log.warn("websocket Ping error {error}", { error:err.message });
+		log.warn("websocket Ping error {error}", { error: err.message });
 	}
 };
 
@@ -101,26 +103,27 @@ const handlePong = (data: { pubkey: string; mode: string }) => {
 	const newEntry = {
 		pubkey: data.pubkey,
 		ts: Date.now(),
-	}
+	};
 	if (data.mode === "pay") {
-		const i = takerMakerData.makers.findIndex((maker) => maker.pubkey === data.pubkey);
+		const i = takerMakerData.makers.findIndex(
+			(maker) => maker.pubkey === data.pubkey,
+		);
 		if (i !== -1) {
 			takerMakerData.makers.splice(i, 1, newEntry);
-		}
-		else {
+		} else {
 			takerMakerData.makers.push(newEntry);
 		}
-	}
-	else if (data.mode === "earn") {
-		const i = takerMakerData.takers.findIndex((taker) => taker.pubkey === data.pubkey);
+	} else if (data.mode === "earn") {
+		const i = takerMakerData.takers.findIndex(
+			(taker) => taker.pubkey === data.pubkey,
+		);
 		if (i !== -1) {
 			takerMakerData.takers.splice(i, 1, newEntry);
-		}
-		else {
+		} else {
 			takerMakerData.takers.push(newEntry);
 		}
 	}
-}
+};
 
 const handleCommand = async (message: { command: string; data: unknown }) => {
 	switch (message.command) {
@@ -128,7 +131,7 @@ const handleCommand = async (message: { command: string; data: unknown }) => {
 			break;
 		}
 		case "pong":
-			handlePong(message.data as {pubkey: string, mode: string});
+			handlePong(message.data as { pubkey: string; mode: string });
 			break;
 		default:
 			log.warn("Unknown websocket command {message}", { message });

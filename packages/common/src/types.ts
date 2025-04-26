@@ -1,6 +1,7 @@
 export type PingData = {
    takers: number
    makers: number
+   price: number
 }
 
 export const OFFER_STATE = {

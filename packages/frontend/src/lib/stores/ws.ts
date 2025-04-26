@@ -4,6 +4,7 @@ import { browser } from '$app/environment';
 import { env } from '$env/dynamic/public';
 import { keysStore } from '@gandlaf21/cashu-wallet-engine';
 import { appMode } from './local/mode';
+import { priceStore } from './price';
 export let socket: undefined | WebSocket;
 
 const {PUBLIC_API_VERSION, PUBLIC_BACKEND_URL} = env;
@@ -13,6 +14,7 @@ const handleSocketCommand = (data: { command: string; data: any }) => {
 	switch (data.command) {
 		case 'ping': {
 			dataStore.updateConnections(data?.data)
+			priceStore.set(data?.data.price)
 			break
 		}
 		case 'new-offer':

@@ -18,12 +18,11 @@ export const postOffer = async (body: {
 			status: 400,
 		});
 	}
-	if (amount > Number.parseInt(Bun.env.PUBLIC_MAX_FIAT_AMOUNT!)){
+	if (amount > Number.parseInt(Bun.env.PUBLIC_MAX_FIAT_AMOUNT!)) {
 		return new Response("Amount exceeds maximum allowed", {
 			status: 400,
 		});
 	}
-	
 
 	const conversionRate = await getConversionRate();
 

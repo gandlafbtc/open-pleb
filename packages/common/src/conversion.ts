@@ -1,7 +1,7 @@
 const priceSource = 'https://api.upbit.com';
 
 let lastChecked = 0;
-let lastResult: number | null = null;
+let lastResult = 150_000_000;
 const checkExpiry = 60 * 1000; // 1 hour in milliseconds
 
 export const getConversionRate = async () => {

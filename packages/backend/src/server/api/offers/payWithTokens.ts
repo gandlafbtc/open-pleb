@@ -1,17 +1,17 @@
-import { db } from "@openPleb/common/db";
-import { eq } from "drizzle-orm";
-import { wallet } from "../../../cashu/wallet";
-import { OFFER_STATE } from "@openPleb/common/types";
 import { getDecodedToken } from "@cashu/cashu-ts";
+import { db } from "@openPleb/common/db";
 import {
 	type InsertProof,
 	offerTable,
 	proofsTable,
 } from "@openPleb/common/db/schema";
-import { InternalProofState } from "../../../types";
 import { ensureError } from "@openPleb/common/errors";
+import { OFFER_STATE } from "@openPleb/common/types";
+import { eq } from "drizzle-orm";
+import { wallet } from "../../../cashu/wallet";
+import { notifyNewOfferSubs } from "../../../dynamic/subscribers";
 import { eventEmitter } from "../../../events/emitter";
-import { notifyNewOfferSubs, subscribers } from "../../../dynamic/subscribers";
+import { InternalProofState } from "../../../types";
 
 export const payWithTokens = async (id: string, tokenString: string) => {
 	if (!id) {
@@ -34,7 +34,8 @@ export const payWithTokens = async (id: string, tokenString: string) => {
 		return new Response("Invalid offer state", { status: 400 });
 	}
 
-	const totalAmount = offer.satsAmount +
+	const totalAmount =
+		offer.satsAmount +
 		offer.platformFeePercentage +
 		offer.takerFeePercentage +
 		offer.platformFeeFlatRate +
@@ -55,9 +56,7 @@ export const payWithTokens = async (id: string, tokenString: string) => {
 
 	try {
 		const proofs = await wallet.receive(token);
-		if (
-			proofs.reduce((acc, proof) => acc + proof.amount, 0) !== totalAmount
-		) {
+		if (proofs.reduce((acc, proof) => acc + proof.amount, 0) !== totalAmount) {
 			throw new Error("Invalid bond amount after redemption");
 		}
 		const proofsToInsert: InsertProof[] = proofs.map((p) => {
@@ -85,13 +84,13 @@ export const payWithTokens = async (id: string, tokenString: string) => {
 		.where(eq(offerTable.id, offerId))
 		.returning();
 
-		const o = offerResponse[0]
+	const o = offerResponse[0];
 	eventEmitter.emit("socket-event", {
 		command: "update-offer",
 		data: { offer: o },
 	});
 
-	notifyNewOfferSubs(o)
+	notifyNewOfferSubs(o);
 
-	return {offer: offerResponse[0]}
+	return { offer: offerResponse[0] };
 };

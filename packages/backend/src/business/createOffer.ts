@@ -1,9 +1,7 @@
-import { CashuMint } from "@cashu/cashu-ts";
 import { db } from "@openPleb/common/db";
 import {
 	type InsertOffer,
 	type Offer,
-	mintQuotesTable,
 	offerTable,
 } from "@openPleb/common/db/schema";
 import { OFFER_STATE } from "@openPleb/common/types";
@@ -65,19 +63,15 @@ export const createOffer = async (offerData: OfferData): Promise<Offer> => {
 	const takerFeeFlatRate = Number.parseFloat(
 		Bun.env.PUBLIC_TAKER_FEE_FLAT_RATE!,
 	);
-	const bondFlatRate = Number.parseFloat(
-		Bun.env.PUBLIC_BOND_FLAT_RATE!,
-	);
+	const bondFlatRate = Number.parseFloat(Bun.env.PUBLIC_BOND_FLAT_RATE!);
 
 	const takerFeePercentage = Math.ceil(
 		(satsAmount * Number.parseFloat(Bun.env.PUBLIC_TAKER_FEE_PERCENTAGE!)) /
 			100,
 	);
 	const bondPercentage = Math.ceil(
-		(satsAmount * Number.parseFloat(Bun.env.PUBLIC_BOND_PERCENTAGE!)) /
-			100,
+		(satsAmount * Number.parseFloat(Bun.env.PUBLIC_BOND_PERCENTAGE!)) / 100,
 	);
-	
 
 	const insertOffer: InsertOffer = {
 		createdAt: Math.ceil(Date.now() / 1000),
@@ -97,7 +91,7 @@ export const createOffer = async (offerData: OfferData): Promise<Offer> => {
 		pubkey,
 	};
 
-	console.log(insertOffer)
+	console.log(insertOffer);
 
 	const offerResponse = await db
 		.insert(offerTable)

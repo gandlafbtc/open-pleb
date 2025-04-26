@@ -32,10 +32,7 @@
 
 			if (permission === 'granted') {
 				// Permission granted, could show a test notification here
-				const notification = new Notification('OpenPleb Notifications Enabled', {
-					body: 'You will now receive updates about new offers.',
-					icon: '/openpleb.svg'
-				});
+
 			}
 
 			// Close the dialog

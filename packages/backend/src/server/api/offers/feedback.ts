@@ -1,26 +1,25 @@
 import {
 	CheckStateEnum,
-	getEncodedToken,
 	OutputData,
 	type Proof,
+	getEncodedToken,
 } from "@cashu/cashu-ts";
 import { schnorr } from "@noble/curves/secp256k1";
 import { sha256 } from "@noble/hashes/sha256";
 import { db } from "@openPleb/common/db";
 import {
-	claimsTable,
 	type InsertProof,
+	type Offer,
+	claimsTable,
 	offerTable,
 	proofsTable,
 	receiptsTable,
-	type Offer,
-	type Receipt,
 } from "@openPleb/common/db/schema";
 import { OFFER_STATE } from "@openPleb/common/types";
 import { and, eq } from "drizzle-orm";
+import { parseSecret } from "../../../cashu/helper";
 import { wallet } from "../../../cashu/wallet";
 import { eventEmitter } from "../../../events/emitter";
-import { parseSecret } from "../../../cashu/helper";
 import { InternalProofState } from "../../../types";
 export const commitFeedback = async (
 	offerId: string,
@@ -41,35 +40,27 @@ export const commitFeedback = async (
 	}
 	const offer = offers[0];
 
-	if (
-		![
-			OFFER_STATE.RECEIPT_SUBMITTED,
-		].includes(offer.status)
-	) {
+	if (![OFFER_STATE.RECEIPT_SUBMITTED].includes(offer.status)) {
 		return new Response(`Invalid offer state: ${offer.status}`, {
 			status: 400,
 		});
 	}
 
-	const message = feedbackData.nonce +
+	const message =
+		feedbackData.nonce +
 		feedbackData.feedback +
 		feedbackData.status +
 		offerId +
 		offer.invoice;
 	const messageHash = sha256(message);
-	const res = schnorr.verify(
-		feedbackData.signature,
-		messageHash,
-		offer.pubkey,
-	);
+	const res = schnorr.verify(feedbackData.signature, messageHash, offer.pubkey);
 	if (!res) {
 		return new Response("Invalid signature", { status: 401 });
 	}
 	if (
-		![
-			OFFER_STATE.MARKED_WITH_ISSUE,
-			OFFER_STATE.COMPLETED,
-		].includes(feedbackData.status)
+		![OFFER_STATE.MARKED_WITH_ISSUE, OFFER_STATE.COMPLETED].includes(
+			feedbackData.status,
+		)
 	) {
 		return new Response("Invalid status", { status: 400 });
 	}
@@ -82,7 +73,7 @@ export const handlePayouts = async (
 	feedback: string,
 	status: string,
 ) => {
-		const receipts = await db
+	const receipts = await db
 		.select()
 		.from(receiptsTable)
 		.where(eq(receiptsTable.offerId, offer.id));
@@ -90,12 +81,15 @@ export const handlePayouts = async (
 	if (receipts.length === 0) {
 		return new Response("No receipts found", { status: 404 });
 	}
-	const proofsFromDb = await db.select().from(proofsTable).where(
-		and(
-			eq(proofsTable.state, CheckStateEnum.UNSPENT),
-			eq(proofsTable.offerId, offer.id),
-		),
-	);
+	const proofsFromDb = await db
+		.select()
+		.from(proofsTable)
+		.where(
+			and(
+				eq(proofsTable.state, CheckStateEnum.UNSPENT),
+				eq(proofsTable.offerId, offer.id),
+			),
+		);
 
 	const proofs: Proof[] = proofsFromDb.map((p) => {
 		return {
@@ -106,8 +100,11 @@ export const handlePayouts = async (
 		};
 	});
 
-	const sendAmount = offer.satsAmount + offer.takerFeeFlatRate +
-		offer.takerFeePercentage + offer.bondFlatRate +
+	const sendAmount =
+		offer.satsAmount +
+		offer.takerFeeFlatRate +
+		offer.takerFeePercentage +
+		offer.bondFlatRate +
 		offer.bondPercentage;
 
 	const makerBondAmount = offer.bondFlatRate + offer.bondPercentage;
@@ -182,8 +179,8 @@ export const handlePayouts = async (
 		}
 	});
 
-	const mintUrl = Bun.env.PUBLIC_MINT_URL || '';
-	
+	const mintUrl = Bun.env.PUBLIC_MINT_URL || "";
+
 	const refundToken = getEncodedToken({
 		mint: mintUrl,
 		proofs: refundProofs,
@@ -196,7 +193,8 @@ export const handlePayouts = async (
 
 	const updatedClaims = await db
 		.update(claimsTable)
-		.set({ reward: rewardToken }).where(eq(claimsTable.offerId, offer.id))
+		.set({ reward: rewardToken })
+		.where(eq(claimsTable.offerId, offer.id))
 		.returning();
 
 	if (updatedClaims.length === 0) {
@@ -204,10 +202,10 @@ export const handlePayouts = async (
 	}
 
 	const updatedOffer = await db
-	.update(offerTable)
-	.set({ feedback, status, refund: refundToken  })
-	.where(eq(offerTable.id, offer.id))
-	.returning();
+		.update(offerTable)
+		.set({ feedback, status, refund: refundToken })
+		.where(eq(offerTable.id, offer.id))
+		.returning();
 
 	if (!updatedOffer || updatedOffer.length === 0) {
 		return new Response("Failed to update offer", { status: 500 });
@@ -216,7 +214,6 @@ export const handlePayouts = async (
 		command: "update-offer",
 		data: { offer: updatedOffer[0] },
 	});
-
 
 	const claim = updatedClaims[0];
 

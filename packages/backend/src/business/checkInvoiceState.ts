@@ -1,12 +1,17 @@
 import { CashuMint, MintQuoteState } from "@cashu/cashu-ts";
 import { db } from "@openPleb/common/db";
-import { type InsertProof, type MintQuote, offerTable, proofsTable } from "@openPleb/common/db/schema";
+import {
+	type InsertProof,
+	type MintQuote,
+	offerTable,
+	proofsTable,
+} from "@openPleb/common/db/schema";
 import { OFFER_STATE } from "@openPleb/common/types";
 import { eq } from "drizzle-orm";
-import { eventEmitter } from "../events/emitter";
 import { wallet } from "../cashu/wallet";
-import { InternalProofState } from "../types";
 import { notifyNewOfferSubs } from "../dynamic/subscribers";
+import { eventEmitter } from "../events/emitter";
+import { InternalProofState } from "../types";
 
 export const checkInvoiceState = async (
 	quote: MintQuote,
@@ -15,10 +20,9 @@ export const checkInvoiceState = async (
 	const mint = new CashuMint(Bun.env.PUBLIC_MINT_URL!);
 	const { state } = await mint.checkMintQuote(quote.quote);
 	if (state === MintQuoteState.PAID) {
-
 		const proofs = await wallet.mintProofs(quote.amount, quote.quote, {
-			// maybe lock to server pubkey?	
-		})
+			// maybe lock to server pubkey?
+		});
 		const proofsToInsert: InsertProof[] = proofs.map((p) => {
 			return {
 				id: p.id,
@@ -27,10 +31,13 @@ export const checkInvoiceState = async (
 				secret: p.secret,
 				offerId,
 				state: InternalProofState.UNSPENT,
-			}
-		})
-		await db.insert(proofsTable).values(proofsToInsert)
-		const offers = await db.select().from(offerTable).where(eq(offerTable.id, offerId));
+			};
+		});
+		await db.insert(proofsTable).values(proofsToInsert);
+		const offers = await db
+			.select()
+			.from(offerTable)
+			.where(eq(offerTable.id, offerId));
 		if (!offers.length) {
 			throw new Error("Offer not found");
 		}
@@ -50,7 +57,7 @@ export const checkInvoiceState = async (
 			command: "update-offer",
 			data: { offer: offerResponse[0] },
 		});
-		notifyNewOfferSubs(offer)
+		notifyNewOfferSubs(offer);
 	}
 
 	return state;
