@@ -18,6 +18,7 @@ ENV LOG_FILE_NAME=/app/data/logs/app.log
 
 WORKDIR /app
 COPY --from=install /app/packages/backend/openpleb /app/openpleb
+COPY --from=install /app/packages/backend/vapid.json /app/vapid.json
 COPY --from=install /app/packages/backend/empty /app/data
 
 EXPOSE 3003/tcp
