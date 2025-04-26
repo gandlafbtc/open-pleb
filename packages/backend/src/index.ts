@@ -94,8 +94,8 @@ const app = new Elysia()
 	)
 	.use(
 		rateLimit({
-			duration: 30000,
-			max: 100,
+			duration: 60000,
+			max: 1000,
 		}),
 	)
 	.use(
@@ -143,7 +143,7 @@ const app = new Elysia()
 			
 			  // Send notification.
 			  await subscriber.pushTextMessage(
-				JSON.stringify({ title: "You will now receive notifications on new offers from openPleb!" }),
+				JSON.stringify({ title: "OpenPleb notifications enabled!", body: "You will now receive notifications on new offers!" }),
 				{},
 			  );
 
@@ -156,11 +156,3 @@ const app = new Elysia()
 
 
 	log.info`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`;
-	// {
-	// 	endpoint: "https://jmt17.google.com/fcm/send/erIfvI2IcE8:APA91bGYnnPHCO4bXMDEzhNdesJnEgL7ZVcIb5LkN54swkTz7Hx-fsSXvqOw7W8GvcuUFRYbZEMLfOrJQNRtMcCJ-ov-7a9MM_TlY2k4vIXOD5b0jhxeK3ZmVHWtZ2KTqeIKtnFUFQb_",
-	// 	expirationTime: null,
-	// 	keys: {
-	// 	  p256dh: "BGqRojoWb8fiMbeF4ZtuuUdSFaeFvn3aYwDqo7cCiaM44gvYz4Xnaup9UAr5aVN9sFH5Q4UYgjW6VrsZvHoldF0",
-	// 	  auth: "qSaQnyMw6ZnEeaV0Qv569Q",
-	// 	},
-	//   }

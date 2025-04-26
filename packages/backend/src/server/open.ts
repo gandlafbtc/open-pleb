@@ -62,7 +62,7 @@ export const open = (app: Elysia) =>
 				sendPing(ws);
 				setInterval(async () => {
 					sendPing(ws);
-				}, 10000);
+				}, 5000);
 				eventEmitter.on("socket-event", (e: SocketEventData) => {
 					//if it's a pubkey event and it's not for this pubkey, ignore it
 					if (e.pubkeys?.length && !e.pubkeys.includes(pubkey)) {
@@ -88,19 +88,12 @@ const sendPing = async (ws: ElysiaWS) => {
 		const pingData: PingData = {
 			takers: takerMakerData.takers.length,
 			makers: takerMakerData.makers.length,
+			price: await getConversionRate()
 		};
 		ws.send({ command: "ping", data: pingData });
-		// log.debug(`sent websocket ping {pingData}`, {pingData} )
 	} catch (error) {
 		const err = ensureError(error);
-		log.warn("websocket Ping error {error}", { error });
-		ws.send({
-			command: "ping",
-			data: {
-				isConnected: false,
-				detail: err.message,
-			},
-		});
+		log.warn("websocket Ping error {error}", { error:err.message });
 	}
 };
 

@@ -11,7 +11,7 @@ import {
 import { InternalProofState } from "../../../types";
 import { ensureError } from "@openPleb/common/errors";
 import { eventEmitter } from "../../../events/emitter";
-import { subscribers } from "../../../dynamic/subscribers";
+import { notifyNewOfferSubs, subscribers } from "../../../dynamic/subscribers";
 
 export const payWithTokens = async (id: string, tokenString: string) => {
 	if (!id) {
@@ -91,12 +91,7 @@ export const payWithTokens = async (id: string, tokenString: string) => {
 		data: { offer: o },
 	});
 
-	for (const subscriber of subscribers) {
-		subscriber.pushTextMessage(
-			JSON.stringify({ title: "New offer available on openPleb!", body: `Pay ${o.amount} ${o.currency} and earn ${o.satsAmount + o.takerFeeFlatRate + o.takerFeePercentage} sats!` }),
-			{},
-		  );		
-	}
+	notifyNewOfferSubs(o)
 
 	return {offer: offerResponse[0]}
 };
