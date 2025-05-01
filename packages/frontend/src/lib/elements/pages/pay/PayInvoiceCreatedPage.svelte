@@ -7,6 +7,7 @@
 	import { onMount } from 'svelte';
 	import { formatCurrency } from '$lib/helper';
 	import type { Offer } from '@openPleb/common/db/schema';
+	import Expiry from '$lib/elements/Expiry.svelte';
 
 	const { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL } = env;
 
@@ -43,11 +44,15 @@
 			</p>
 		</div>
 		<a href="lightning:{offer.invoice}">
-			<div class="w-full rounded-md border p-2">
+			<div class="w-full rounded-md border p-2 bg-white">
 				{@html encodeQR(offer?.invoice, 'svg')}
 			</div>
 		</a>
 		<CopiableToken token={offer?.invoice}></CopiableToken>
+		<div>
+            <p class="font-semibold mb-1">Expiry</p>
+            <Expiry offer={offer} />
+        </div>
 	</div>
 {:else}
 	<LoaderCircle class="animate-spin"></LoaderCircle>

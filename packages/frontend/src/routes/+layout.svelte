@@ -4,7 +4,6 @@
 	import AppSidebar from '$lib/components/app-sidebar.svelte';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import Separator from '$lib/components/ui/separator/separator.svelte';
-	import { page } from '$app/state';
 	import { Toaster } from '$lib/components/ui/sonner/index.js';
 	import { onMount } from 'svelte';
 	import { priceStore } from '$lib/stores/price';
@@ -20,17 +19,23 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import InstallPrompt from '$lib/elements/InstallPrompt.svelte';
 	import PushNotification from '$lib/elements/PushNotification.svelte';
+	import { ModeWatcher } from "mode-watcher";
 
 	const {PUBLIC_MINT_URL } = env;
 
 	const { children } = $props();
 
 	let isInit = $state(false);
+	
+	let initStatus = $state("Initializing");
+
+
 
 	onMount(() => {
 		if (browser) {
 			initCashu().then(async () => {
 				await init()
+				initStatus = "Updating mint"
 				await mintsStore.fetchMint(PUBLIC_MINT_URL)
 				isInit = true;
 			}).catch((error) => {
@@ -40,7 +45,7 @@
 		priceStore.refresh();
 	});
 </script>
-
+<ModeWatcher></ModeWatcher>
 <Toaster richColors closeButton />
 <InstallPrompt />
 <PushNotification />
@@ -88,7 +93,8 @@
 	
 	{/if}
 {:else}
-	<div class="flex h-screen w-screen items-center justify-center">
+	<div class="flex flex-col gap-2 h-screen w-screen items-center justify-center">
 		<LoaderCircle class="animate-spin"></LoaderCircle>
+		{initStatus}
 	</div>
 {/if}

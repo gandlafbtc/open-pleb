@@ -89,7 +89,7 @@
         "idb": "^8.0.2",
         "light-bolt11-decoder": "^3.2.0",
         "lucide-svelte": "^0.486.0",
-        "mode-watcher": "^0.5.1",
+        "mode-watcher": "0.5.1",
         "prettier": "^3.4.2",
         "prettier-plugin-svelte": "^3.3.3",
         "prettier-plugin-tailwindcss": "^0.6.10",

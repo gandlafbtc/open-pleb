@@ -2,6 +2,7 @@
 	import { checkIfRedeemed } from "$lib/actions";
 	import { dataStore } from "$lib/stores/session/data.svelte";
 	import type { Offer } from "@openPleb/common/db/schema";
+	import DetailReceipt from "../pay/components/DetailReceipt.svelte";
 
     interface Props {offer: Offer}
     
@@ -14,8 +15,4 @@
 	})
 </script>
 
-<div class="flex flex-col items-center gap-2">
-    <div class="flex flex-col items-center gap-2">
-        <p>Offer expired.</p>
-    </div>
-</div>
+<DetailReceipt {offer} receipt={null}></DetailReceipt>

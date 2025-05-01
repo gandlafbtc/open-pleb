@@ -20,11 +20,8 @@
 
 </script>
 
-<div class="w-80 xl:w-[600px] p-2 border rounded-md flex flex-col items-center justify-center">
-	{#if offer}
-	{#if [OFFER_STATE.CREATED, OFFER_STATE.INVOICE_CREATED, OFFER_STATE.INVOICE_PAID, OFFER_STATE.CLAIMED, OFFER_STATE.RECEIPT_SUBMITTED].includes(offer.status)}
-	<Expiry {offer}></Expiry>
-	{/if}
+<div class="w-80 xl:w-[600px] p-2 justify-center">
+{#if offer}
 	{#if offer.status === OFFER_STATE.CREATED}
 	<EarnCreatedPage {offer}></EarnCreatedPage>
 	{:else if offer.status === OFFER_STATE.INVOICE_CREATED}

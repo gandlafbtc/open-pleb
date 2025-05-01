@@ -39,11 +39,8 @@
 		return total;
 	});
 </script>
-<div class="w-80 xl:w-[600px] p-2 border rounded-md flex flex-col items-center justify-center">
+<div class="w-80 xl:w-[600px] p-2">
 {#if offer && totalSats && bondTotalSats}
-{#if [OFFER_STATE.CREATED, OFFER_STATE.INVOICE_CREATED, OFFER_STATE.INVOICE_PAID, OFFER_STATE.CLAIMED, OFFER_STATE.RECEIPT_SUBMITTED].includes(offer.status)}
-<Expiry {offer}></Expiry>
-{/if}
 	{#if offer.status === OFFER_STATE.CREATED}
 		<PayCreatedPage {offer} {totalSats} {bondTotalSats}></PayCreatedPage>
 	{:else if offer.status === OFFER_STATE.INVOICE_CREATED}

@@ -19,7 +19,7 @@ export const postOffer = async (body: {
 		});
 	}
 	if (amount > Number.parseInt(Bun.env.PUBLIC_MAX_FIAT_AMOUNT!)) {
-		return new Response("Amount exceeds maximum allowed", {
+		return new Response(`Amount exceeds maximum allowed: ${Number.parseInt(Bun.env.PUBLIC_MAX_FIAT_AMOUNT!)} ${Bun.env.PUBLIC_CURRENCY!}`, {
 			status: 400,
 		});
 	}

@@ -103,12 +103,12 @@
 			</div>
 		</div>
 	{:else if scannedResult}
-		<p class="font-bold">Enter amount to pay</p>
-		<div class="flex flex-col items-center gap-2">
-			<p class="text-xl font-bold">
+	<div class="flex flex-col items-center gap-2">
+			<p class="font-bold">Enter amount to pay</p>
+			<p class="text-3xl font-bold">
 				{formatCurrency(amount, PUBLIC_CURRENCY)}
 			</p>
-			<p class="text-xl font-bold  text-muted-foreground">
+			<p class="font-bold  text-muted-foreground">
 				~ {formatCurrency(estimate, 'SAT')}
 			</p>
 			<p class="text text-muted-foreground font-bold">
@@ -127,7 +127,7 @@
 		>
 			<div class="flex w-full flex-col gap-2">
 				<Input type="number" placeholder="Amount" bind:value={amount} />
-				<FormButton type="submit" value="Pay" disabled={!amount} >Create offer ({formatCurrency(estimate+bondEstimate, 'SAT')})</FormButton>
+				<FormButton type="submit" value="Pay" disabled={!amount} >Create offer (~ {formatCurrency(estimate+bondEstimate, 'SAT')})</FormButton>
 			</div>
 		</form>
 		<div></div>

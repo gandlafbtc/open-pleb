@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import type { Offer } from '@openPleb/common/db/schema';
 	import { checkIfRedeemed } from '$lib/actions';
+	import DetailReceipt from '../pay/components/DetailReceipt.svelte';
 
     interface Props {offer: Offer}
     
@@ -26,8 +27,5 @@
 </script>
 
 {#if receipt}
-	<div class="flex flex-col items-center justify-center gap-2">
-		<p class="font-bold">Transaction complete!</p>
-		<img src={receipt.receiptImg} alt="" />
-	</div>
+	<DetailReceipt {offer} {receipt}></DetailReceipt>
 {/if}

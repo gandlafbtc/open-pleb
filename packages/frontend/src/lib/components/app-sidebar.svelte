@@ -2,7 +2,7 @@
 <script lang="ts">
 	import VersionSwitcher from '$lib/components/version-switcher.svelte';
 	import * as Sidebar from '$lib/components/ui/sidebar/index';
-	import type { ComponentProps } from 'svelte';
+	import { onMount, type ComponentProps } from 'svelte';
 	import { page } from '$app/state';
 	import { priceStore } from '$lib/stores/price';
 	import { formatCurrency } from '$lib/helper';
@@ -11,6 +11,12 @@
 	import { dataStore } from '$lib/stores/session/data.svelte';
 	import { appMode } from '$lib/stores/local/mode';
 	import { OFFER_STATE } from '@openPleb/common/types';
+	import ToggleDarkMode from '$lib/elements/settings/ToggleDarkMode.svelte';
+
+	let sidebar = $state();
+	onMount(() => {
+		sidebar = Sidebar.useSidebar();
+	});
 
 	const {PUBLIC_BOND_FLAT_RATE,
 	PUBLIC_BOND_PERCENTAGE,
@@ -143,7 +149,7 @@
 					<Sidebar.Menu>
 						{#each group.items as item (item.title)}
 							<Sidebar.MenuItem>
-								<Sidebar.MenuButton isActive={page.url.pathname === item.url}>
+								<Sidebar.MenuButton isActive={page.url.pathname === item.url} onclick={() => (sidebar.isMobile ? sidebar.toggle() : '')}>
 									{#snippet child({ props })}
 										<a href={item.url} {...props}>{item.title}</a>
 									{/snippet}
@@ -159,6 +165,9 @@
 				</Sidebar.GroupContent>
 			</Sidebar.Group>
 		{/each}
+	<Sidebar.Footer>
+		<ToggleDarkMode></ToggleDarkMode>
+	</Sidebar.Footer>
 	</Sidebar.Content>
 	<Sidebar.Rail />
 </Sidebar.Root>

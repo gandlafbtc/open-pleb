@@ -12,6 +12,7 @@
 	import encodeQR from 'qr';
 	import Dropzone from 'svelte-file-dropzone';
 	import { toast } from 'svelte-sonner';
+	import Expiry from '$lib/elements/Expiry.svelte';
 	
     const { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL, PUBLIC_CURRENCY} = env;
 
@@ -162,7 +163,7 @@
 	</script>
 
 {#if claim?.pubkey && claim.pubkey === $keysStore[0]?.publicKey}
-<div class="flex flex-col gap-2 w-full">
+<div class="flex flex-col gap-2 w-full border p-2 rounded-md">
 	{#if isPaid}
 		<p class="text-center text-xl font-bold">
 			Upload a screenshot of the receipt to verify the payment.
@@ -178,7 +179,7 @@
 					>
 						<Trash class="text-white "></Trash>
 					</button>
-					<img id="receiptImage" src={file} alt="" class="rounded-md p-10" />
+					<img id="receiptImage" src={file} alt="" class="rounded-md px-[20%]" />
 				</div>
 			{:else}
 				<Dropzone
@@ -194,14 +195,17 @@
 				</Dropzone>
 			{/if}
 		</div>
+		{#if file}
+		
 		<Button disabled={!file || isLoading} onclick={upload}>
 			{#if isLoading}
-				<LoaderCircle class="animate-spin"></LoaderCircle>
+			<LoaderCircle class="animate-spin"></LoaderCircle>
 			{:else}
-				<Upload></Upload>
+			<Upload></Upload>
 			{/if}
 			Upload
 		</Button>
+		{/if}
 
 		<Button
 			class="mt-10"
@@ -218,7 +222,7 @@
 			{formatCurrency(offer.amount, PUBLIC_CURRENCY)}
 			to
 		</p>
-		<div class="w-full rounded-md border p-2" id="qr-code-container">
+		<div class="w-full rounded-md border p-2 bg-white" id="qr-code-container">
 			{@html encodeQR(offer.qrCode, 'svg')}
 		</div>
 		<div class="flex gap-2 items-center">
@@ -243,8 +247,11 @@
 			I paid it
 		</Button>
 	{/if}
+	<div>
+		<p class="font-semibold mb-1">Expiry</p>
+		<Expiry offer={offer} />
+	</div>
 </div>
-
 
 {:else}
 <p>
