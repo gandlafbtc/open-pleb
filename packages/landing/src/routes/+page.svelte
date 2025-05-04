@@ -1,73 +1,136 @@
-<script lang="ts">
-    import "../app.css";
+<script>
+    // 필요한 경우 JavaScript 코드 작성
   </script>
   
-  <main class="font-sans text-gray-800">
-    <!-- Hero Section -->
-    <section class="min-h-screen bg-white flex flex-col items-center justify-center text-center px-6 py-24">
-      <h1 class="text-5xl font-extrabold mb-4">Connect Banking QRs with Bitcoin</h1>
-      <p class="text-lg max-w-2xl mb-8">
+  <!-- Header -->
+  <header class="bg-white shadow fixed w-full z-50">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="#" class="text-2xl font-bold text-gray-900">
+        Open<span class="text-orange-500">Pleb</span>
+      </a>
+      <nav>
+        <ul class="flex space-x-6 text-sm font-medium">
+          <li><a href="#features" class="hover:text-orange-500">Features</a></li>
+          <li><a href="#how-it-works" class="hover:text-orange-500">How It Works</a></li>
+          <li><a href="#status" class="hover:text-orange-500">Status</a></li>
+          <li><a href="https://github.com/gandlafbtc/open-pleb" target="_blank" class="hover:text-orange-500">GitHub</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  
+  <!-- Hero -->
+  <section class="pt-32 pb-20 text-center bg-gradient-to-br from-gray-50 to-gray-100">
+    <div class="max-w-4xl mx-auto px-4">
+      <h1 class="text-4xl font-extrabold mb-4">Connect Banking QRs with Bitcoin</h1>
+      <p class="text-lg text-gray-600 mb-8">
         OpenPleb bridges traditional banking and Bitcoin, enabling users to pay banking QR codes with Bitcoin while earners receive Bitcoin for handling those payments.
       </p>
-      <div class="flex flex-wrap justify-center gap-4">
-        <a href="#how-it-works" class="bg-black text-white px-6 py-3 rounded-xl hover:bg-gray-800 transition">Learn How It Works</a>
-        <a href="#project-status" class="border border-black text-black px-6 py-3 rounded-xl hover:bg-gray-100 transition">Check Project Status</a>
+      <div class="flex justify-center gap-4 flex-wrap">
+        <a href="https://openpleb.cash" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-medium transition">Try it Now</a>
+        <a href="#how-it-works" class="border border-orange-500 text-orange-500 px-6 py-3 rounded-xl font-medium hover:bg-orange-50 transition">Learn How It Works</a>
+        <a href="#status" class="border border-orange-500 text-orange-500 px-6 py-3 rounded-xl font-medium hover:bg-orange-50 transition">Check Project Status</a>
       </div>
-    </section>
-  
-    <!-- What is OpenPleb -->
-    <section class="bg-gray-50 px-6 py-16 text-center">
-      <h2 class="text-3xl font-bold mb-4">What is OpenPleb?</h2>
-      <p class="text-lg max-w-3xl mx-auto">
-        OpenPleb is a platform that connects users who want to pay Korean banking QR codes using Bitcoin with those who want to earn Bitcoin by helping them do so.
-      </p>
-    </section>
-  
-    <!-- Key Features -->
-    <section class="px-6 py-16 bg-white">
-      <h2 class="text-3xl font-bold text-center mb-12">Key Features</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-        <div><h3 class="text-xl font-semibold mb-2">Cashu-based Bond System</h3><p>Incentivizes fairness between users with token bonds.</p></div>
-        <div><h3 class="text-xl font-semibold mb-2">QR Integration</h3><p>Easy banking QR scanning and offer creation.</p></div>
-        <div><h3 class="text-xl font-semibold mb-2">Lightning Payments</h3><p>Fast and low-cost Bitcoin settlements.</p></div>
-        <div><h3 class="text-xl font-semibold mb-2">Dispute Resolution</h3><p>Built-in process to resolve transaction conflicts.</p></div>
-        <div><h3 class="text-xl font-semibold mb-2">Offer Expiry</h3><p>Ensures offers remain fresh and timely.</p></div>
-      </div>
-    </section>
-  
-    <!-- How It Works -->
-    <section id="how-it-works" class="bg-gray-50 px-6 py-16">
-      <h2 class="text-3xl font-bold text-center mb-12">How It Works</h2>
-      <ol class="space-y-6 max-w-3xl mx-auto list-decimal list-inside">
-        <li><strong>Maker Creates Offer:</strong> Scan QR, enter amount, submit bond.</li>
-        <li><strong>Taker Claims Offer:</strong> Browse, claim, and submit bond.</li>
-        <li><strong>Payment Execution:</strong> Taker pays via bank and uploads receipt.</li>
-        <li><strong>Verification & Settlement:</strong> Maker approves, Lightning payout happens.</li>
-      </ol>
-    </section>
-  
-    <!-- Project Status -->
-    <section id="project-status" class="px-6 py-16 bg-white">
-      <h2 class="text-3xl font-bold text-center mb-8">Project Status</h2>
-      <ul class="max-w-2xl mx-auto space-y-4 list-disc list-inside">
-        <li><strong>Bond Creation:</strong> Implemented with Cashu tokens.</li>
-        <li><strong>Offer Creation:</strong> UX and validation in progress.</li>
-        <li><strong>Lightning Integration:</strong> Partially done.</li>
-        <li><strong>Claiming Offers:</strong> In development.</li>
-        <li><strong>Receipt Handling:</strong> Coming soon.</li>
-        <li><strong>Dispute Resolution:</strong> Planned.</li>
-      </ul>
-    </section>
-  
-    <!-- Join Us -->
-    <section class="bg-gray-50 px-6 py-16 text-center">
-      <h2 class="text-3xl font-bold mb-4">Join the OpenPleb Project</h2>
-      <p class="text-lg mb-6 max-w-2xl mx-auto">
-        OpenPleb is an open-source initiative. Developers, designers, and Bitcoiners are welcome to contribute!
-      </p>
-      <a href="https://github.com/openpleb" class="bg-black text-white px-6 py-3 rounded-xl hover:bg-gray-800 transition">
-        View on GitHub
-      </a>
-    </section>
-  </main>
-  
+    </div>
+</section>
+
+<!--features-->
+<section id="features" class="py-20 bg-white">
+    <div class="max-w-6xl mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-12">Key Features</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="bg-gray-50 p-6 rounded-lg shadow hover:shadow-lg transition">
+                <h3 class="text-xl font-semibold mb-2">Secure Bond System</h3>
+                <p class="text-gray-600">Using Cashu tokens as bonds to ensure incentives are aligned.</p>
+            </div>
+            <div class="bg-gray-50 p-6 rounded-lg shadow hover:shadow-lg transition">
+                <h3 class="text-xl font-semibold mb-2">QR code Intergration</h3>
+                <p class="text-gray-600">Easily scan banking QR codes and create offers for payment.</p>
+            </div>
+            <div class="bg-gray-50 p-6 rounded-lg shadow hover:shadow-lg transition">
+                <h3 class="text-xl font-semibold mb-2">Lightning Payments</h3>
+                <p class="text-gray-600">Fast and low-cost Bitcoin transactions using Lightning.</p>
+            </div>
+            <div class="bg-gray-50 p-6 rounded-lg shadow hover:shadow-lg transition">
+                <h3 class="text-xl font-semibold mb-2">Dispute Resolution</h3>
+                <p class="text-gray-600">Mechanisms for resolving conflicts and ensuring fairness.</p>
+            </div>
+            <div class="bg-gray-50 p-6 rounded-lg shadow hover:shadow-lg transition">
+                <h3 class="text-xl font-semibold mb-2">Platform Matching</h3>
+                <p class="text-gray-600">Connects payers and earners in a trust-minimized way.</p>
+            </div>
+            <div class="bg-gray-50 p-6 rounded-lg shadow hover:shadow-lg transition">
+                <h3 class="text-xl font-semibold mb-2">Offer Expiry</h3>
+                <p class="text-gray-600">Time-based controls prevent stale or outdated offers.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--How it Works-->
+<section id="how-it-works" class="py-20 bg-gray-100">
+    <div class="max-w-5xl mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-12">How it Works</h2>
+        <ol class="space-y-8">
+            <li class="bg-white p-6 rounded-lg shadow">
+                <h3 class="font-semibold text-lg mb-1">1.Maker Creates Offer</h3>
+                <p class="text-gray-600">User scans QR, enters amount, submits bond to open offer.</p>
+            </li>
+            <li class="bg-white p-6 rounded-lg shadow">
+                <h3 class="font-semibold text-lg mb-1">2. Taker Claims Offer</h3>
+                <p class="text-gray-600">Another user claims the offer and stakes their bond.</p>
+            </li>
+            <li class="bg-white p-6 rounded-lg shadow">
+                <h3 class="font-semibold text-lg mb-1">3. Payment Execution</h3>
+                <p class="text-gray-600">Taker pays through their bank and uploads a receipt.</p>
+            </li>
+            <li class="bg-white p-6 rounded-lg shadow">
+                <h3 class="font-semibold text-lg mb-1">4. Settlement</h3>
+                <p class="text-gray-600">Maker verifies, Lightning payout completes, bonds return.</p>
+            </li>
+
+        </ol>
+    </div>
+</section>
+
+<!-- project Status -->
+<section id="status" class="py-20 bg-white">
+    <div class="max-w-6xl mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-12">Project Status</h2>
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="border-l-4 border-green-500 bg-gray-50 p-4 rounded">
+                <h4 class="font-semibold mb-1">Bond Creation</h4>
+                <p class="text-sm text-gray-600">✅ Complete</p>
+            </div>
+            <div class="border-l-4 border-green-500 bg-gray-50 p-4 rounded">
+                <h4 class="font-semibold mb-1">Offer Creation</h4>
+                <p class="text-sm text-gray-600">✅ Complete</p>
+            </div>
+            <div class="border-l-4 border-green-500 bg-gray-50 p-4 rounded">
+                <h4 class="font-semibold mb-1">Lightning Integration</h4>
+                <p class="text-sm text-gray-600">✅ Complete</p>
+            </div>
+            <div class="border-l-4 border-green-500 bg-gray-50 p-4 rounded">
+                <h4 class="font-semibold mb-1">Claiming Offers</h4>
+                <p class="text-sm text-gray-600">✅ Complete</p>
+            </div>
+            <div class="border-l-4 border-gray-400 bg-gray-50 p-4 rounded">
+                <h4 class="font-semibold mb-1">Receipt Handling</h4>
+                <p class="text-sm text-gray-600">🚧 In Progress</p>
+            </div>
+            <div class="border-l-4 border-gray-400 bg-gray-50 p-4 rounded">
+                <h4 class="font-semibold mb-1">Dispute Resolution</h4>
+                <p class="text-sm text-gray-600">🚧 In Progress</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--Call to Action-->
+<section class="py-20 text-center bg-gradient-to-br from-gray-50 to-gray-100">
+    <div class="max-w-3xl mx-auto px-4">
+        <h2 class="text-3xl font-bold mb-4">Join the OpenPleb Project</h2>
+        <p class="text-lg text-gray-600 mb-6">OpenPlen is an open-source initiative. Developers, Designers, and Bitcoiners are welcome to contribute!</p>
+        <a href="https://githuib.com/gandlafbtc/open-pleb" target="_blank" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-medium transition">View on Github</a>
+    </div>
+</section>
