@@ -5,9 +5,10 @@
   <!-- Header -->
   <header class="bg-white shadow fixed w-full z-50">
     <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-      <a href="#" class="text-2xl font-bold text-gray-900">
-        Open<span class="text-orange-500">Pleb</span>
-      </a>
+        <a href="/" class="flex items-center space-x-2">
+            <img src="/openpleb.svg" alt="OpenPleb Logo" class="h-8 w-auto" />
+            <span class="sr-only">OpenPleb</span>
+        </a>
       <nav>
         <ul class="flex space-x-6 text-sm font-medium">
           <li><a href="#features" class="hover:text-orange-500">Features</a></li>
@@ -22,6 +23,8 @@
   <!-- Hero -->
   <section class="pt-32 pb-20 text-center bg-gradient-to-br from-gray-50 to-gray-100">
     <div class="max-w-4xl mx-auto px-4">
+
+        <img src="/openpleb.svg" alt="OpenPleb Logo" class="mx-auto mb-8 w-32 h-auto sm:w-60 md:w-60 lg:w-120" />
       <h1 class="text-4xl font-extrabold mb-4">Connect Banking QRs with Bitcoin</h1>
       <p class="text-lg text-gray-600 mb-8">
         OpenPleb bridges traditional banking and Bitcoin, enabling users to pay banking QR codes with Bitcoin while earners receive Bitcoin for handling those payments.
