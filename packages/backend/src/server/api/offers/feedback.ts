@@ -7,6 +7,7 @@ import {
 import { schnorr } from "@noble/curves/secp256k1";
 import { sha256 } from "@noble/hashes/sha256";
 import { db } from "@openPleb/common/db";
+import { verifyPayload } from "@openPleb/common/payloads";
 import {
 	type InsertProof,
 	type Offer,
@@ -24,10 +25,13 @@ import { InternalProofState } from "../../../types";
 export const commitFeedback = async (
 	offerId: string,
 	feedbackData: {
-		feedback: string;
+		payload: {
+			status: string;
+			feedback: string;
+		}
 		signature: string;
-		status: string;
 		nonce: string;
+		timestamp: number;
 	},
 ) => {
 	const id = Number.parseInt(offerId);
@@ -46,26 +50,63 @@ export const commitFeedback = async (
 		});
 	}
 
-	const message =
-		feedbackData.nonce +
-		feedbackData.feedback +
-		feedbackData.status +
-		offerId +
-		offer.invoice;
-	const messageHash = sha256(message);
-	const res = schnorr.verify(feedbackData.signature, messageHash, offer.pubkey);
-	if (!res) {
+	const isValidSig = verifyPayload(feedbackData.payload, feedbackData.signature, feedbackData.nonce, feedbackData.timestamp, offer.pubkey);
+	
+	if (!isValidSig) {
 		return new Response("Invalid signature", { status: 401 });
 	}
 	if (
 		![OFFER_STATE.MARKED_WITH_ISSUE, OFFER_STATE.COMPLETED].includes(
-			feedbackData.status,
+			feedbackData.payload.status,
 		)
 	) {
 		return new Response("Invalid status", { status: 400 });
 	}
+	if (feedbackData.payload.status === OFFER_STATE.MARKED_WITH_ISSUE) {
+		return await handleMarkedWithIssue(offerId, feedbackData.payload.feedback)
+	}
+	return await handlePayouts(offer, feedbackData.payload.feedback, feedbackData.payload.status);
+};
 
-	return await handlePayouts(offer, feedbackData.feedback, feedbackData.status);
+ const handleMarkedWithIssue = async (offerId: string, feedback: string) => {
+	const id = Number.parseInt(offerId);
+	const offers = await db
+		.select()
+		.from(offerTable)
+		.where(eq(offerTable.id, id));
+	
+	if (!offers || offers.length === 0) {
+		return new Response("Offer not found", { status: 404 });
+	}
+	
+	const offer = offers[0];
+	
+	// Add 250 seconds to the expiry time
+	const currentValidForS = offer.validForS || 0;
+	const updatedValidForS = currentValidForS + 250;
+	
+	// Update offer status, feedback, and validity period
+	const updatedOffer = await db
+		.update(offerTable)
+		.set({ 
+			status: OFFER_STATE.MARKED_WITH_ISSUE,
+			feedback,
+			validForS: updatedValidForS
+		})
+		.where(eq(offerTable.id, id))
+		.returning();
+	
+	if (!updatedOffer || updatedOffer.length === 0) {
+		return new Response("Failed to update offer", { status: 500 });
+	}
+	
+	// Notify connected clients about the update
+	eventEmitter.emit("socket-event", {
+		command: "update-offer",
+		data: { offer: updatedOffer[0] },
+	});
+	
+	return updatedOffer[0];
 };
 
 export const handlePayouts = async (

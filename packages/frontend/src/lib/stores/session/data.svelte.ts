@@ -23,7 +23,7 @@ export const createDataStore = () => {
 		const response = await fetch(
 			`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/data/${
 				get(keysStore)[0]?.publicKey
-			}`,
+			}`
 		);
 		const data: Data = await response.json();
 		offers.push(...data.offers);

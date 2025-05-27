@@ -9,6 +9,7 @@ import { commitFeedback } from "./feedback";
 import { payWithTokens } from "./payWithTokens";
 import { postOffer } from "./post";
 import { createReceipt, getReceipt } from "./receipt";
+import { counterOrForfeitDispute } from "./counterOrForfeit";
 
 export const offers = (app: Elysia) =>
 	app.group("/offers", (app) =>
@@ -43,7 +44,9 @@ export const offers = (app: Elysia) =>
 					return await checkInvoicePaid(params.id);
 				} catch (error) {
 					const err = ensureError(error);
-					log.error("Error checking invoice offer {error}", { error });
+					log.error("Error checking invoice offer {error}", {
+						error,
+					});
 					return new Response(err.message, {
 						status: 500,
 					});
@@ -54,7 +57,9 @@ export const offers = (app: Elysia) =>
 					return await createInvoice(params.id);
 				} catch (error) {
 					const err = ensureError(error);
-					log.error("Error creating invoice for offer {error}", { error });
+					log.error("Error creating invoice for offer {error}", {
+						error,
+					});
 					return new Response(err.message, {
 						status: 500,
 					});
@@ -75,10 +80,38 @@ export const offers = (app: Elysia) =>
 				},
 				{
 					body: t.Object({
-						feedback: t.String(),
-						signature: t.String(),
-						status: t.String(),
+						payload: t.Object({
+							status: t.String(),
+							feedback: t.String(),
+						}),
 						nonce: t.String(),
+						timestamp: t.Number(),
+						signature: t.String(),
+					}),
+				},
+			)
+			.post(
+				"/:id/counterorforfeit",
+				async ({ params, body }) => {
+					try {
+						return await counterOrForfeitDispute(params.id, { ...body });
+					} catch (error) {
+						const err = ensureError(error);
+						log.error("Error posting feedback {error}", { error });
+						return new Response(err.message, {
+							status: 500,
+						});
+					}
+				},
+				{
+					body: t.Object({
+						payload: t.Object({
+							response: t.String(),
+							message: t.String(),
+						}),
+						nonce: t.String(),
+						timestamp: t.Number(),
+						signature: t.String(),
 					}),
 				},
 			)
@@ -154,5 +187,4 @@ export const offers = (app: Elysia) =>
 						pubkey: t.String(),
 					}),
 				},
-			),
-	);
+			));

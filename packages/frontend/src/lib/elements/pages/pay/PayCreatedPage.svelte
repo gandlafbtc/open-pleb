@@ -7,6 +7,7 @@
 	import type { Offer } from "@openPleb/common/db/schema";
 	import { toast } from "svelte-sonner";
 	import {	getEncodedToken  } from "@cashu/cashu-ts";
+	import Expiry from "$lib/elements/Expiry.svelte";
 
 	const {PUBLIC_API_VERSION, PUBLIC_BACKEND_URL, PUBLIC_MINT_URL} = env;
 
@@ -77,4 +78,6 @@
 	<Button class="w-full mt-5"  onclick={createInvoice} disabled={isLoading} variant="outline"
 		>Get Invoice ( {formatCurrency(totalSats + bondTotalSats, 'SAT')} )</Button
 	>
+	<Expiry {offer}></Expiry>
+	
 </div>

@@ -2,15 +2,13 @@
 	import { env} from '$env/dynamic/public';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { OFFER_STATE } from '@openPleb/common/types';
-	import { schnorr } from '@noble/curves/secp256k1';
 	import { toast } from 'svelte-sonner';
-	import { sha256 } from '@noble/hashes/sha256';
-	import { bytesToHex } from '@noble/hashes/utils';
 	import { ensureError } from '$lib/errors';
 	import {  keysStore } from '@gandlaf21/cashu-wallet-engine';
 	import type { Offer } from '@openPleb/common/db/schema';
 	import * as Dialog  from '$lib/components/ui/dialog';
-
+	import Input from '$lib/components/ui/input/input.svelte';
+	import { signPayload } from "@openPleb/common/payloads";
     const { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL } = env;
 
     interface Props {offer: Offer}
@@ -19,13 +17,15 @@
 
     let isLoading = $state(false)
     let isShow = $state(false)
+    let isShowSuccess = $state(false)
+	let feedback = $state('');
 
-    	const markPaymentFailed = async () => {
-		await commitFeedback('Payment failed', OFFER_STATE.MARKED_WITH_ISSUE);
+    const markPaymentFailed = async () => {
+		await commitFeedback(feedback, OFFER_STATE.MARKED_WITH_ISSUE);
 	};
 
 	const markPaymentSucceeded = async () => {
-		await commitFeedback('Payment completed', OFFER_STATE.COMPLETED);
+		await commitFeedback(feedback, OFFER_STATE.COMPLETED);
 	};
 
 	const commitFeedback = async (feedback: string, status: string) => {
@@ -34,11 +34,8 @@
 				toast.warning('Offer not found');
 				return;
 			}
-			const nonce = bytesToHex(schnorr.utils.randomPrivateKey());
-			const message = nonce + feedback + status + offer.id + offer.invoice;
-			const messageHash = sha256(message);
-			const signature = bytesToHex(schnorr.sign(messageHash, $keysStore[0].privateKey));
 			isLoading = true;
+			const {nonce, signature, timestamp, payload} = signPayload({status,feedback},$keysStore[0].privateKey)
 			const res = await fetch(
 				`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/offers/${offer?.id}/feedback`,
 				{
@@ -47,10 +44,10 @@
 						'Content-Type': 'application/json'
 					},
 					body: JSON.stringify({
+						payload,
 						nonce,
+						timestamp,
 						signature,
-						status,
-						feedback
 					})
 				}
 			);
@@ -69,7 +66,7 @@
 </script>
 
 <div class="flex w-full flex-col items-center gap-2">
-    <Button disabled={isLoading} class="w-full" onclick={markPaymentSucceeded}>
+    <Button disabled={isLoading} class="w-full" onclick={() => isShowSuccess = true}>
         If the payment was successful, click here!
     </Button>
     <Button disabled={isLoading} class="w-full" variant="link" onclick={() => (isShow = true)}>
@@ -88,12 +85,42 @@
 		If ruled against you, your bond will be forfeited.
       </Dialog.Description>
      </Dialog.Header>
+	 <Input placeholder="Feedback..." bind:value={feedback}  />
+
 	 <Dialog.Footer>
-		 <Button variant="outline" disabled={isLoading} class="w-full" onclick={() => (isShow = false)}>
+		 <Button variant="outline" disabled={isLoading} class="w-full" onclick={() => {
+			isShow = false
+			feedback = ''
+		}}>
 			 Close
 		 </Button>
 		 <Button disabled={isLoading} variant="destructive"  class="w-full" onclick={markPaymentFailed}>
 			 Confirm Payment failure
+		 </Button>
+	 </Dialog.Footer>
+    </Dialog.Content>
+   </Dialog.Root>
+
+   <Dialog.Root bind:open={isShowSuccess}>
+    <Dialog.Content>
+     <Dialog.Header>
+      <Dialog.Title class="text-green-500">
+		Reporting Payment as Successful!
+	  </Dialog.Title>
+      <Dialog.Description>
+		By marking the payment as successful, the bonds will be returned, the rewards issued and the offer finalized. There will be no recourse.
+      </Dialog.Description>
+     </Dialog.Header>
+	 <Input placeholder="Feedback..." bind:value={feedback}  />
+	 <Dialog.Footer>
+		 <Button variant="outline" disabled={isLoading} class="w-full" onclick={() => {
+			isShowSuccess = false
+			feedback = ''
+		}}>
+			 Close
+		 </Button>
+		 <Button disabled={isLoading} class="w-full" onclick={markPaymentSucceeded}>
+			 Confirm
 		 </Button>
 	 </Dialog.Footer>
     </Dialog.Content>

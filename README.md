@@ -32,13 +32,22 @@ This project is under construction, and we are working on it actively. It is not
 - [x] receipt aproval
     - [x] Approve receipt UX
         - [x] Dispurse funds to local wallet (cashu token)
-        - [ ] Dispurse funds (to ln adress)
+        - [ ] auto withdraw (to ln adress)
     - [ ] Reject receipt UX
     - [ ] open dispute
+- [ ] review system
 - [ ] resolve conflicts
+    - [ ] admin portal
     - [ ] Handle bonds
     - [ ] Handle inflight funds
     - [ ] handle refunds
+- [ ] admin portal
+    - [ ] manage wallet
+    - [ ] manage offers
+    - [ ] manage users
+    - [ ] manage subscriptions
+    - [ ] manage disputes
+
 
 
 

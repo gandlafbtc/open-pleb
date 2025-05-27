@@ -1,6 +1,7 @@
 import { cors } from "@elysiajs/cors";
 import { swagger } from "@elysiajs/swagger";
 import { Elysia } from "elysia";
+import jwt from "@elysiajs/jwt";
 
 import cron from "@elysiajs/cron";
 import { logger } from "@grotto/logysia";
@@ -15,6 +16,7 @@ import { expireOffers } from "./jobs/expire";
 import { updateConnected } from "./jobs/updateConnected";
 import { log } from "./logger";
 import { open } from "./server/open";
+import { auth } from "./server/auth/auth";
 
 log.info`Starting OpenPleb version ${version}...`;
 
@@ -34,6 +36,7 @@ const requiredEnvVars = [
 	"PUBLIC_BOND_FLAT_RATE",
 	"PUBLIC_CURRENCY",
 	"PUBLIC_MAX_FIAT_AMOUNT",
+	"JWT_SECRET"
 ];
 
 for (const envVar of requiredEnvVars) {
@@ -148,7 +151,18 @@ const app = new Elysia()
 
 		// OK.
 		return new Response();
-	})
+	}).group("/admin", (app) =>
+		app
+			.use(
+				jwt({
+					name: "jwt",
+					// biome-ignore lint/style/noNonNullAssertion: <explanation>
+					secret: Bun.env.JWT_SECRET!,
+					exp: "7d",
+				}),
+			)
+			.use(auth),
+	)
 	.listen(Bun.env.PORT);
 
 log.info`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`;

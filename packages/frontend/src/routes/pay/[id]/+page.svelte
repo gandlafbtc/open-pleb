@@ -53,7 +53,7 @@
 		<PayReceiptSubmittedPage {offer}></PayReceiptSubmittedPage>
 	{:else if offer.status === OFFER_STATE.COMPLETED}
 		<PayCompletedPage {offer}></PayCompletedPage>
-	{:else if offer.status === OFFER_STATE.MARKED_WITH_ISSUE}
+	{:else if offer.status === OFFER_STATE.MARKED_WITH_ISSUE || offer.status === OFFER_STATE.FOREFEIT}
 		<PayMarkedWithIssuePage {offer}></PayMarkedWithIssuePage>
 	{:else if offer.status === OFFER_STATE.DISPUTED}
 		<PayDisputedPage {offer}></PayDisputedPage>

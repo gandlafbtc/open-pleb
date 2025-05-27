@@ -20,6 +20,8 @@ export const expireOffers = async () => {
 					OFFER_STATE.CLAIMED,
 					OFFER_STATE.CREATED,
 					OFFER_STATE.RECEIPT_SUBMITTED,
+					OFFER_STATE.MARKED_WITH_ISSUE,
+					OFFER_STATE.FOREFEIT,
 				]),
 			),
 		);
@@ -40,6 +42,15 @@ export const expireOffers = async () => {
 			}
 			case OFFER_STATE.CLAIMED: {
 				//refund and refund taker bond?
+				await expireOfferInvoicePaid(offer);
+				break;
+			}
+			case OFFER_STATE.MARKED_WITH_ISSUE: {
+				//refund and refund taker bond?
+				await expireOfferInvoicePaid(offer);
+				break;
+			}
+			case OFFER_STATE.FOREFEIT: {
 				await expireOfferInvoicePaid(offer);
 				break;
 			}
