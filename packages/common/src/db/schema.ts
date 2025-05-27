@@ -20,6 +20,7 @@ export const offerTable = pgTable('offers', {
 	validForS: integer('valid_for_s'),
 	currency: text('currency'),
 	feedback: text('feedback'),
+	feedbackResponse: text('feedback_response'),
 	description: text('description'),
 	refund: text('refund')
 });
@@ -78,14 +79,26 @@ export const subscriptionsTable = pgTable('subscriptions', {
 	type: text('type')
 })
 
+export const userTable = pgTable("user", {
+	id: text("id").primaryKey().$defaultFn(()=> crypto.randomUUID()),
+    username: text('username').notNull().unique(),
+	passwordHash: text('password_hash').notNull(),
+	createdAt: integer('created_at').notNull(),
+});
+
+
 export type MintQuote = typeof mintQuotesTable.$inferSelect;
 export type Claim = typeof claimsTable.$inferSelect;
 export type Offer = typeof offerTable.$inferSelect;
 export type Receipt = typeof receiptsTable.$inferSelect;
 export type Proof = typeof proofsTable.$inferSelect;
+export type Subscription = typeof subscriptionsTable.$inferSelect;
+export type User = typeof userTable.$inferSelect;
 
 export type InsertMintQuote = typeof mintQuotesTable.$inferInsert;
 export type InsertClaim = typeof claimsTable.$inferInsert;
 export type InsertOffer = typeof offerTable.$inferInsert;
 export type InsertReceipt = typeof receiptsTable.$inferInsert;
 export type InsertProof = typeof proofsTable.$inferInsert;
+export type InsertSubscription = typeof subscriptionsTable.$inferInsert;
+export type InsertUser = typeof userTable.$inferInsert;

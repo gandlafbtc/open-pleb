@@ -34,7 +34,7 @@
 	<EarnReceiptSubmittedPage {offer}></EarnReceiptSubmittedPage>
 	{:else if offer.status === OFFER_STATE.COMPLETED}
 	<EarnCompletedPage {offer}></EarnCompletedPage>
-	{:else if offer.status === OFFER_STATE.MARKED_WITH_ISSUE}
+	{:else if offer.status === OFFER_STATE.MARKED_WITH_ISSUE || offer.status === OFFER_STATE.FOREFEIT}
 	<EarnMarkedWithIssuePage {offer}></EarnMarkedWithIssuePage>
 	{:else if offer.status === OFFER_STATE.DISPUTED}
 	<EarnDisputedPage {offer}></EarnDisputedPage>

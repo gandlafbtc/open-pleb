@@ -16,6 +16,7 @@ import { and, eq } from "drizzle-orm";
 import { wallet } from "../../cashu/wallet";
 import { eventEmitter } from "../../events/emitter";
 import { InternalProofState } from "../../types";
+import { log } from "../../logger";
 
 export const expireOffer = async (offer: Offer) => {
 	const offers = await db
@@ -31,6 +32,7 @@ export const expireOffer = async (offer: Offer) => {
 };
 
 export const expireOfferInvoicePaid = async (offer: Offer) => {
+	log.info(`${offer.id}`)
 	const keys = await wallet.getKeys();
 	//refund
 	const sendAmount =
