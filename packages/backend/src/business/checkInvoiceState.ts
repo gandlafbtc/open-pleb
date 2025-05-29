@@ -17,7 +17,7 @@ export const checkInvoiceState = async (
 	quote: MintQuote,
 	offerId: number,
 ): Promise<MintQuoteState> => {
-	const mint = new CashuMint(Bun.env.PUBLIC_MINT_URL!);
+	const mint = new CashuMint(Bun.env.OPENPLEB_MINT_URL!);
 	const { state } = await mint.checkMintQuote(quote.quote);
 	if (state === MintQuoteState.PAID) {
 		const proofs = await wallet.mintProofs(quote.amount, quote.quote, {

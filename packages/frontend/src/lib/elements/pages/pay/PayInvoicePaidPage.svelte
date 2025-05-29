@@ -7,8 +7,6 @@
     
     const {offer} = $props() as Props;
     
-    const { PUBLIC_CURRENCY } = env;
-    
     // Format date from unix timestamp
     const formatDate = (timestamp: number | undefined) => {
         if (!timestamp) return 'N/A';

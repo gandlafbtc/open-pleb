@@ -1,8 +1,5 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import {
-		env
-	} from '$env/dynamic/public';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { formatCurrency } from '$lib/helper.js';
@@ -14,7 +11,7 @@
 		import * as Pagination from "$lib/components/ui/pagination/index.js";
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 
-	const {PUBLIC_CURRENCY} = env;
+	const {OPENPLEB_CURRENCY} = dataStore.env;
 
 	const id = Number.parseInt(page.params.id);
 	const offerIds = $derived(dataStore.claims.filter((c) => c.pubkey === $keysStore[0].publicKey).map(c=>c.offerId));
@@ -41,7 +38,7 @@
 	{#each pageItems as offer}
 		<Card.Root class="w-80">
 			<Card.Header>
-				<Card.Title>Pay {formatCurrency(offer.amount, PUBLIC_CURRENCY)}</Card.Title>
+				<Card.Title>Pay {formatCurrency(offer.amount, OPENPLEB_CURRENCY)}</Card.Title>
 				<Card.Description
 					>For {formatCurrency(
 						(offer.satsAmount ?? 0) +

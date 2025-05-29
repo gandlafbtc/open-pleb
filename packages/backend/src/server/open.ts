@@ -9,24 +9,39 @@ import { log } from "../logger";
 import type { SocketEventData } from "../types";
 import { getData, getDataForId } from "./api/data";
 import { offers } from "./api/offers/offers";
+import { environment } from "../env";
+
 
 export const open = (app: Elysia) =>
 	app
-		.get("/conversion", async () => {
-			try {
-				const conversion = await getConversionRate();
-				return { conversion };
-			} catch (error) {
-				const err = ensureError(error);
-				log.error("Error getting conversion rate {error}", { error });
-				return new Response(err.message, {
-					status: 500,
-				});
-			}
-		})
+.get("/conversion", async () => {
+	try {
+		const conversion = await getConversionRate();
+		return { conversion };
+	} catch (error) {
+		const err = ensureError(error);
+		log.error("Error getting conversion rate {error}", { error });
+		return new Response(err.message, {
+			status: 500,
+		});
+	}
+})		.get("/envsettings", async () => {
+		try {
+			return { 
+				env: environment
+			 };
+		} catch (error) {
+			const err = ensureError(error);
+			log.error("Error getting conversion rate {error}", { error });
+			return new Response(err.message, {
+				status: 500,
+			});
+		}
+})
 		.get("/data/:pubkey", async ({ params }) => {
 			try {
-				return await getData(params.pubkey);
+				const data = await getData(params.pubkey)
+				return {...data, env: environment};
 			} catch (error) {
 				const err = ensureError(error);
 				log.error("Error getting data for pubkey {pubkey}: {error}", {

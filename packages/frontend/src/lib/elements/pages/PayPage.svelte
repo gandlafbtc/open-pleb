@@ -11,18 +11,18 @@
 	import QrScanner from 'qr-scanner';
 	import { keysStore } from '@gandlaf21/cashu-wallet-engine';
 	import { priceStore } from '$lib/stores/price';
-	import { env } from '$env/dynamic/public';
 	import { createNewOffer, type OfferResponse } from '$lib/actions';
+	import { dataStore } from '$lib/stores/session/data.svelte';
 
-	const {PUBLIC_BOND_FLAT_RATE, PUBLIC_BOND_PERCENTAGE, PUBLIC_CURRENCY, PUBLIC_PLATFORM_FEE_FLAT_RATE, PUBLIC_PLATFORM_FEE_PERCENTAGE, PUBLIC_TAKER_FEE_FLAT_RATE, PUBLIC_TAKER_FEE_PERCENTAGE } = env;
+	const {OPENPLEB_BOND_FLAT_RATE, OPENPLEB_BOND_PERCENTAGE, OPENPLEB_CURRENCY, OPENPLEB_PLATFORM_FEE_FLAT_RATE, OPENPLEB_PLATFORM_FEE_PERCENTAGE, OPENPLEB_TAKER_FEE_FLAT_RATE, OPENPLEB_TAKER_FEE_PERCENTAGE } = dataStore.env;
 
 	let isScanning = $state(true);
 	let scannedResult = $state('');
 	let manualInput = $state('');
 	let amount = $state(0);
 	let satsAmount = $derived(Math.ceil((100000000 / $priceStore) * amount))
-	let estimate = $derived(satsAmount + (Number.parseInt(PUBLIC_PLATFORM_FEE_FLAT_RATE)) + (Number.parseInt(PUBLIC_TAKER_FEE_FLAT_RATE)) + (satsAmount*0.01*Number.parseInt(PUBLIC_TAKER_FEE_PERCENTAGE)) + (satsAmount*0.01*Number.parseInt(PUBLIC_PLATFORM_FEE_PERCENTAGE)))
-	let bondEstimate = $derived(satsAmount*0.01*Number.parseInt(PUBLIC_BOND_PERCENTAGE)+Number.parseInt(PUBLIC_BOND_FLAT_RATE))
+	let estimate = $derived(satsAmount + OPENPLEB_PLATFORM_FEE_FLAT_RATE + OPENPLEB_TAKER_FEE_FLAT_RATE + (satsAmount*0.01*OPENPLEB_TAKER_FEE_PERCENTAGE) + (satsAmount*0.01*OPENPLEB_PLATFORM_FEE_PERCENTAGE))
+	let bondEstimate = $derived(satsAmount*0.01*OPENPLEB_BOND_PERCENTAGE+OPENPLEB_BOND_FLAT_RATE)
 	let isLoading = $state(false);
 
 	let file = $state('');
@@ -106,7 +106,7 @@
 	<div class="flex flex-col items-center gap-2">
 			<p class="font-bold">Enter amount to pay</p>
 			<p class="text-3xl font-bold">
-				{formatCurrency(amount, PUBLIC_CURRENCY)}
+				{formatCurrency(amount, OPENPLEB_CURRENCY)}
 			</p>
 			<p class="font-bold  text-muted-foreground">
 				~ {formatCurrency(estimate, 'SAT')}

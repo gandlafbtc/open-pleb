@@ -31,12 +31,9 @@
 	import { getLocalTimeZone, today } from '@internationalized/date';
 	import * as Popover from '$lib/components/ui/popover';
 	import { date } from 'zod';
-	import { env } from '$env/dynamic/public';
 	import { goto } from '$app/navigation';
 	import { OFFER_STATE } from '@openPleb/common/types';
   
-  const {PUBLIC_CURRENCY}  = env
-
 	const formatDate = (timestamp: number | undefined) => {
 		if (!timestamp) return 'N/A';
 		return new Date(timestamp * 1000).toLocaleString();
@@ -114,7 +111,7 @@
 				});
 				const formatter = new Intl.NumberFormat('en-US', {
 					style: 'currency',
-					currency: PUBLIC_CURRENCY
+					currency: dataStore.env?.OPENPLEB_CURRENCY
 				});
 
 				return renderSnippet(

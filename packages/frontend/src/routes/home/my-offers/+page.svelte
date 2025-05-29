@@ -1,12 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import {
-		PUBLIC_API_VERSION,
-		PUBLIC_BACKEND_URL,
-		PUBLIC_CURRENCY,
-		PUBLIC_TAKER_FEE_PERCENTAGE
-	} from '$env/static/public';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { ensureError } from '$lib/errors.js';
@@ -21,6 +15,10 @@
 		import * as Pagination from "$lib/components/ui/pagination/index.js";
 	import type { Offer } from '@openPleb/common/db/schema';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
+
+	const {
+		OPENPLEB_CURRENCY
+	} = dataStore.env
 
 	const id = Number.parseInt(page.params.id);
 	const offers = $derived([...dataStore.offers.filter((o) => o.pubkey === $keysStore[0].publicKey)]?.sort((a,b )=> b.createdAt - a.createdAt));
@@ -43,7 +41,7 @@
 	{#each pageItems as offer}
 		<Card.Root class="w-80">
 			<Card.Header>
-				<Card.Title>Pay {formatCurrency(offer.amount, PUBLIC_CURRENCY)}</Card.Title>
+				<Card.Title>Pay {formatCurrency(offer.amount, OPENPLEB_CURRENCY)}</Card.Title>
 				<Card.Description
 					>For {formatCurrency(
 						(offer.satsAmount ?? 0) +

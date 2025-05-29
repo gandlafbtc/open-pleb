@@ -18,8 +18,8 @@ export const postOffer = async (body: {
 			status: 400,
 		});
 	}
-	if (amount > Number.parseInt(Bun.env.PUBLIC_MAX_FIAT_AMOUNT!)) {
-		return new Response(`Amount exceeds maximum allowed: ${Number.parseInt(Bun.env.PUBLIC_MAX_FIAT_AMOUNT!)} ${Bun.env.PUBLIC_CURRENCY!}`, {
+	if (amount > Number.parseInt(Bun.env.OPENPLEB_MAX_FIAT_AMOUNT!)) {
+		return new Response(`Amount exceeds maximum allowed: ${Number.parseInt(Bun.env.OPENPLEB_MAX_FIAT_AMOUNT!)} ${Bun.env.OPENPLEB_CURRENCY!}`, {
 			status: 400,
 		});
 	}

@@ -4,8 +4,9 @@ import { toast } from 'svelte-sonner';
 import { get } from 'svelte/store';
 import { ensureError } from './errors';
 import { CheckStateEnum, getDecodedToken } from '@cashu/cashu-ts';
+import { dataStore } from './stores/session/data.svelte';
 
-const { PUBLIC_BACKEND_URL, PUBLIC_API_VERSION, PUBLIC_MINT_URL } = env;
+const { PUBLIC_BACKEND_URL, PUBLIC_API_VERSION } = env;
 export type Offer = {
 	amount: number;
 	qrCode: string;
@@ -52,8 +53,11 @@ const doClaim = async (token:string) => {
 
 export const checkIfRedeemed = async (reward: string) => {
 	try {
+		if (!dataStore.env?.OPENPLEB_MINT_URL) {
+			throw new Error("OPENPLEB_MINT_URL not set");
+		}
 		const token = getDecodedToken(reward)
-		const wallet = await getWalletWithUnit(get(mintsStore), PUBLIC_MINT_URL, "sat")
+		const wallet = await getWalletWithUnit(get(mintsStore), dataStore.env?.OPENPLEB_MINT_URL, "sat")
 		const states = await wallet.checkProofsStates(token.proofs);
 		const spentOrPending = states.find(s=> s.state===CheckStateEnum.PENDING || s.state===CheckStateEnum.SPENT)
 

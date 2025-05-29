@@ -29,15 +29,15 @@ services:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres
       CASHU_SEED_PHRASE: because oxygen subway review excuse elder coconut kingdom govern scrub enact minimum
       FRONTEND_URL: http://frontend:3000
-      PUBLIC_PLATFORM_FEE_PERCENTAGE: 0
-      PUBLIC_PLATFORM_FEE_FLAT_RATE: 100
-      PUBLIC_TAKER_FEE_PERCENTAGE: 2
-      PUBLIC_TAKER_FEE_FLAT_RATE: 100
-      PUBLIC_BOND_PERCENTAGE: 10
-      PUBLIC_BOND_FLAT_RATE: 500
-      PUBLIC_CURRENCY: KRW
-      PUBLIC_MINT_URL: http://nutshell:3338
-      PUBLIC_MAX_FIAT_AMOUNT: 100000
+      OPENPLEB_PLATFORM_FEE_PERCENTAGE: 0
+      OPENPLEB_PLATFORM_FEE_FLAT_RATE: 100
+      OPENPLEB_TAKER_FEE_PERCENTAGE: 2
+      OPENPLEB_TAKER_FEE_FLAT_RATE: 100
+      OPENPLEB_BOND_PERCENTAGE: 10
+      OPENPLEB_BOND_FLAT_RATE: 500
+      OPENPLEB_CURRENCY: KRW
+      OPENPLEB_MINT_URL: http://nutshell:3338
+      OPENPLEB_MAX_FIAT_AMOUNT: 100000
     ports:
       - "3003:3003"
     volumes:
@@ -56,16 +56,7 @@ services:
     restart: unless-stopped
     environment:
       PUBLIC_BACKEND_URL: http://localhost:3003
-      PUBLIC_PLATFORM_FEE_PERCENTAGE: 0
-      PUBLIC_PLATFORM_FEE_FLAT_RATE: 100
-      PUBLIC_TAKER_FEE_PERCENTAGE: 2
-      PUBLIC_TAKER_FEE_FLAT_RATE: 100
-      PUBLIC_MINT_URL: http://localhost:3338
       PUBLIC_API_VERSION: v1
-      PUBLIC_BOND_PERCENTAGE: 10
-      PUBLIC_BOND_FLAT_RATE: 500
-      PUBLIC_CURRENCY: KRW
-      PUBLIC_MAX_FIAT_AMOUNT: 100000
     ports:
       - "3000:3000"
     networks:

@@ -1,7 +1,7 @@
 import { integer, pgTable, text } from 'drizzle-orm/pg-core';
 
 export const offerTable = pgTable('offers', {
-	id: integer().primaryKey().generatedAlwaysAsIdentity(),
+	id: integer().primaryKey().$defaultFn(()=> Math.ceil(Math.random()*100000000)),
 	createdAt: integer('created_at').notNull(),
 	amount: integer('amount').notNull(),
 	qrCode: text('qr_code').notNull(),
@@ -14,7 +14,7 @@ export const offerTable = pgTable('offers', {
 	bondPercentage: integer('bond_percentage').notNull(),
 	satsAmount: integer('sats_amount').notNull(),
 	status: text('status').notNull(),
-	pubkey: text('pubkey').notNull(),
+	pubkey: text('pubkey').notNull(),	
 	invoice: text('invoice'),
 	paidAt: integer('paid_at'),
 	validForS: integer('valid_for_s'),
@@ -23,7 +23,8 @@ export const offerTable = pgTable('offers', {
 	feedbackResponse: text('feedback_response'),
 	resolutionReason: text('resolution_reason'),
 	description: text('description'),
-	refund: text('refund')
+	refund: text('refund'),
+	fiatProviderId: integer("fiat_provider_id").references(() => fiatProviderTable.id)
 });
 
 export const mintQuotesTable = pgTable('mint_quotes', {
@@ -87,6 +88,22 @@ export const userTable = pgTable("user", {
 	createdAt: integer('created_at').notNull(),
 });
 
+export const fiatProviderTable = pgTable("fiat_provider", {
+	id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    label: text('label').notNull().unique(),
+	icon: text('icon').notNull(),
+	matchTemplate: text('match_template'),
+	createdAt: integer('created_at').notNull(),
+});
+
+export const settingsTable = pgTable("settings", {
+	id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    userId: text('user_id').notNull().references(() => userTable.id),
+    key: text('key').notNull(),
+	label: text('label').notNull(),
+    value: text('value').notNull(),
+	createdAt: integer('created_at').notNull(),
+});
 
 export type MintQuote = typeof mintQuotesTable.$inferSelect;
 export type Claim = typeof claimsTable.$inferSelect;
@@ -95,6 +112,8 @@ export type Receipt = typeof receiptsTable.$inferSelect;
 export type Proof = typeof proofsTable.$inferSelect;
 export type Subscription = typeof subscriptionsTable.$inferSelect;
 export type User = typeof userTable.$inferSelect;
+export type FiatProvider = typeof fiatProviderTable.$inferSelect;
+export type Setting = typeof settingsTable.$inferSelect;
 
 export type InsertMintQuote = typeof mintQuotesTable.$inferInsert;
 export type InsertClaim = typeof claimsTable.$inferInsert;
@@ -103,3 +122,5 @@ export type InsertReceipt = typeof receiptsTable.$inferInsert;
 export type InsertProof = typeof proofsTable.$inferInsert;
 export type InsertSubscription = typeof subscriptionsTable.$inferInsert;
 export type InsertUser = typeof userTable.$inferInsert;
+export type InsertFiatProvider = typeof fiatProviderTable.$inferInsert;
+export type InsertSetting = typeof settingsTable.$inferInsert;

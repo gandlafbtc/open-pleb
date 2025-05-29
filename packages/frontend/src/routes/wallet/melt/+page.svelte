@@ -1,6 +1,5 @@
 <script>
 	import { goto } from "$app/navigation";
-	import { env } from "$env/dynamic/public";
 	import Badge from "$lib/components/ui/badge/badge.svelte";
 	import FormButton from "$lib/components/ui/form/form-button.svelte";
 import Input from "$lib/components/ui/input/input.svelte";
@@ -10,10 +9,11 @@ import Input from "$lib/components/ui/input/input.svelte";
 	import { getInvoiceForLNURLAddress } from "@openPleb/common/lnurl";
 	import { createMeltQuote, meltQuotesStore, proofsStore } from "@gandlaf21/cashu-wallet-engine";
 	import { decode } from "light-bolt11-decoder";
-	import { Check, LoaderCircle, QrCode, Scan } from "lucide-svelte";
+	import { Check, LoaderCircle, Scan } from "lucide-svelte";
 	import { toast } from "svelte-sonner";
+	import { dataStore } from "$lib/stores/session/data.svelte";
     
-    const {PUBLIC_MINT_URL} = env;
+    const {OPENPLEB_MINT_URL} = dataStore.env;
 
     let invoiceOrAddress = $state(""); 
     let isLoading = $state(false);
@@ -52,7 +52,7 @@ import Input from "$lib/components/ui/input/input.svelte";
                 invoice = invoiceOrAddress;
             }
             
-            const quote = await createMeltQuote(PUBLIC_MINT_URL,invoice)
+            const quote = await createMeltQuote(OPENPLEB_MINT_URL,invoice)
             goto(`/wallet/melt/${quote.quote}`)
         } catch (error) {
             const err = ensureError(error);

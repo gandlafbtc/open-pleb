@@ -2,6 +2,7 @@ import { get, writable } from "svelte/store";
 import type { Claim, Offer, Receipt } from "@openPleb/common/db/schema";
 import { env } from "$env/dynamic/public";
 import { keysStore } from "@gandlaf21/cashu-wallet-engine";
+import type { Environment } from "@openPleb/common/types";
 
 const { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL } = env;
 export interface Data {
@@ -10,6 +11,7 @@ export interface Data {
 	receipts: Receipt[];
 	takers: number,
 	makers: number
+	env: Environment
 }
 
 export const createDataStore = () => {
@@ -18,7 +20,7 @@ export const createDataStore = () => {
 	let receipts: Receipt[]  = $state([])
 	let takers: number  = $state(0)
 	let makers: number  = $state(0)
-
+	let env: Environment = $state()
 	const init = async () => {
 		const response = await fetch(
 			`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/data/${
@@ -26,6 +28,7 @@ export const createDataStore = () => {
 			}`
 		);
 		const data: Data = await response.json();
+		env = data.env
 		offers.push(...data.offers);
 		claims.push(...data.claims);
 		receipts.push(...data.receipts);
@@ -98,6 +101,8 @@ export const createDataStore = () => {
 		get claims() {return claims},
 		get takers() {return takers},
 		get makers() {return makers},
+		get env() {return env},
+		
 		init,
 		newOffer,
 		updateOffer,

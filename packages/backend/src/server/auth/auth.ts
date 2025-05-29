@@ -13,6 +13,8 @@ import { eventEmitter } from "../../events/emitter";
 import type { SocketEventData } from "../../types";
 import { desc } from 'drizzle-orm';
 import { resolveDispute } from "../api/offers/resolveDispute";
+import { authFiatProviders } from "./fiat_providers/crud";
+import { environment } from "../../env";
 export const auth = (app: Elysia) =>
 	app
 		//@ts-ignore
@@ -147,8 +149,9 @@ export const auth = (app: Elysia) =>
 			if (!user ){
 				return
 			}
+			//todo prioritize disputed offers
 			const offers = await db.select().from(offerTable).orderBy(desc(offerTable.createdAt)).limit(100)  
-			return {offers}
+			return {offers, env: environment}
 		})
 		.post("/resolvedispute", async ({user, body})=> {
 			if (!user ){
@@ -157,8 +160,7 @@ export const auth = (app: Elysia) =>
 			await resolveDispute(body)
 			console.log(body)
 			return {}
-		})
-		
+		}).use(authFiatProviders)
 		.ws("/ws", {
 			//@ts-ignore
 			beforeHandle: async ({ headers, request, set, jwt }) => {

@@ -2,7 +2,7 @@ import { get } from "svelte/store";
 import type { Claim, Offer, Receipt } from "@openPleb/common/db/schema";
 import { env } from "$env/dynamic/public";
 import { userLoggedIn } from "./user";
-import type { UserInfo } from "@openPleb/common/types";
+import type { Environment, UserInfo } from "@openPleb/common/types";
 
 const { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL } = env;
 
@@ -13,6 +13,7 @@ export interface Data {
 	claims: Claim[];
 	receipts: Receipt[];
 	unserInfos: UserInfo[];
+	env: Environment,
 	takers: number,
 	makers: number
 }
@@ -24,6 +25,7 @@ export const createDataStore = () => {
 	let takers: number  = $state(0)
 	let makers: number  = $state(0)
 	let userInfos: UserInfo[]  = $state([])
+	let env: Environment | undefined = $state()
 
 	const init = async () => {
 		const response = await fetch(
@@ -38,6 +40,9 @@ export const createDataStore = () => {
 			throw new Error("Failed to fetch data");
 		}
 		const data: Data = await response.json();
+
+		env = data.env
+
 		if (data.offers) {	
 			offers.push(...data.offers);
 		}
@@ -134,6 +139,8 @@ export const createDataStore = () => {
 		get claims() {return claims},
 		get takers() {return takers},
 		get makers() {return makers},
+		get env() {return env},
+		
 		init,
 		updateOffer,
 		fetchForId,

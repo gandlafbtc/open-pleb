@@ -1,18 +1,14 @@
 <script lang="ts">
 	// import { ParaglideJS } from '@inlang/paraglide-sveltekit';
 	import '../app.css';
-	import AppSidebar from '$lib/components/app-sidebar.svelte';
-	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
-	import Separator from '$lib/components/ui/separator/separator.svelte';
 	import { Toaster } from '$lib/components/ui/sonner/index.js';
 	import { onMount } from 'svelte';
 	import { init } from '$lib/init';
 	import { LoaderCircle } from 'lucide-svelte';
 
-	import { env} from '$env/dynamic/public';
 	import { ModeWatcher } from "mode-watcher";
 
-	const {PUBLIC_MINT_URL } = env;
+
 
 	const { children } = $props();
 

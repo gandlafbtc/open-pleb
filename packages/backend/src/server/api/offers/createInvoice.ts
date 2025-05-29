@@ -44,7 +44,7 @@ export const createInvoice = async (id: string) => {
 		offer.bondPercentage +
 		offer.bondFlatRate;
 
-	const cashuMint = new CashuMint(Bun.env.PUBLIC_MINT_URL!);
+	const cashuMint = new CashuMint(Bun.env.OPENPLEB_MINT_URL!);
 
 	// Create a mint quote for the total amount
 	// This will return a Lightning invoice that the maker will pay

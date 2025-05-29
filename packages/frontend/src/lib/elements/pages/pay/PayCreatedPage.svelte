@@ -8,8 +8,13 @@
 	import { toast } from "svelte-sonner";
 	import {	getEncodedToken  } from "@cashu/cashu-ts";
 	import Expiry from "$lib/elements/Expiry.svelte";
+	import { dataStore } from "$lib/stores/session/data.svelte";
 
-	const {PUBLIC_API_VERSION, PUBLIC_BACKEND_URL, PUBLIC_MINT_URL} = env;
+	const {PUBLIC_API_VERSION, PUBLIC_BACKEND_URL} = env;
+
+	const {
+		OPENPLEB_MINT_URL
+	} = dataStore.env
 
     interface Props {offer: Offer; totalSats: number; bondTotalSats: number}
     
@@ -40,7 +45,7 @@
 				toast.warning("Could not pay with tokens, please try again later.");
 				return;
 			}
-			const {send} = await sendEcash(PUBLIC_MINT_URL, totalSats+bondTotalSats)
+			const {send} = await sendEcash(OPENPLEB_MINT_URL, totalSats+bondTotalSats)
 			const res = await fetch(
 				`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/offers/${offer.id}/paywithtoken`,
 			{
@@ -49,7 +54,7 @@
 						"Content-Type": "application/json",
 					},
 				body: JSON.stringify({
-					token: getEncodedToken({mint: PUBLIC_MINT_URL, proofs: send}),
+					token: getEncodedToken({mint: OPENPLEB_MINT_URL, proofs: send}),
 				}),
 			})
             if (!res.ok) {

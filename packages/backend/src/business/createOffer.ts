@@ -53,24 +53,24 @@ export const createOffer = async (offerData: OfferData): Promise<Offer> => {
 	const satsAmount = Math.ceil((100000000 / conversionRate) * amount);
 
 	const platformFeePercentage = Math.ceil(
-		(satsAmount * Number.parseFloat(Bun.env.PUBLIC_PLATFORM_FEE_PERCENTAGE!)) /
+		(satsAmount * Number.parseFloat(Bun.env.OPENPLEB_PLATFORM_FEE_PERCENTAGE!)) /
 			100,
 	);
 
 	const platformFeeFlatRate = Number.parseFloat(
-		Bun.env.PUBLIC_PLATFORM_FEE_FLAT_RATE!,
+		Bun.env.OPENPLEB_PLATFORM_FEE_FLAT_RATE!,
 	);
 	const takerFeeFlatRate = Number.parseFloat(
-		Bun.env.PUBLIC_TAKER_FEE_FLAT_RATE!,
+		Bun.env.OPENPLEB_TAKER_FEE_FLAT_RATE!,
 	);
-	const bondFlatRate = Number.parseFloat(Bun.env.PUBLIC_BOND_FLAT_RATE!);
+	const bondFlatRate = Number.parseFloat(Bun.env.OPENPLEB_BOND_FLAT_RATE!);
 
 	const takerFeePercentage = Math.ceil(
-		(satsAmount * Number.parseFloat(Bun.env.PUBLIC_TAKER_FEE_PERCENTAGE!)) /
+		(satsAmount * Number.parseFloat(Bun.env.OPENPLEB_TAKER_FEE_PERCENTAGE!)) /
 			100,
 	);
 	const bondPercentage = Math.ceil(
-		(satsAmount * Number.parseFloat(Bun.env.PUBLIC_BOND_PERCENTAGE!)) / 100,
+		(satsAmount * Number.parseFloat(Bun.env.OPENPLEB_BOND_PERCENTAGE!)) / 100,
 	);
 
 	const insertOffer: InsertOffer = {
@@ -78,8 +78,8 @@ export const createOffer = async (offerData: OfferData): Promise<Offer> => {
 		validForS: 120,
 		conversionRate,
 		platformFeeFlatRate,
-		takerFeeFlatRate: Number.parseInt(Bun.env.PUBLIC_TAKER_FEE_FLAT_RATE!),
-		currency: Bun.env.PUBLIC_CURRENCY!,
+		takerFeeFlatRate: Number.parseInt(Bun.env.OPENPLEB_TAKER_FEE_FLAT_RATE!),
+		currency: Bun.env.OPENPLEB_CURRENCY!,
 		platformFeePercentage,
 		takerFeePercentage,
 		bondFlatRate,

@@ -14,8 +14,8 @@
 	import { toast } from 'svelte-sonner';
 	import Expiry from '$lib/elements/Expiry.svelte';
 	
-    const { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL, PUBLIC_CURRENCY} = env;
-
+    const { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL} = env;
+	const { OPENPLEB_CURRENCY } = dataStore.env
     interface Props {offer:Offer}
     
     let {offer}: Props = $props();
@@ -221,7 +221,7 @@
 	{:else}
 		<p class="text-center text-xl font-bold">
 			Pay
-			{formatCurrency(offer.amount, PUBLIC_CURRENCY)}
+			{formatCurrency(offer.amount, OPENPLEB_CURRENCY)}
 			to
 		</p>
 		<div class="w-full rounded-md border p-2 bg-white" id="qr-code-container">

@@ -12,12 +12,17 @@
 	import { clock } from '$lib/stores/clock.svelte';
 	import Expiry from '$lib/elements/Expiry.svelte';
 	import { getEncodedToken } from "@cashu/cashu-ts";
+	import { dataStore } from '$lib/stores/session/data.svelte';
 
 	const {
 		PUBLIC_API_VERSION,
 		PUBLIC_BACKEND_URL,
-		PUBLIC_CURRENCY,
-		PUBLIC_MINT_URL} = env 
+		} = env 
+	
+	const {
+		OPENPLEB_CURRENCY,
+		OPENPLEB_MINT_URL
+	} = dataStore.env
 
     interface Props {offer: Offer}
     
@@ -35,7 +40,7 @@
 				return
 			}
 
-			const bond = await sendEcash(PUBLIC_MINT_URL, bondAmount)
+			const bond = await sendEcash(OPENPLEB_MINT_URL, bondAmount)
 
 			isLoading = true;
 			const response = await fetch(
@@ -47,7 +52,7 @@
 					},
 					body: JSON.stringify({
 						pubkey: $keysStore[0]?.publicKey,
-						bond: getEncodedToken({ mint: PUBLIC_MINT_URL, proofs: bond.send}) 
+						bond: getEncodedToken({ mint: OPENPLEB_MINT_URL, proofs: bond.send}) 
 					})
 				}
 			);
@@ -77,7 +82,7 @@
     <Card.Header>
         <Card.Title>
 			<a href={`/earn/${offer.id}`}>
-				Pay {formatCurrency(offer.amount, PUBLIC_CURRENCY)}
+				Pay {formatCurrency(offer.amount, OPENPLEB_CURRENCY)}
 			</a>
 		</Card.Title>
         <Card.Description

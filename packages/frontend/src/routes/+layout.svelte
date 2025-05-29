@@ -12,7 +12,6 @@
 	import { LoaderCircle } from 'lucide-svelte';
 
 	import { init as initCashu, mintsStore } from "@gandlaf21/cashu-wallet-engine";
-	import { env} from '$env/dynamic/public';
 	import TinyBondWallet from '$lib/elements/bond-wallet/TinyBondWallet.svelte';
 	import PayEarnToggle from '$lib/elements/PayEarnToggle.svelte';
 	import { appMode } from '$lib/stores/local/mode';
@@ -20,23 +19,22 @@
 	import InstallPrompt from '$lib/elements/InstallPrompt.svelte';
 	import PushNotification from '$lib/elements/PushNotification.svelte';
 	import { ModeWatcher } from "mode-watcher";
+	import { dataStore } from '$lib/stores/session/data.svelte';
 
-	const {PUBLIC_MINT_URL } = env;
-
+	
 	const { children } = $props();
-
+	
 	let isInit = $state(false);
 	
 	let initStatus = $state("Initializing");
-
-
-
+	
 	onMount(() => {
 		if (browser) {
 			initCashu().then(async () => {
 				await init()
+				const {OPENPLEB_MINT_URL } = dataStore.env;
 				initStatus = "Updating mint"
-				await mintsStore.fetchMint(PUBLIC_MINT_URL)
+				await mintsStore.fetchMint(OPENPLEB_MINT_URL)
 				isInit = true;
 			}).catch((error) => {
 				console.error('Error initializing Cashu:', error);

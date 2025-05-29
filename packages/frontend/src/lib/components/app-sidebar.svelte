@@ -6,8 +6,7 @@
 	import { page } from '$app/state';
 	import { priceStore } from '$lib/stores/price';
 	import { formatCurrency } from '$lib/helper';
-	import {
-	env } from '$env/dynamic/public';
+
 	import { dataStore } from '$lib/stores/session/data.svelte';
 	import { appMode } from '$lib/stores/local/mode';
 	import { OFFER_STATE } from '@openPleb/common/types';
@@ -18,14 +17,14 @@
 		sidebar = Sidebar.useSidebar();
 	});
 
-	const {PUBLIC_BOND_FLAT_RATE,
-	PUBLIC_BOND_PERCENTAGE,
-		PUBLIC_CURRENCY,
-		PUBLIC_PLATFORM_FEE_FLAT_RATE,
-		PUBLIC_PLATFORM_FEE_PERCENTAGE,
-		PUBLIC_TAKER_FEE_FLAT_RATE,
-		PUBLIC_TAKER_FEE_PERCENTAGE
-	}	= env;
+	const {OPENPLEB_BOND_FLAT_RATE,
+		OPENPLEB_BOND_PERCENTAGE,
+		OPENPLEB_CURRENCY,
+		OPENPLEB_PLATFORM_FEE_FLAT_RATE,
+		OPENPLEB_PLATFORM_FEE_PERCENTAGE,
+		OPENPLEB_TAKER_FEE_FLAT_RATE,
+		OPENPLEB_TAKER_FEE_PERCENTAGE
+	}	= dataStore.env;
 
 	const data = $derived({
 		navMain: [
@@ -96,48 +95,48 @@
 
 		<Sidebar.MenuBadge>
 			1 BTC =
-			{formatCurrency($priceStore, PUBLIC_CURRENCY)}
+			{formatCurrency($priceStore, OPENPLEB_CURRENCY)}
 		</Sidebar.MenuBadge>
 	</Sidebar.GroupLabel>
 			<Sidebar.GroupLabel
 				>Platform fee percentage
 
 				<Sidebar.MenuBadge>
-					{PUBLIC_PLATFORM_FEE_PERCENTAGE}%
+					{OPENPLEB_PLATFORM_FEE_PERCENTAGE}%
 				</Sidebar.MenuBadge>
 			</Sidebar.GroupLabel>
 			<Sidebar.GroupLabel
 				>Platform fee flat
 
 				<Sidebar.MenuBadge>
-					{formatCurrency(Number.parseInt(PUBLIC_PLATFORM_FEE_FLAT_RATE), 'SAT')}
+					{formatCurrency(Number.parseInt(OPENPLEB_PLATFORM_FEE_FLAT_RATE), 'SAT')}
 				</Sidebar.MenuBadge>
 			</Sidebar.GroupLabel>
 			<Sidebar.GroupLabel
 				>Taker fee percentage
 
 				<Sidebar.MenuBadge>
-					{PUBLIC_TAKER_FEE_PERCENTAGE}%
+					{OPENPLEB_TAKER_FEE_PERCENTAGE}%
 				</Sidebar.MenuBadge>
 			</Sidebar.GroupLabel>
 			<Sidebar.GroupLabel
 				>Taker fee flat
 
 				<Sidebar.MenuBadge>
-					{formatCurrency(Number.parseInt(PUBLIC_TAKER_FEE_FLAT_RATE), 'SAT')}
+					{formatCurrency(Number.parseInt(OPENPLEB_TAKER_FEE_FLAT_RATE), 'SAT')}
 				</Sidebar.MenuBadge>
 			</Sidebar.GroupLabel>
 			<Sidebar.GroupLabel
 			>Taker/Maker bond percentage
 
 			<Sidebar.MenuBadge>
-				{PUBLIC_BOND_PERCENTAGE}%
+				{OPENPLEB_BOND_PERCENTAGE}%
 			</Sidebar.MenuBadge>
 		</Sidebar.GroupLabel>
 		<Sidebar.GroupLabel
 		>Taker/Maker bond flat
 		<Sidebar.MenuBadge>
-			{formatCurrency(Number.parseInt(PUBLIC_BOND_FLAT_RATE), 'SAT')}
+			{formatCurrency(Number.parseInt(OPENPLEB_BOND_FLAT_RATE), 'SAT')}
 		</Sidebar.MenuBadge>
 	</Sidebar.GroupLabel>
 		</Sidebar.Group>

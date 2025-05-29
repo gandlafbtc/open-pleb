@@ -89,7 +89,7 @@ export const expireOfferInvoicePaid = async (offer: Offer) => {
 	await db.insert(proofsTable).values(proofsToInsert);
 
 	const refundToken = getEncodedToken({
-		mint: Bun.env.PUBLIC_MINT_URL!,
+		mint: Bun.env.OPENPLEB_MINT_URL!,
 		proofs: send,
 	});
 

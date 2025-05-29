@@ -220,7 +220,7 @@ export const handlePayouts = async (
 		}
 	});
 
-	const mintUrl = Bun.env.PUBLIC_MINT_URL || "";
+	const mintUrl = Bun.env.OPENPLEB_MINT_URL || "";
 
 	const refundToken = getEncodedToken({
 		mint: mintUrl,
