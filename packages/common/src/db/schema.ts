@@ -21,6 +21,7 @@ export const offerTable = pgTable('offers', {
 	currency: text('currency'),
 	feedback: text('feedback'),
 	feedbackResponse: text('feedback_response'),
+	resolutionReason: text('resolution_reason'),
 	description: text('description'),
 	refund: text('refund')
 });

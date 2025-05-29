@@ -4,10 +4,11 @@
 	import Progress from "$lib/components/ui/progress/progress.svelte";
 	import { formatCurrency } from '$lib/helper';
 	import { clock } from "$lib/stores/clock.svelte";
-	import type { Offer, Claim, Receipt } from "@openPleb/common/db/schema";
 	import { OFFER_STATE } from "@openPleb/common/types";
 	import { BadgeDollarSign, CalendarDays, Coins, CurrencyIcon, FileImage, Fullscreen, Info, Rotate3D, Stamp, User, Clock, Award, QrCode, Receipt as ReceiptIcon, RefreshCcw, AlertTriangle, Scale } from "lucide-svelte";
 	import CopiableToken from "./CopiableToken.svelte";
+	import Button from "$lib/components/ui/button/button.svelte";
+	import ResolveDispute from "./ResolveDispute.svelte";
 
     interface Props {id: number }
     
@@ -139,8 +140,30 @@
                             </div>
                             
                             <div>
-                                <p class="font-semibold text-sm text-gray-600">Claimed At:</p>
-                                <p class="text-sm">{formatDate(claim.createdAt)}</p>
+                                
+                    <div class="flex items-center gap-2">
+                        <div>
+                            <p class="font-semibold text-sm text-gray-600">Receipt Image</p>
+                        </div>
+                    </div>
+                    
+                    <div class="w-full overflow-hidden rounded-lg border relative">
+                        <div class="absolute right-5 top-5">
+                            <button
+                                onclick={() => {
+                                    showFullScreen = true;
+                                }}
+                                class="opacity-80 hover:opacity-100 transition-colors p-2 rounded-md bg-background"
+                            >
+                                <Fullscreen></Fullscreen>
+                            </button>
+                        </div>
+                        <img
+                        src={receipt?.receiptImg}
+                        alt="Receipt"
+                        class="h-20 object-contain"
+                        />
+                    </div>
                             </div>
                             
                             {#if offer.feedbackResponse}
@@ -151,8 +174,9 @@
                             {/if}
                         </div>
                     </div>
-                {/if}
-            </div>
+                    {/if}
+                </div>
+                <ResolveDispute></ResolveDispute>
             
             <div class="text-sm text-muted-foreground">
                 <p>Dispute opened at: {formatDate(offer.createdAt)}</p>

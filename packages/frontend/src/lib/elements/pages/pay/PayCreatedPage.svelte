@@ -74,7 +74,7 @@
 	<p class="text-lg font-bold text-muted-foreground"> + {formatCurrency(bondTotalSats, 'SAT')} Bond</p>
 	<Button class="w-full mt-5" onclick={payWithTokens} disabled={isLoading || (totalSats+bondTotalSats)>$proofsStore.reduce((acc, proof) => acc + proof.amount,0)}>
 		Pay with tokens ({formatCurrency(totalSats + bondTotalSats, 'SAT')})</Button
-	>
+>
 	<Button class="w-full mt-5"  onclick={createInvoice} disabled={isLoading} variant="outline"
 		>Get Invoice ( {formatCurrency(totalSats + bondTotalSats, 'SAT')} )</Button
 	>

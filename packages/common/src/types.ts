@@ -24,6 +24,13 @@ export const DISPUTE_RESPONSE = {
 	COUNTER: 'COUNTER',
 }
 
+export const RESOLUTION_PATHS = {
+	MAKER_WINS: 'MAKER_WINS',
+	TAKER_WINS: 'TAKER_WINS',
+	SPLIT: 'SPLIT',
+	RETURN: 'RETURN',
+}
+
 export interface UserInfo {
 	pubkey: string;
 	numberOfOffers: number;

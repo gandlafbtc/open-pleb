@@ -12,6 +12,7 @@ import { log } from "../../logger";
 import { eventEmitter } from "../../events/emitter";
 import type { SocketEventData } from "../../types";
 import { desc } from 'drizzle-orm';
+import { resolveDispute } from "../api/offers/resolveDispute";
 export const auth = (app: Elysia) =>
 	app
 		//@ts-ignore
@@ -149,6 +150,15 @@ export const auth = (app: Elysia) =>
 			const offers = await db.select().from(offerTable).orderBy(desc(offerTable.createdAt)).limit(100)  
 			return {offers}
 		})
+		.post("/resolvedispute", async ({user, body})=> {
+			if (!user ){
+				return
+			}
+			await resolveDispute(body)
+			console.log(body)
+			return {}
+		})
+		
 		.ws("/ws", {
 			//@ts-ignore
 			beforeHandle: async ({ headers, request, set, jwt }) => {

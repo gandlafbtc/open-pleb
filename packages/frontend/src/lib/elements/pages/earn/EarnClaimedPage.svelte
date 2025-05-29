@@ -45,10 +45,12 @@
 							headers: {
 								'Content-Type': 'application/json'
 							},
+							// todo, signature should be added here?
 							body: JSON.stringify({
 								pubkey: $keysStore[0]?.publicKey,
 								receipt: b64
 							})
+							
 						}
 					);
 					if (!response.ok) {

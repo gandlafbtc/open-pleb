@@ -65,7 +65,7 @@ export const commitFeedback = async (
 	if (feedbackData.payload.status === OFFER_STATE.MARKED_WITH_ISSUE) {
 		return await handleMarkedWithIssue(offerId, feedbackData.payload.feedback)
 	}
-	return await handlePayouts(offer, feedbackData.payload.feedback, feedbackData.payload.status);
+	return await handlePayouts(offer, feedbackData.payload.status, {feedback: feedbackData.payload.feedback});
 };
 
  const handleMarkedWithIssue = async (offerId: string, feedback: string) => {
@@ -111,8 +111,8 @@ export const commitFeedback = async (
 
 export const handlePayouts = async (
 	offer: Offer,
-	feedback: string,
 	status: string,
+	custom?: { maker?: number; taker?: number, resolutionReason?: string , feedback?: string},
 ) => {
 	const receipts = await db
 		.select()
@@ -141,14 +141,14 @@ export const handlePayouts = async (
 		};
 	});
 
-	const sendAmount =
-		offer.satsAmount +
+	const sendAmount = custom?.taker ??
+		(offer.satsAmount +
 		offer.takerFeeFlatRate +
 		offer.takerFeePercentage +
 		offer.bondFlatRate +
-		offer.bondPercentage;
+		offer.bondPercentage);
 
-	const makerBondAmount = offer.bondFlatRate + offer.bondPercentage;
+	const makerBondAmount = custom?.maker ?? (offer.bondFlatRate + offer.bondPercentage);
 
 	const keys = await wallet.getKeys();
 
@@ -242,9 +242,18 @@ export const handlePayouts = async (
 		return new Response("Could not update receipt", { status: 400 });
 	}
 
+	const values: {status: string, refund?: string, feedback?: string, resolutionReason?: string } = { status, refund: refundToken }
+
+	if (custom?.feedback) {
+		values.feedback = custom.feedback;
+	}
+	if (custom?.resolutionReason) {
+		values.resolutionReason = custom.resolutionReason;
+	}
+
 	const updatedOffer = await db
 		.update(offerTable)
-		.set({ feedback, status, refund: refundToken })
+		.set(values)
 		.where(eq(offerTable.id, offer.id))
 		.returning();
 

@@ -7,6 +7,7 @@ import {
 import { verifyPayload } from "@openPleb/common/payloads";
 import { DISPUTE_RESPONSE, OFFER_STATE } from "@openPleb/common/types";
 import { eq } from "drizzle-orm";
+import { eventEmitter } from "../../../events/emitter";
 
 export const counterOrForfeitDispute = async (
 	offerId: string,
@@ -69,5 +70,9 @@ const handleCounterOrForfeitDispute = async (id: number, payload: {response: str
 		return new Response("Invalid dispute response", { status: 400 });
 	}
     const [offer] = await db.update(offerTable).set(values).where(eq(offerTable.id, id)).returning();
+	eventEmitter.emit("socket-event", {
+		command: "update-offer",
+		data: { offer },
+	});
 	return offer
 };
