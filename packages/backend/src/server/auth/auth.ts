@@ -11,7 +11,7 @@ import { ensureError } from "@openPleb/common/errors";
 import { log } from "../../logger";
 import { eventEmitter } from "../../events/emitter";
 import type { SocketEventData } from "../../types";
-import { desc } from 'drizzle-orm';
+import { desc } from "drizzle-orm";
 import { resolveDispute } from "../api/offers/resolveDispute";
 import { authFiatProviders } from "./fiat_providers/crud";
 import { environment } from "../../env";
@@ -53,7 +53,7 @@ export const auth = (app: Elysia) =>
 					passwordHash,
 					username,
 					createdAt: Math.ceil(Date.now() / 1000),
-				}); 
+				});
 				// generate access
 				const user = await db
 					.select()
@@ -96,70 +96,105 @@ export const auth = (app: Elysia) =>
 		})
 		//@ts-ignore
 		.post("/login", async ({ body, set, jwt }) => {
-			const { username, password } = body as {
-				username: string;
-				password: string;
-			};
-			// verify email/username
-			const user = await db
-				.select()
-				.from(userTable)
-				.where(eq(userTable.username, username))
-				.then(takeUniqueOrUndefinded);
-			if (!user) {
-				set.status = 400;
-				return {
-					success: false,
-					data: null,
-					message: "Invalid credentials",
+			try {
+				const { username, password } = body as {
+					username: string;
+					password: string;
 				};
-			}
+				// verify email/username
+				const user = await db
+					.select()
+					.from(userTable)
+					.where(eq(userTable.username, username))
+					.then(takeUniqueOrUndefinded);
+				if (!user) {
+					set.status = 400;
+					return {
+						success: false,
+						data: null,
+						message: "Invalid credentials",
+					};
+				}
 
-			// verify password
-			const match = await verify(user.passwordHash, password);
-			if (!match) {
-				set.status = 400;
+				// verify password
+				const match = await verify(user.passwordHash, password);
+				if (!match) {
+					set.status = 400;
+					return {
+						success: false,
+						data: null,
+						message: "Invalid credentials",
+					};
+				}
+
+				// generate access
+				const signature = await jwt.sign({
+					userId: user.id,
+				});
+
 				return {
-					success: false,
-					data: null,
-					message: "Invalid credentials",
-				};
-			}
-
-			// generate access
-			const signature = await jwt.sign({
-				userId: user.id,
-			});
-
-			return {
-				success: true,
-				data: {
-					user: {
-						access_token: signature,
-						id: user.id,
-						username: user.username,
+					success: true,
+					data: {
+						user: {
+							access_token: signature,
+							id: user.id,
+							username: user.username,
+						},
 					},
-				},
-				message: "Login successful",
-			};
+					message: "Login successful",
+				};
+			} catch (error) {
+				set.status = 400;
+				const err = ensureError(error);
+				log.error("Error: {error}", { error });
+				return {
+					success: false,
+					message: err.message,
+					data: {},
+				};
+			}
 		})
 		.use(isAuthenticated)
 		// protected routes
-		.get("/data", async ({user})=> {
-			if (!user ){
-				return
+		.get("/data", async ({ user, set }) => {
+			try {
+				if (!user) {
+					return;
+				}
+				//todo prioritize disputed offers
+				const offers = await db.select().from(offerTable).orderBy(
+					desc(offerTable.createdAt),
+				).limit(100);
+				return { offers, env: environment };
+			} catch (error) {
+				set.status = 400;
+				const err = ensureError(error);
+				log.error("Error: {error}", { error });
+				return {
+					success: false,
+					message: err.message,
+					data: {},
+				};
 			}
-			//todo prioritize disputed offers
-			const offers = await db.select().from(offerTable).orderBy(desc(offerTable.createdAt)).limit(100)  
-			return {offers, env: environment}
 		})
-		.post("/resolvedispute", async ({user, body})=> {
-			if (!user ){
-				return
+		.post("/resolvedispute", async ({ user, body, set }) => {
+			try {
+				if (!user) {
+					return;
+				}
+				await resolveDispute(body);
+				console.log(body);
+				return {};
+			} catch (error) {
+				set.status = 400;
+				const err = ensureError(error);
+				log.error("Error: {error}", { error });
+				return {
+					success: false,
+					message: err.message,
+					data: {},
+				};
 			}
-			await resolveDispute(body)
-			console.log(body)
-			return {}
 		}).use(authFiatProviders)
 		.ws("/ws", {
 			//@ts-ignore
@@ -206,15 +241,21 @@ export const auth = (app: Elysia) =>
 			},
 
 			open: (ws) => {
-				ws.subscribe("message");
-				sendPing(ws);
-				setInterval(async () => {
+				try {
+					
+					ws.subscribe("message");
 					sendPing(ws);
-				}, 10000);
-				eventEmitter.on("socket-event", (e: SocketEventData) => {
-					log.debug("Sending socket event {e}", { e });
-					ws.send(e);
-				});
+					setInterval(async () => {
+						sendPing(ws);
+					}, 10000);
+					eventEmitter.on("socket-event", (e: SocketEventData) => {
+						log.debug("Sending socket event {e}", { e });
+						ws.send(e);
+					});
+				} catch (error) {
+					const err = ensureError(error);
+					log.error("Error: {error}", { error });
+				}
 			},
 			message(ws, message: string) {
 				//receiving messages
@@ -222,14 +263,15 @@ export const auth = (app: Elysia) =>
 					//@ts-ignore
 					handleCommand(message);
 				} catch (error) {
-					console.error(error);
+					const err = ensureError(error);
+					log.error("Error: {error}", { error });
 				}
 			},
 		});
 
-const sendPing = async (ws: ElysiaWS) => {	
-		ws.send({ command: "ping", data: {} });
-		// log.debug(`sent websocket ping {pingData}`, {pingData} )
+const sendPing = async (ws: ElysiaWS) => {
+	ws.send({ command: "ping", data: {} });
+	// log.debug(`sent websocket ping {pingData}`, {pingData} )
 };
 const handleCommand = async (message: { command: string; data: unknown }) => {
 	// log.debug(`Received websocket command: {message}`, {message} )

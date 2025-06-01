@@ -235,17 +235,17 @@
 </script>
 
 <div class="w-full">
-	<div class="flex items-center py-4">
+	<div class="flex items-center py-4 gap-2 flex-col lg:flex-row">
+		<Input
+			placeholder="Filter status..."
+			value={(table.getColumn('status')?.getFilterValue() as string) ?? ''}
+			oninput={(e) => table.getColumn('status')?.setFilterValue(e.currentTarget.value)}
+			onchange={(e) => {
+				table.getColumn('status')?.setFilterValue(e.currentTarget.value);
+			}}
+			class="max-w-sm"
+		/>
 		<div class="flex items-start gap-2">
-			<Input
-				placeholder="Filter status..."
-				value={(table.getColumn('status')?.getFilterValue() as string) ?? ''}
-				oninput={(e) => table.getColumn('status')?.setFilterValue(e.currentTarget.value)}
-				onchange={(e) => {
-					table.getColumn('status')?.setFilterValue(e.currentTarget.value);
-				}}
-				class="max-w-sm"
-			/>
 
 			<Popover.Root>
 				<Popover.Trigger>

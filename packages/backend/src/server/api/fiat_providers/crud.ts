@@ -6,7 +6,7 @@ import { log } from "../../../logger";
 import { takeUniqueOrUndefinded } from "../../../db/orm-helpers/orm-helper";
 import { eq } from "drizzle-orm";
 
-export const authFiatProviders = (app: Elysia) =>
+export const fiatProviders = (app: Elysia) =>
 	app.get("/fiat-providers", async ({ user, set }) => {
     try {
         const providers = await db.select().from(fiatProviderTable);

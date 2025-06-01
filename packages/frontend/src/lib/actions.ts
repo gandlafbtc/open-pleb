@@ -13,6 +13,7 @@ export type Offer = {
 	pubkey: string;
 	currency?: string;
 	description?: string;
+	fiatProviderId?: number;
 };
 
 export type OfferResponse = {

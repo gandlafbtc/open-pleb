@@ -34,6 +34,7 @@ export const offers = (app: Elysia) =>
 					body: t.Object({
 						qrCode: t.String(),
 						amount: t.Number(),
+						fiatProviderId: t.Optional(t.Number()),
 						pubkey: t.String(),
 						token: t.Optional(t.String()),
 					}),

@@ -5,8 +5,9 @@ export const postOffer = async (body: {
 	amount: number;
 	qrCode: string;
 	pubkey: string;
+	fiatProviderId?: number;
 }) => {
-	const { amount, qrCode, pubkey } = body;
+	const { amount, qrCode, pubkey, fiatProviderId } = body;
 
 	if (!amount || !qrCode || !pubkey) {
 		return new Response("Invalid request", {
@@ -37,6 +38,7 @@ export const postOffer = async (body: {
 		qrCode,
 		pubkey,
 		conversionRate,
+		fiatProviderId
 	});
 
 	return { offer };

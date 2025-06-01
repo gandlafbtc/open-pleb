@@ -33,20 +33,21 @@ This project is under construction, and we are working on it actively. It is not
     - [x] Approve receipt UX
         - [x] Dispurse funds to local wallet (cashu token)
         - [ ] auto withdraw (to ln adress)
-    - [ ] Reject receipt UX
-    - [ ] open dispute
+    - [x] Reject receipt UX
+    - [x] open dispute
 - [ ] review system
-- [ ] resolve conflicts
-    - [ ] admin portal
-    - [ ] Handle bonds
-    - [ ] Handle inflight funds
-    - [ ] handle refunds
-- [ ] admin portal
-    - [ ] manage wallet
+    - [ ] user reviews
+    - [ ] admin user/review inspection
+- [x] resolve conflicts
+    - [x] admin portal
+    - [x] Handle bonds
+    - [x] handle refunds
+- [x] admin portal
+    - [x] manage disputes
     - [ ] manage offers
+    - [ ] manage wallet
     - [ ] manage users
     - [ ] manage subscriptions
-    - [ ] manage disputes
 
 
 

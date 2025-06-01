@@ -13,6 +13,7 @@
 	import Expiry from '$lib/elements/Expiry.svelte';
 	import { getEncodedToken } from "@cashu/cashu-ts";
 	import { dataStore } from '$lib/stores/session/data.svelte';
+	import { Landmark } from 'lucide-svelte';
 
 	const {
 		PUBLIC_API_VERSION,
@@ -78,7 +79,14 @@
 	
 </script>
 
-<Card.Root class="w-80">
+<Card.Root class="w-80 relative">
+	<div class="absolute top-4 right-4">
+		{#if offer.fiatProviderId}
+			<img src="{dataStore.providers.find(p => p.id === offer.fiatProviderId)?.icon}" alt="" class="w-6 h-6 rounded-md"  />
+		{:else}
+			<Landmark class='w-6 h-6'></Landmark>
+		{/if}
+	</div>
     <Card.Header>
         <Card.Title>
 			<a href={`/earn/${offer.id}`}>

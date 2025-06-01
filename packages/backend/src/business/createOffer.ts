@@ -34,6 +34,8 @@ export interface OfferData {
 	 * The public key of the maker creating the offer.
 	 */
 	pubkey: string;
+	
+	fiatProviderId?: number;
 }
 /**
  * Creates a new offer in the system based on the provided offer data.
@@ -48,7 +50,7 @@ export interface OfferData {
  * @returns Promise resolving to the created Offer object
  */
 export const createOffer = async (offerData: OfferData): Promise<Offer> => {
-	const { amount, conversionRate, qrCode, pubkey } = offerData;
+	const { amount, conversionRate, qrCode, pubkey, fiatProviderId  } = offerData;
 
 	const satsAmount = Math.ceil((100000000 / conversionRate) * amount);
 
@@ -89,6 +91,7 @@ export const createOffer = async (offerData: OfferData): Promise<Offer> => {
 		amount,
 		qrCode,
 		pubkey,
+		fiatProviderId
 	};
 
 	console.log(insertOffer);

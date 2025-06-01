@@ -28,7 +28,7 @@ services:
       LOG_FILE_NAME: /app/data/logs/app.log
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres
       CASHU_SEED_PHRASE: because oxygen subway review excuse elder coconut kingdom govern scrub enact minimum
-      FRONTEND_URL: http://frontend:3000
+      FRONTEND_URL: http://frontend:3010
       OPENPLEB_PLATFORM_FEE_PERCENTAGE: 0
       OPENPLEB_PLATFORM_FEE_FLAT_RATE: 100
       OPENPLEB_TAKER_FEE_PERCENTAGE: 2
@@ -58,7 +58,22 @@ services:
       PUBLIC_BACKEND_URL: http://localhost:3003
       PUBLIC_API_VERSION: v1
     ports:
-      - "3000:3000"
+      - "3010:3000"
+    networks:
+      - postgres-network
+    depends_on:
+      - backend
+  admin-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: openpleb-admin-frontend
+    restart: unless-stopped
+    environment:
+      PUBLIC_BACKEND_URL: http://localhost:3003
+      PUBLIC_API_VERSION: v1
+    ports:
+      - "3011:3000"
     networks:
       - postgres-network
     depends_on:

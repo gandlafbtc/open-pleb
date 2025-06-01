@@ -24,7 +24,7 @@ export const DISPUTE_RESPONSE = {
 	COUNTER: 'COUNTER',
 }
 
-export const CURRENCIES = ["KRW"]
+export const CURRENCIES = ["KRW, JPY", "LAK"]
 
 export interface Environment {
 	OPENPLEB_PLATFORM_FEE_PERCENTAGE: number 

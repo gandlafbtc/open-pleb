@@ -17,6 +17,7 @@ import { updateConnected } from "./jobs/updateConnected";
 import { log } from "./logger";
 import { open } from "./server/open";
 import { auth } from "./server/auth/auth";
+import { ensureError } from "@openPleb/common/errors";
 
 log.info`Starting OpenPleb version ${version}...`;
 
@@ -81,7 +82,12 @@ const app = new Elysia()
 			// run every 5 seconds
 			pattern: "*/5 * * * * *",
 			run() {
-				expireOffers();
+				try {
+					expireOffers();
+				} catch (error) {
+					const err = ensureError(error);
+					log.error("Error: {error}", { error });				
+				}
 			},
 		}),
 	)
@@ -91,7 +97,13 @@ const app = new Elysia()
 			// run every 10 seconds
 			pattern: "*/10 * * * * *",
 			run() {
-				updateConnected();
+				try {
+					
+					updateConnected();
+				} catch (error) {
+					const err = ensureError(error);
+					log.error("Error: {error}", { error });
+				}
 			},
 		}),
 	)
@@ -118,39 +130,62 @@ const app = new Elysia()
 		}),
 	)
 	.group("/api/v1", (app) => app.use(open))
-	.get("/vapid", async () => {
-		const publicKey = encodeBase64Url(
-			await crypto.subtle.exportKey("raw", vapidKeys.publicKey),
-		);
-		return { publicKey };
+	.get("/vapid", async ({set}) => {
+		try {
+			const publicKey = encodeBase64Url(
+				await crypto.subtle.exportKey("raw", vapidKeys.publicKey),
+			);
+			return { publicKey };
+		} catch (error) {
+			set.status = 400
+			const err = ensureError(error);
+			log.error("Error: {error}", { error });
+			return {
+                success: false,
+                message: err.message,
+                data: null,
+            };
+		}
 	})
-	.post("/subscribe", async ({ body }) => {
-		// Retrieve subscription.
-		const { subscription } = body;
-		// You can store it in a DB to reuse it later.
-		// ...
-		console.log(subscription);
-
-		await db.insert(subscriptionsTable).values({
-			subscription: JSON.stringify(subscription),
-			createdAt: Math.ceil(Date.now() / 1000),
-		});
-		// Create a subscriber object.
-		const subscriber = appServer.subscribe(subscription);
-
-		// Send notification.
-		await subscriber.pushTextMessage(
-			JSON.stringify({
-				title: "OpenPleb notifications enabled!",
-				body: "You will now receive notifications on new offers!",
-			}),
-			{},
-		);
-
-		subscribers.push(subscriber);
-
-		// OK.
-		return new Response();
+	.post("/subscribe", async ({ body, set }) => {
+		try {
+			
+			// Retrieve subscription.
+			const { subscription } = body;
+			// You can store it in a DB to reuse it later.
+			// ...
+			console.log(subscription);
+			
+			await db.insert(subscriptionsTable).values({
+				subscription: JSON.stringify(subscription),
+				createdAt: Math.ceil(Date.now() / 1000),
+			});
+			// Create a subscriber object.
+			const subscriber = appServer.subscribe(subscription);
+			
+			// Send notification.
+			await subscriber.pushTextMessage(
+				JSON.stringify({
+					title: "OpenPleb notifications enabled!",
+					body: "You will now receive notifications on new offers!",
+				}),
+				{},
+			);
+			
+			subscribers.push(subscriber);
+			
+			// OK.
+			return new Response();
+		} catch (error) {
+			set.status = 400
+			const err = ensureError(error);
+			log.error("Error: {error}", { error });
+			return {
+                success: false,
+                message: err.message,
+                data: null,
+            };
+		}
 	}).group("/admin", (app) =>
 		app
 			.use(

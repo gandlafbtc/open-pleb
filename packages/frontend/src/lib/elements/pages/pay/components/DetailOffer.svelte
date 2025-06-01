@@ -3,12 +3,14 @@
 	import { formatCurrency } from '$lib/helper';
 	import type { Offer } from "@openPleb/common/db/schema";
 	import Expiry from "$lib/elements/Expiry.svelte";
-	import { BadgeDollarSign, CalendarDays, Coins, CurrencyIcon, Info, Rotate3D, Stamp } from "lucide-svelte";
+	import { BadgeDollarSign, CalendarDays, Coins, CurrencyIcon, Info, Landmark, Rotate3D, Stamp } from "lucide-svelte";
+	import { dataStore } from '$lib/stores/session/data.svelte';
 
     interface Props {offer: Offer}
     
     const {offer} = $props() as Props;
-    
+
+    const provider = dataStore.providers.find(p => p.id === offer.fiatProviderId);
     
     // Format date from unix timestamp
     const formatDate = (timestamp: number | undefined) => {
@@ -32,6 +34,21 @@
         </Card.Description>
     </Card.Header>
     <Card.Content class="space-y-4">
+        <div class="flex items-center gap-2">
+            <Landmark class="h-5 w-5" />
+            <div>
+                <p class="font-semibold">Provider</p>
+                <div class="flex items-center gap-2">
+                {#if provider }
+                <img src={provider.icon} alt="" class="w-6 h-6 rounded-md">
+                <p>{provider.label}</p>
+                  
+                {:else}
+                  <p>Unknown provider</p>
+                {/if}
+                </div>
+            </div>
+        </div>
         <div class="flex items-center gap-2">
             <BadgeDollarSign class="h-5 w-5" />
             <div>

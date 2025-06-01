@@ -10,6 +10,7 @@ import type { SocketEventData } from "../types";
 import { getData, getDataForId } from "./api/data";
 import { offers } from "./api/offers/offers";
 import { environment } from "../env";
+import {  fiatProviders } from "./api/fiat_providers/crud";
 
 
 export const open = (app: Elysia) =>
@@ -69,25 +70,33 @@ export const open = (app: Elysia) =>
 			}
 		})
 		.use(offers)
+		.use(fiatProviders)
 		.ws("/ws", {
 			open: (ws) => {
-				const headers = ws.data.request.headers;
-				const pubkey = JSON.parse(JSON.stringify(headers))[
-					"sec-websocket-protocol"
-				];
-				ws.subscribe("message");
-				sendPing(ws);
-				setInterval(async () => {
+				try {
+					
+					const headers = ws.data.request.headers;
+					const pubkey = JSON.parse(JSON.stringify(headers))[
+						"sec-websocket-protocol"
+					];
+					ws.subscribe("message");
 					sendPing(ws);
-				}, 5000);
-				eventEmitter.on("socket-event", (e: SocketEventData) => {
-					//if it's a pubkey event and it's not for this pubkey, ignore it
-					if (e.pubkeys?.length && !e.pubkeys.includes(pubkey)) {
-						return;
-					}
-					log.debug("Sending socket event {e}", { e: e.command });
-					ws.send(e);
-				});
+					setInterval(async () => {
+						sendPing(ws);
+					}, 5000);
+					eventEmitter.on("socket-event", (e: SocketEventData) => {
+						//if it's a pubkey event and it's not for this pubkey, ignore it
+						if (e.pubkeys?.length && !e.pubkeys.includes(pubkey)) {
+							return;
+						}
+						log.debug("Sending socket event {e}", { e: e.command });
+						ws.send(e);
+					});
+				} catch (error) {
+					const err = ensureError(error);
+					log.error("Error: {error}", { error });
+					
+				}
 			},
 			message(ws, message: string) {
 				//receiving messages

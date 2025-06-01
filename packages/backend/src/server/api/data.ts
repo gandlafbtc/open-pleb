@@ -1,6 +1,7 @@
 import { db } from "@openPleb/common/db";
 import {
 	claimsTable,
+	fiatProviderTable,
 	type Offer,
 	offerTable,
 	receiptsTable,
@@ -30,7 +31,8 @@ export const getData = async (pubkey: string) => {
 		.select()
 		.from(receiptsTable)
 		.where(inArray(receiptsTable.offerId, offerIds));
-	return { offers, claims, receipts };
+	const fiatProviders = await db.select().from(fiatProviderTable); 
+	return { offers, claims, receipts, fiatProviders };
 };
 
 export const getDataForId = async (id: number) => {

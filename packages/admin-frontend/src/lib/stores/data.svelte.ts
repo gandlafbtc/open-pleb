@@ -1,5 +1,5 @@
 import { get } from "svelte/store";
-import type { Claim, Offer, Receipt } from "@openPleb/common/db/schema";
+import type { Claim, FiatProvider, Offer, Receipt } from "@openPleb/common/db/schema";
 import { env } from "$env/dynamic/public";
 import { userLoggedIn } from "./user";
 import type { Environment, UserInfo } from "@openPleb/common/types";
@@ -16,6 +16,7 @@ export interface Data {
 	env: Environment,
 	takers: number,
 	makers: number
+	fiatProviders: FiatProvider[]
 }
 
 export const createDataStore = () => {
@@ -26,6 +27,7 @@ export const createDataStore = () => {
 	let makers: number  = $state(0)
 	let userInfos: UserInfo[]  = $state([])
 	let env: Environment | undefined = $state()
+	let fiatProviders: FiatProvider[] = $state([])
 
 	const init = async () => {
 		const response = await fetch(
@@ -54,6 +56,9 @@ export const createDataStore = () => {
 		}
 		if (data.unserInfos) {
 			userInfos.push(...data.unserInfos)
+		}
+		if (data.fiatProviders) {	
+			fiatProviders.push(...data.fiatProviders);	
 		}
 		
 	};
@@ -140,6 +145,7 @@ export const createDataStore = () => {
 		get takers() {return takers},
 		get makers() {return makers},
 		get env() {return env},
+		get fiatProviders() {return fiatProviders},
 		
 		init,
 		updateOffer,

@@ -24,6 +24,11 @@
 						title: 'Home',
 						url: '/'
 					}
+					,
+					{
+						title: 'Settings',
+						url: '/settings'
+					}
 				]
 				
 			}
