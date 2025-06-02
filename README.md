@@ -97,10 +97,6 @@ Fiat banking usually doesn't offer open protocols that would allow us to make at
 2. navigate to `packages/backend` and run `bun i && bun run dev` to start the backend server
 3. navigate to `packages/frontend` and run `bun i  && bun run dev` to start the frontend development server
 
-#### optional
-
-1. To enable notifications, create the `vapid.json` file with your own public and private keys (see vapid.json.example for an example)
-    1. You can generate them from the `packages/backend` folder, by running `deno run https://raw.githubusercontent.com/negrel/webpush/master/cmd/generate-vapid-keys.ts`
 ## Environment Configuration
 
 **IMPORTANT**: WHEN RUNNING IN PRODUCTION, YOU NEED TO CONFIGURE THE ENVIRONMENT VARIABLES FOR YOUR OWN ENVIRONMENT! ESPACIALLY THE `DATABASE_URL` SHOULD BE CHANGED TO USE NON DEFAULT CREDENTIALS

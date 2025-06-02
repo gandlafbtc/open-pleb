@@ -38,10 +38,13 @@ services:
       OPENPLEB_CURRENCY: KRW
       OPENPLEB_MINT_URL: http://nutshell:3338
       OPENPLEB_MAX_FIAT_AMOUNT: 100000
+      OPENPLEB_MIGRATIONS_DIR: /app/migrations
+      OPENPLEB_CONTACT: gandlaf@proton.me
+      JWT_SECRET: secret-ooohoOHOHOoohohooH
     ports:
       - "3003:3003"
     volumes:
-      - backend-data:/app/data
+      - ${PWD}/data:/app/data
     networks:
       - postgres-network
     depends_on:
@@ -109,8 +112,6 @@ services:
           memory: 1G
 volumes:
   postgres-data:
-    driver: local
-  backend-data:
     driver: local
 
 networks:

@@ -9,7 +9,8 @@
 	import { priceStore } from '$lib/stores/price';
 	import { init } from '$lib/init';
 	import { browser } from '$app/environment';
-	import { LoaderCircle } from 'lucide-svelte';
+	import { LoaderCircle, X } from 'lucide-svelte';
+	import { slide } from 'svelte/transition';
 
 	import { init as initCashu, mintsStore } from "@gandlaf21/cashu-wallet-engine";
 	import TinyBondWallet from '$lib/elements/bond-wallet/TinyBondWallet.svelte';
@@ -25,7 +26,7 @@
 	const { children } = $props();
 	
 	let isInit = $state(false);
-	
+	let showAlphaBanner = $state(false);
 	let initStatus = $state("Initializing");
 	
 	onMount(() => {
@@ -36,6 +37,7 @@
 				initStatus = "Updating mint"
 				await mintsStore.fetchMint(OPENPLEB_MINT_URL)
 				isInit = true;
+				showAlphaBanner=true
 			}).catch((error) => {
 				console.error('Error initializing Cashu:', error);
 			});
@@ -44,6 +46,25 @@
 	});
 </script>
 <ModeWatcher></ModeWatcher>
+
+<!-- Alpha Banner -->
+{#if showAlphaBanner}
+<div 
+  in:slide={{ duration: 400, axis: 'y', delay: 300 }}
+  out:slide={{ duration: 300, axis: 'y' }}
+  class="fixed top-0 left-0 w-full bg-amber-500 flex items-center justify-center z-50 text-black font-medium shadow-md"
+>
+  <p>⚠️ This application is in early alpha. Use at your own risk. ⚠️</p>
+  <button 
+    class="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 hover:bg-amber-600 rounded-full"
+    onclick={() => showAlphaBanner = false}
+    aria-label="Close banner"
+  >
+    <X class="h-4 w-4" />
+  </button>
+</div>
+{/if}
+
 <Toaster richColors closeButton />
 <InstallPrompt />
 <PushNotification />

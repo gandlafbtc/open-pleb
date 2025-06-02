@@ -6,9 +6,9 @@
 	import { ensureError } from '$lib/errors.js';
 	import { formatCurrency, objectUrlToBase64 } from '$lib/helper';
 	import { dataStore } from '$lib/stores/session/data.svelte';
-	import type { Claim, Offer } from '@openPleb/common/db/schema';
+	import type { Claim, FiatProvider, Offer } from '@openPleb/common/db/schema';
 	import { keysStore } from '@gandlaf21/cashu-wallet-engine';
-	import { LoaderCircle, Trash, Upload } from 'lucide-svelte';
+	import { LoaderCircle, Trash, Upload, Pencil, Check } from 'lucide-svelte';
 	import encodeQR from 'qr';
 	import Dropzone from 'svelte-file-dropzone';
 	import { toast } from 'svelte-sonner';
@@ -23,6 +23,120 @@
     let isPaid = $state(false);
 	let isLoading = $state(false);
 	let file = $state('');
+	let isDrawingMode = $state(false);
+	let penSize = $state(10); // Default: small
+	let canvas: HTMLCanvasElement | null = $state(null);
+	let canvasContext: CanvasRenderingContext2D | null = $state(null);
+	let isDrawing = $state(false);
+	let lastX = 0;
+	let lastY = 0;
+	
+// Find the fiat provider for this offer
+let fiatProvider: FiatProvider | undefined = $derived(
+	offer.fiatProviderId 
+		? dataStore.providers.find(p => p.id === offer.fiatProviderId) 
+		: undefined
+);
+
+function initializeCanvas() {
+	if (!canvas || !file) return;
+	
+	const img = new Image();
+	img.onload = () => {
+		if (!canvas) return;
+		
+		canvas.width = img.width;
+		canvas.height = img.height;
+		
+		canvasContext = canvas.getContext('2d');
+		if (!canvasContext) return;
+		
+		canvasContext.drawImage(img, 0, 0, canvas.width, canvas.height);
+		canvasContext.lineCap = 'round';
+		canvasContext.lineJoin = 'round';
+		canvasContext.strokeStyle = 'black';
+		canvasContext.lineWidth = penSize;
+	};
+	
+	img.src = file;
+}
+
+function startDrawing(e: MouseEvent | TouchEvent) {
+	if (!canvasContext || !canvas) return;
+	isDrawing = true;
+	
+	// Get coordinates with scaling factor correction
+	const rect = canvas.getBoundingClientRect();
+	const scaleX = canvas.width / rect.width;
+	const scaleY = canvas.height / rect.height;
+	
+	const clientX = e instanceof MouseEvent ? e.clientX : e.touches[0].clientX;
+	const clientY = e instanceof MouseEvent ? e.clientY : e.touches[0].clientY;
+	
+	// Calculate coordinates relative to canvas and apply scaling
+	const x = (clientX - rect.left) * scaleX;
+	const y = (clientY - rect.top) * scaleY;
+	
+	lastX = x;
+	lastY = y;
+}
+
+function draw(e: MouseEvent | TouchEvent) {
+	if (!isDrawing || !canvasContext || !canvas) return;
+	e.preventDefault();
+	
+	// Get coordinates with scaling factor correction
+	const rect = canvas.getBoundingClientRect();
+	const scaleX = canvas.width / rect.width;
+	const scaleY = canvas.height / rect.height;
+	
+	const clientX = e instanceof MouseEvent ? e.clientX : e.touches[0].clientX;
+	const clientY = e instanceof MouseEvent ? e.clientY : e.touches[0].clientY;
+	
+	// Calculate coordinates relative to canvas and apply scaling
+	const x = (clientX - rect.left) * scaleX;
+	const y = (clientY - rect.top) * scaleY;
+	
+	// Draw line
+	canvasContext.beginPath();
+	canvasContext.moveTo(lastX, lastY);
+	canvasContext.lineTo(x, y);
+	canvasContext.stroke();
+	
+	lastX = x;
+	lastY = y;
+}
+
+function stopDrawing() {
+	isDrawing = false;
+	
+	// Update the file blob with the new canvas content
+	if (canvas && browser) {
+		canvas.toBlob(blob => {
+			if (blob) {
+				// Release the old object URL to avoid memory leaks
+				URL.revokeObjectURL(file);
+				// Create a new object URL from the blob
+				file = URL.createObjectURL(blob);
+			}
+		}, 'image/png');
+	}
+}
+
+function setPenSize(size: number) {
+	penSize = size;
+	if (canvasContext) {
+		canvasContext.lineWidth = size;
+	}
+}
+
+function toggleDrawingMode() {
+	isDrawingMode = !isDrawingMode;
+	if (isDrawingMode && file) {
+		// Initialize canvas on next tick to ensure DOM is updated
+		setTimeout(initializeCanvas, 0);
+	}
+}
 
 	const upload = async () => {
 		if (!file) {
@@ -82,8 +196,8 @@
     height = viewBox?.[3] || svgElement.getBoundingClientRect().height;
   } else {
     // Try to get width and height attributes, fallback to getBoundingClientRect
-    width = parseFloat(svgClone.getAttribute('width') || '') || svgElement.getBoundingClientRect().width;
-    height = parseFloat(svgClone.getAttribute('height') || '') || svgElement.getBoundingClientRect().height;
+    width = Number.parseFloat(svgClone.getAttribute('width') || '') || svgElement.getBoundingClientRect().width;
+    height = Number.parseFloat(svgClone.getAttribute('height') || '') || svgElement.getBoundingClientRect().height;
   }
   
   // Set explicit dimensions on the SVG clone
@@ -173,15 +287,92 @@
 		<div class="w-full">
 			{#if file}
 				<div class="relative">
-					<button
-						class="absolute inset-0 flex items-center justify-center rounded-lg bg-black/50 opacity-0 transition-all hover:opacity-100"
-						onclick={() => {
-							file = '';
-						}}
-					>
-						<Trash class="text-white "></Trash>
-					</button>
-					<img id="receiptImage" src={file} alt="" class="rounded-md px-[20%]" />
+					{#if isDrawingMode}
+						<!-- Drawing mode -->
+						<div class="flex flex-col gap-3">
+							<!-- Drawing tools -->
+							<div class="flex justify-between items-center mb-2">
+								<div class="flex items-center gap-3">
+									<div class="flex gap-1">
+										<Button 
+											size="sm" 
+											variant={penSize === 10 ? "default" : "outline"} 
+											class="p-1 h-8 w-8" 
+											onclick={() => setPenSize(10)}
+										>
+											<div class="w-2 h-2 bg-black rounded-full"></div>
+										</Button>
+										<Button 
+											size="sm" 
+											variant={penSize === 25 ? "default" : "outline"} 
+											class="p-1 h-8 w-8" 
+											onclick={() => setPenSize(25)}
+										>
+											<div class="w-3 h-3 bg-black rounded-full"></div>
+										</Button>
+										<Button 
+											size="sm" 
+											variant={penSize === 50 ? "default" : "outline"} 
+											class="p-1 h-8 w-8" 
+											onclick={() => setPenSize(50)}
+										>
+											<div class="w-4 h-4 bg-black rounded-full"></div>
+										</Button>
+									</div>
+								</div>
+								<Button 
+									size="sm" 
+									variant="outline"
+									class="h-8" 
+									onclick={toggleDrawingMode}
+								>
+									<Check class="h-4 w-4 mr-1" />
+									Done
+								</Button>
+							</div>
+							
+							<!-- Canvas for drawing -->
+							<div class="px-[20%]">
+								<canvas
+									bind:this={canvas}
+									on:mousedown={startDrawing}
+									on:mousemove={draw}
+									on:mouseup={stopDrawing}
+									on:mouseleave={stopDrawing}
+									on:touchstart={startDrawing}
+									on:touchmove={draw}
+									on:touchend={stopDrawing}
+									on:touchcancel={stopDrawing}
+									class="touch-none w-full rounded-md border"
+								></canvas>
+							</div>
+						</div>
+					{:else}
+						<!-- View mode -->
+						<div>
+							<div class="absolute top-2 right-2 z-10 flex gap-1">
+								<Button
+									size="icon"
+									variant="outline"
+									class="h-8 w-8 bg-white/80"
+									onclick={toggleDrawingMode}
+								>
+									<Pencil class="h-4 w-4" />
+								</Button>
+								<Button
+									size="icon"
+									variant="outline"
+									class="h-8 w-8 bg-white/80"
+									onclick={() => {
+										file = '';
+									}}
+								>
+									<Trash class="h-4 w-4" />
+								</Button>
+							</div>
+							<img id="receiptImage" src={file} alt="" class="rounded-md px-[20%]" />
+						</div>
+					{/if}
 				</div>
 			{:else}
 				<Dropzone
@@ -219,26 +410,43 @@
 			Back
 		</Button>
 	{:else}
-		<p class="text-center text-xl font-bold">
-			Pay
-			{formatCurrency(offer.amount, OPENPLEB_CURRENCY)}
-			to
-		</p>
+		<!-- Payment amount display -->
+		<div class="flex flex-col items-center gap-2 mb-4">
+			<p class="text-center text-lg text-muted-foreground">Please pay:</p>
+			<div class="text-center text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+				{formatCurrency(offer.amount, OPENPLEB_CURRENCY)}
+			</div>
+			
+			{#if fiatProvider}
+			<div class="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
+				<p>via</p>
+				{#if fiatProvider.icon}
+				<img src={fiatProvider.icon} alt={fiatProvider.label} class="w-5 h-5" />
+				{/if}
+				<p class="font-medium">{fiatProvider.label}</p>
+			</div>
+			{/if}
+		</div>
+		
 		<div class="w-full rounded-md border p-2 bg-white" id="qr-code-container">
 			{@html encodeQR(offer.qrCode, 'svg')}
 		</div>
-		<div class="flex gap-2 items-center">
-			<div class="w-full">
-
-				<CopiableToken token={offer.qrCode}></CopiableToken>
+		<!-- QR code plaintext and options -->
+		<div class="mt-4 bg-muted/30 rounded-md p-3">
+			<div class="mb-2">
+				<p class="text-sm font-medium text-muted-foreground mb-1">QR Code Content:</p>
+					<CopiableToken token={offer.qrCode}></CopiableToken>
 			</div>
-			<Button class="w-full" size='lg' variant='ghost' onclick={()=> {
-				if (browser) {
-					downloadSvgAsJpeg(document.getElementById('qr-code-container')?.firstChild, 'qr.jpg')
-				}
-			}}>
-				Download as Image
-			</Button>
+			
+			<div class="flex gap-2 items-center">
+				<Button class="w-full" size='lg' variant='outline' onclick={()=> {
+					if (browser) {
+						downloadSvgAsJpeg(document.getElementById('qr-code-container')?.firstChild as SVGElement, 'qr.jpg')
+					}
+				}}>
+					Download as Image
+				</Button>
+			</div>
 		</div>
 		<Button
 			class="mt-10"

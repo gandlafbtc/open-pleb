@@ -105,6 +105,12 @@ export const settingsTable = pgTable("settings", {
 	createdAt: integer('created_at').notNull(),
 });
 
+export const vapidKeysTable = pgTable("vapid_keys", {
+	id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    vapidJSON: text('vapid_json').notNull(),
+	createdAt: integer('created_at').notNull(),
+});
+
 export type MintQuote = typeof mintQuotesTable.$inferSelect;
 export type Claim = typeof claimsTable.$inferSelect;
 export type Offer = typeof offerTable.$inferSelect;
@@ -114,6 +120,7 @@ export type Subscription = typeof subscriptionsTable.$inferSelect;
 export type User = typeof userTable.$inferSelect;
 export type FiatProvider = typeof fiatProviderTable.$inferSelect;
 export type Setting = typeof settingsTable.$inferSelect;
+export type VapidKey = typeof vapidKeysTable.$inferSelect;
 
 export type InsertMintQuote = typeof mintQuotesTable.$inferInsert;
 export type InsertClaim = typeof claimsTable.$inferInsert;
@@ -124,3 +131,4 @@ export type InsertSubscription = typeof subscriptionsTable.$inferInsert;
 export type InsertUser = typeof userTable.$inferInsert;
 export type InsertFiatProvider = typeof fiatProviderTable.$inferInsert;
 export type InsertSetting = typeof settingsTable.$inferInsert;
+export type InsertVapidKey = typeof vapidKeysTable.$inferInsert;

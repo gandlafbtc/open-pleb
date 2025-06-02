@@ -6,7 +6,7 @@ import jwt from "@elysiajs/jwt";
 import cron from "@elysiajs/cron";
 import { logger } from "@grotto/logysia";
 import * as webpush from "@negrel/webpush";
-import { subscriptionsTable } from "@openPleb/common/db/schema";
+import { subscriptionsTable, vapidKeysTable } from "@openPleb/common/db/schema";
 import { encodeBase64Url } from "@std/encoding/base64url";
 import { rateLimit } from "elysia-rate-limit";
 import { version } from "../package.json";
@@ -18,6 +18,16 @@ import { log } from "./logger";
 import { open } from "./server/open";
 import { auth } from "./server/auth/auth";
 import { ensureError } from "@openPleb/common/errors";
+import { migrate } from "drizzle-orm/postgres-js/migrator";
+
+if (!process.env.OPENPLEB_MIGRATIONS_DIR) {
+	log.error("OPENPLEB_MIGRATIONS_DIR environment variable is not set");
+	process.exit(1);
+}
+
+log.info`migrating db...`;
+
+await migrate(db, {migrationsFolder: process.env.OPENPLEB_MIGRATIONS_DIR });
 
 log.info`Starting OpenPleb version ${version}...`;
 
@@ -28,6 +38,7 @@ const requiredEnvVars = [
 	"DATABASE_URL",
 	"CASHU_SEED_PHRASE",
 	"LOG_FILE_NAME",
+	"OPENPLEB_CONTACT",
 	"OPENPLEB_PLATFORM_FEE_PERCENTAGE",
 	"OPENPLEB_PLATFORM_FEE_FLAT_RATE",
 	"OPENPLEB_TAKER_FEE_PERCENTAGE",
@@ -47,12 +58,21 @@ for (const envVar of requiredEnvVars) {
 	}
 }
 
-const exportedVapidKeys = JSON.parse(await Bun.file("./vapid.json").text());
-const vapidKeys = await webpush.importVapidKeys(exportedVapidKeys, {
+let [exportedVapidKeys] = await db.select().from(vapidKeysTable)
+
+if (!exportedVapidKeys) {
+	const cryptoKeyPair = await webpush.generateVapidKeys({extractable: true })
+	const newExportedVapidKeys = await webpush.exportVapidKeys(cryptoKeyPair)
+	const newExportedVapidKeysJSON = JSON.stringify(newExportedVapidKeys)
+	const inserted = await db.insert(vapidKeysTable).values({ vapidJSON: newExportedVapidKeysJSON, createdAt: Math.ceil(Date.now()/1000) }).returning();
+	exportedVapidKeys = inserted[0];
+}
+
+const vapidKeys = await webpush.importVapidKeys(JSON.parse(exportedVapidKeys.vapidJSON), {
 	extractable: false,
 });
 const appServer = await webpush.ApplicationServer.new({
-	contactInformation: "mailto:gandlaf@proton.me",
+	contactInformation: Bun.env.OPENPLEB_CONTACT??'',
 	vapidKeys,
 });
 
