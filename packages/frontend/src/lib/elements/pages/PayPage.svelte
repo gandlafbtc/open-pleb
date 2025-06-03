@@ -58,11 +58,11 @@
 	{#if !scannedResult && isScanning === true}
 		<Card.Root class="w-full">
 			<Card.Header>
-				<Card.Title>Scan QR Code</Card.Title>
-				<Card.Description>Scan a QR code, enter address manually, or upload an image</Card.Description>
+				<Card.Title>Scan FIAT QR Code</Card.Title>
+				<Card.Description>Scan a QR code, enter address manually, or use a QR image from storage</Card.Description>
 			</Card.Header>
 			<Card.Content>
-					<SimpleScanner bind:isScanning whatToScan="FIAT" bind:scannedResult></SimpleScanner>
+					<SimpleScanner bind:isScanning bind:scannedResult></SimpleScanner>
 				<div class="relative flex w-full items-center py-3">
 					<div class="flex-grow border-t border-muted"></div>
 					<span class="mx-4 flex-shrink text-muted-foreground">OR</span>

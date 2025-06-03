@@ -19,6 +19,7 @@ import { open } from "./server/open";
 import { auth } from "./server/auth/auth";
 import { ensureError } from "@openPleb/common/errors";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
+import { initDiscordBot } from "./discord/bot";
 
 if (!process.env.OPENPLEB_MIGRATIONS_DIR) {
 	log.error("OPENPLEB_MIGRATIONS_DIR environment variable is not set");
@@ -221,3 +222,7 @@ const app = new Elysia()
 	.listen(Bun.env.PORT);
 
 log.info`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`;
+
+// Initialize the Discord bot
+initDiscordBot();
+log.info`Discord bot initialization attempted`;

@@ -37,6 +37,7 @@
 		"@scure/bip32": "^1.6.2",
 		"@scure/bip39": "^1.5.4",
 		"@std/encoding": "npm:@jsr/std__encoding@0.224.0/base64url",
+		"discord.js": "^14.19.3",
 		"dotenv": "^16.4.7",
 		"drizzle-orm": "^0.38.4",
 		"elysia": "^1.2.25",

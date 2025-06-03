@@ -1,11 +1,11 @@
-import { integer, pgTable, text } from 'drizzle-orm/pg-core';
+import { bigint, integer, pgTable, text } from 'drizzle-orm/pg-core';
 
 export const offerTable = pgTable('offers', {
 	id: integer().primaryKey().$defaultFn(()=> Math.ceil(Math.random()*100000000)),
 	createdAt: integer('created_at').notNull(),
 	amount: integer('amount').notNull(),
 	qrCode: text('qr_code').notNull(),
-	conversionRate: integer('conversion_rate').notNull(),
+	conversionRate: bigint({mode: "number"}).notNull(),
 	platformFeeFlatRate: integer('platform_fee_flat_rate').notNull(),
 	takerFeeFlatRate: integer('taker_fee_flat_rate').notNull(),
 	takerFeePercentage: integer('taker_fee_percentage').notNull(),

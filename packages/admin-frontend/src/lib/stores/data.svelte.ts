@@ -85,6 +85,26 @@ export const createDataStore = () => {
 		}
 	};
 
+	const fetchForPubkey = async (pubkey: string) => {
+		const response = await fetch(
+			`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/data/${
+				pubkey
+			}`
+		);
+		const data: Data = await response.json();
+		env = data.env
+		for (const offer of offers) {
+			updateOffer(offer);
+		}
+		for (const claim of claims) {
+			updateClaim(claim);
+		}
+		for (const receipt of receipts) {
+			updateReceipt(receipt);
+		}
+	}
+		
+
 	const newOffer = (offer: Offer) => {
 		offers.unshift(offer);
 	};
@@ -138,6 +158,8 @@ export const createDataStore = () => {
 		takers = data.takers;
 	}	
 
+	
+
 	return {
 		get offers() {return offers},
 		get receipts() {return receipts},
@@ -146,7 +168,7 @@ export const createDataStore = () => {
 		get makers() {return makers},
 		get env() {return env},
 		get fiatProviders() {return fiatProviders},
-		
+		fetchForPubkey,
 		init,
 		updateOffer,
 		fetchForId,

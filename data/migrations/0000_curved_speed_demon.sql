@@ -31,7 +31,7 @@ CREATE TABLE "offers" (
 	"created_at" integer NOT NULL,
 	"amount" integer NOT NULL,
 	"qr_code" text NOT NULL,
-	"conversion_rate" integer NOT NULL,
+	"conversionRate" bigint NOT NULL,
 	"platform_fee_flat_rate" integer NOT NULL,
 	"taker_fee_flat_rate" integer NOT NULL,
 	"taker_fee_percentage" integer NOT NULL,

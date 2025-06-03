@@ -22,25 +22,8 @@ services:
       dockerfile: Dockerfile
     container_name: openpleb-backend
     restart: unless-stopped
-    environment:
-      PORT: 3003
-      DB_FILE_NAME: /app/data/local.db
-      LOG_FILE_NAME: /app/data/logs/app.log
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres
-      CASHU_SEED_PHRASE: because oxygen subway review excuse elder coconut kingdom govern scrub enact minimum
-      FRONTEND_URL: http://frontend:3010
-      OPENPLEB_PLATFORM_FEE_PERCENTAGE: 0
-      OPENPLEB_PLATFORM_FEE_FLAT_RATE: 100
-      OPENPLEB_TAKER_FEE_PERCENTAGE: 2
-      OPENPLEB_TAKER_FEE_FLAT_RATE: 100
-      OPENPLEB_BOND_PERCENTAGE: 10
-      OPENPLEB_BOND_FLAT_RATE: 500
-      OPENPLEB_CURRENCY: KRW
-      OPENPLEB_MINT_URL: http://nutshell:3338
-      OPENPLEB_MAX_FIAT_AMOUNT: 100000
-      OPENPLEB_MIGRATIONS_DIR: /app/migrations
-      OPENPLEB_CONTACT: gandlaf@proton.me
-      JWT_SECRET: secret-ooohoOHOHOoohohooH
+    env_file: 
+     - ${PWD}/data/config/backend/.env
     ports:
       - "3003:3003"
     volumes:
@@ -57,44 +40,45 @@ services:
       dockerfile: Dockerfile.frontend
     container_name: openpleb-frontend
     restart: unless-stopped
-    environment:
-      PUBLIC_BACKEND_URL: http://localhost:3003
-      PUBLIC_API_VERSION: v1
+    env_file: 
+     - ${PWD}/data/config/frontend/.env
     ports:
       - "3010:3000"
     networks:
       - postgres-network
     depends_on:
       - backend
+    volumes:
+      - ${PWD}/data/config/frontend/.env:/app/data/config/frontend/.env
   admin-frontend:
     build:
       context: .
       dockerfile: Dockerfile.frontend
     container_name: openpleb-admin-frontend
     restart: unless-stopped
-    environment:
-      PUBLIC_BACKEND_URL: http://localhost:3003
-      PUBLIC_API_VERSION: v1
+    env_file: 
+     - ${PWD}/data/config/frontend/.env
     ports:
       - "3011:3000"
     networks:
       - postgres-network
     depends_on:
       - backend
+    volumes:
+      - ${PWD}/data/config/admin-frontend/.env:/app/data/config/admin-frontend/.env
       
   postgres:
     image: postgres:15.3
     container_name: my-postgres-db
     restart: unless-stopped
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
-      PGDATA: /var/lib/postgresql/data/pgdata
+    env_file: 
+     - ${PWD}/data/config/db/.env
     ports:
       - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      - ${PWD}/data/config/db/.env:/app/data/config/db/.env
+
       # Uncomment if you want to mount initialization scripts
       # - ./init-scripts:/docker-entrypoint-initdb.d
     networks:

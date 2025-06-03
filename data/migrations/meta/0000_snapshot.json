@@ -1,5 +1,5 @@
 {
-  "id": "4112cfe7-2ade-448d-824b-a20b547b046b",
+  "id": "e9bf14c4-9d43-43f6-8c8a-39b9b56ebb06",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -241,9 +241,9 @@
           "primaryKey": false,
           "notNull": true
         },
-        "conversion_rate": {
-          "name": "conversion_rate",
-          "type": "integer",
+        "conversionRate": {
+          "name": "conversionRate",
+          "type": "bigint",
           "primaryKey": false,
           "notNull": true
         },

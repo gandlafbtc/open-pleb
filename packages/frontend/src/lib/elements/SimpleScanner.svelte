@@ -5,11 +5,10 @@
 
 	interface Props {
 		isScanning: boolean;
-		whatToScan?: string; // 'pubkey' | 'npub'
 		scannedResult?: string;
 	}
 
-	let { isScanning = $bindable(true), scannedResult = $bindable(), whatToScan }: Props = $props();
+	let { isScanning = $bindable(true), scannedResult = $bindable() }: Props = $props();
 
 	let videoElem: HTMLVideoElement | undefined = $state();
 	let qrScanner: QrScanner | undefined = $state();
@@ -54,9 +53,6 @@
 </script>
 
 <div class="flex min-h-96 w-full flex-col items-center justify-center">
-	<p>
-		Scan a {whatToScan} QR
-	</p>
 	<div class="relative flex h-full w-80 items-center justify-center xl:w-[600px]">
 		<div class="video-wrapper h-80 w-80 rounded-lg border bg-black p-2 xl:w-[600px]">
 			{#if cams === undefined}

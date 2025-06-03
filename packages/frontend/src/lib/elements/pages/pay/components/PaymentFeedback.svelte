@@ -9,6 +9,7 @@
 	import * as Dialog  from '$lib/components/ui/dialog';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { signPayload } from "@openPleb/common/payloads";
+	
     const { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL } = env;
 
     interface Props {offer: Offer}
