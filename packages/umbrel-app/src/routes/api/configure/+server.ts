@@ -5,7 +5,7 @@ import * as path from 'node:path';
 import { env } from '$env/dynamic/private';
 
 // Base path for configuration files
-const CONFIG_BASE_PATH = env.CONFIG_BASE_PATH || './data/config';
+const CONFIG_BASE_PATH = env.CONFIG_PATH || './data/config';
 
 // POST endpoint to save config file content
 export const POST: RequestHandler = async ({ request }) => {

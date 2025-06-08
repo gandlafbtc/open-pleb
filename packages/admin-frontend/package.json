@@ -63,7 +63,6 @@
 		"@elysiajs/jwt": "^1.2.0",
 		"@inlang/paraglide-sveltekit": "^0.15.5",
 		"@internationalized/date": "^3.8.0",
-		"@noble/hashes": "^1.8.0",
 		"@number-flow/svelte": "^0.3.7",
 		"@tanstack/table-core": "^8.21.3",
 		"drizzle-orm": "^0.41.0",

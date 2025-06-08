@@ -53,7 +53,7 @@ services:
   admin-frontend:
     build:
       context: .
-      dockerfile: Dockerfile.frontend
+      dockerfile: Dockerfile.admin-frontend
     container_name: openpleb-admin-frontend
     restart: unless-stopped
     env_file: 
