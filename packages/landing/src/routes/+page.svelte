@@ -119,11 +119,11 @@
             </div>
             <div class="border-l-4 border-gray-400 bg-gray-50 p-4 rounded">
                 <h4 class="font-semibold mb-1">Receipt Handling</h4>
-                <p class="text-sm text-gray-600">🚧 In Progress</p>
+                <p class="text-sm text-gray-600">✅ Complete</p>
             </div>
             <div class="border-l-4 border-gray-400 bg-gray-50 p-4 rounded">
                 <h4 class="font-semibold mb-1">Dispute Resolution</h4>
-                <p class="text-sm text-gray-600">🚧 In Progress</p>
+                <p class="text-sm text-gray-600">✅ Complete</p>
             </div>
         </div>
     </div>
