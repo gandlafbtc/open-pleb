@@ -199,6 +199,23 @@ The `docker-compose.yml` file contains environment variables for each service. H
 
 The `Dockerfile.frontend` file contains the environment variables for the frontend. 
 
+#### 3. Environment Configuration 
+
+When deploying with Docker, make sure to place your environment files under `data/config`:
+
+```
+data/config/
+├── admin-frontend
+│   └── .env
+├── backend
+│   └── .env
+├── db
+│   └── .env
+└── frontend
+    └── .env
+```
+Each service will automatically load its configuration from the corresponding `.env` file in this directory.
+
 
 ### Building and Running
 
