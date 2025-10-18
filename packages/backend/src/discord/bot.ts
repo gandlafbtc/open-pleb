@@ -6,7 +6,7 @@ import { db } from '../db/db';
 import { eq } from "drizzle-orm";
 
 // Initialize configuration
-const DISCORD_TOKEN = Bun.env.DISCORD_TOKEN || '';
+const OPENPLEB_DISCORD_TOKEN = Bun.env.OPENPLEB_DISCORD_TOKEN || '';
 
 
 // Initialize Discord client
@@ -85,7 +85,7 @@ client.once(Events.ClientReady, (c) => {
 // Initialize the Discord bot
 export function initDiscordBot(): void {
   // Skip initialization if token is not provided
-  if (!DISCORD_TOKEN) {
+  if (!OPENPLEB_DISCORD_TOKEN) {
     log.warn('Discord bot token not provided, skipping Discord integration');
     return;
   }
@@ -100,7 +100,7 @@ export function initDiscordBot(): void {
   });
   
   // Login to Discord
-  client.login(DISCORD_TOKEN).catch((error) => {
+  client.login(OPENPLEB_DISCORD_TOKEN).catch((error) => {
     log.error(`Discord bot login failed: ${error}`);
   });
 }
