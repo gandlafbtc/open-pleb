@@ -19,8 +19,8 @@ RUN if [ "$TARGETARCH" = "arm64" ]; then BUN_TARGET=bun-linux-arm64; fi \
     && bun build --compile --minify --sourcemap --target=$BUN_TARGET ./src/index.ts --outfile openpleb
 
 FROM --platform=$TARGETPLATFORM oven/bun:1 AS release
-ENV PORT=3003
-ENV LOG_FILE_NAME=/app/data/logs/app.log
+ENV OPENPLEB_PORT=3003
+ENV OPENPLEB_LOG_FILE_NAME=/app/data/logs/app.log
 WORKDIR /app
 COPY --from=install /app/packages/backend/openpleb /app/openpleb
 COPY --from=install /app/data/migrations /app/migrations

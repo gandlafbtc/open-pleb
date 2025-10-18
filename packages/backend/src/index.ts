@@ -34,11 +34,11 @@ log.info`Starting OpenPleb version ${version}...`;
 
 // Check all required environment variables before starting the service
 const requiredEnvVars = [
-	"PORT",
-	"FRONTEND_URL",
-	"DATABASE_URL",
-	"CASHU_SEED_PHRASE",
-	"LOG_FILE_NAME",
+	"OPENPLEB_PORT",
+	"OPENPLEB_FRONTEND_URL",
+	"OPENPLEB_DATABASE_URL",
+	"OPENPLEB_CASHU_SEED_PHRASE",
+	"OPENPLEB_LOG_FILE_NAME",
 	"OPENPLEB_CONTACT",
 	"OPENPLEB_PLATFORM_FEE_PERCENTAGE",
 	"OPENPLEB_PLATFORM_FEE_FLAT_RATE",
@@ -49,7 +49,7 @@ const requiredEnvVars = [
 	"OPENPLEB_BOND_FLAT_RATE",
 	"OPENPLEB_CURRENCY",
 	"OPENPLEB_MAX_FIAT_AMOUNT",
-	"JWT_SECRET"
+	"OPENPLEB_JWT_SECRET"
 ];
 
 for (const envVar of requiredEnvVars) {
@@ -147,7 +147,7 @@ const app = new Elysia()
 	)
 	.use(
 		cors({
-			// origin: process.env.FRONTEND_URL,
+			// origin: process.env.OPENPLEB_FRONTEND_URL,
 		}),
 	)
 	.group("/api/v1", (app) => app.use(open))
@@ -213,13 +213,13 @@ const app = new Elysia()
 				jwt({
 					name: "jwt",
 					// biome-ignore lint/style/noNonNullAssertion: <explanation>
-					secret: Bun.env.JWT_SECRET!,
+					secret: Bun.env.OPENPLEB_JWT_SECRET!,
 					exp: "7d",
 				}),
 			)
 			.use(auth),
 	)
-	.listen(Bun.env.PORT);
+	.listen(Bun.env.OPENPLEB_PORT);
 
 log.info`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`;
 

@@ -16,56 +16,56 @@ services:
     networks:
       - postgres-network
     
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: openpleb-backend
-    restart: unless-stopped
-    env_file: 
-     - ${PWD}/data/config/backend/.env
-    ports:
-      - "3003:3003"
-    volumes:
-      - ${PWD}/data:/app/data
-    networks:
-      - postgres-network
-    depends_on:
-      - postgres
-      - nutshell
+  # backend:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: openpleb-backend
+  #   restart: unless-stopped
+  #   env_file: 
+  #    - ${PWD}/data/config/backend/.env
+  #   ports:
+  #     - "3003:3003"
+  #   volumes:
+  #     - ${PWD}/data:/app/data
+  #   networks:
+  #     - postgres-network
+  #   depends_on:
+  #     - postgres
+  #     - nutshell
 
-  frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile.frontend
-    container_name: openpleb-frontend
-    restart: unless-stopped
-    env_file: 
-     - ${PWD}/data/config/frontend/.env
-    ports:
-      - "3010:3000"
-    networks:
-      - postgres-network
-    depends_on:
-      - backend
-    volumes:
-      - ${PWD}/data/config/frontend/.env:/app/data/config/frontend/.env
-  admin-frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile.admin-frontend
-    container_name: openpleb-admin-frontend
-    restart: unless-stopped
-    env_file: 
-     - ${PWD}/data/config/frontend/.env
-    ports:
-      - "3011:3000"
-    networks:
-      - postgres-network
-    depends_on:
-      - backend
-    volumes:
-      - ${PWD}/data/config/admin-frontend/.env:/app/data/config/admin-frontend/.env
+  # frontend:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.frontend
+  #   container_name: openpleb-frontend
+  #   restart: unless-stopped
+  #   env_file: 
+  #    - ${PWD}/data/config/frontend/.env
+  #   ports:
+  #     - "3010:3000"
+  #   networks:
+  #     - postgres-network
+  #   depends_on:
+  #     - backend
+  #   volumes:
+  #     - ${PWD}/data/config/frontend/.env:/app/data/config/frontend/.env
+  # admin-frontend:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.admin-frontend
+  #   container_name: openpleb-admin-frontend
+  #   restart: unless-stopped
+  #   env_file: 
+  #    - ${PWD}/data/config/frontend/.env
+  #   ports:
+  #     - "3011:3000"
+  #   networks:
+  #     - postgres-network
+  #   depends_on:
+  #     - backend
+  #   volumes:
+  #     - ${PWD}/data/config/admin-frontend/.env:/app/data/config/admin-frontend/.env
       
   postgres:
     image: postgres:15.3

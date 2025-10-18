@@ -56,7 +56,7 @@ async function createOfferMessage(offer: Offer): Promise<string> {
 💱 **Conversion Rate**: 1 BTC = ${Intl.NumberFormat().format(offer.conversionRate)} ${offer.currency}
 🏦 **provider**: ${fiatProviderName} 
 
-🔗 **Link**: [Click here to view offer](${Bun.env.FRONTEND_URL})
+🔗 **Link**: [Click here to view offer](${Bun.env.OPENPLEB_FRONTEND_URL})
 
 Check it out now before someone else claims it!
 `;

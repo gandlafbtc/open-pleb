@@ -46,17 +46,6 @@ export const proofsTable = pgTable('proofs', {
 	state: text('state').notNull(),
 });
 
-export const offerTokensTable = pgTable('offer_tokens', {
-	id: integer().primaryKey().generatedAlwaysAsIdentity(),
-	offerId: integer("offer_id").references(() => offerTable.id).notNull().unique(),
-	receiveMakerBondToken: text('receive_maker_bond_token'),
-	receiveTakerBondToken: text('receive_taker_bond_token'),
-	receivePaymentToken: text('receive_payment_token'),
-	sendMakerBondToken: text('send_maker_bond_token'),
-	sendTakerBondToken: text('send_taker_bond_token'),
-	sendPaymentToken: text('send_payment_token'),
-	platformFeeToken: text('send_payment_token'),
-});
 
 export const claimsTable = pgTable('claims', {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),

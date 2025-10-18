@@ -99,7 +99,7 @@ Fiat banking usually doesn't offer open protocols that would allow us to make at
 
 ## Environment Configuration
 
-**IMPORTANT**: WHEN RUNNING IN PRODUCTION, YOU NEED TO CONFIGURE THE ENVIRONMENT VARIABLES FOR YOUR OWN ENVIRONMENT! ESPACIALLY THE `DATABASE_URL` SHOULD BE CHANGED TO USE NON DEFAULT CREDENTIALS
+**IMPORTANT**: WHEN RUNNING IN PRODUCTION, YOU NEED TO CONFIGURE THE ENVIRONMENT VARIABLES FOR YOUR OWN ENVIRONMENT! ESPACIALLY THE `OPENPLEB_DATABASE_URL` SHOULD BE CHANGED TO USE NON DEFAULT CREDENTIALS
 
 
 OpenPleb requires several environment variables to be configured for proper operation. Below are instructions for configuring environment variables for both local development and Docker deployment.
@@ -125,19 +125,19 @@ The backend requires the following environment variables in `packages/backend/.e
 
 ```
 # Database connection string
-DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/postgres
+OPENPLEB_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/postgres
 
 # Frontend URL for CORS and other connectivity
-FRONTEND_URL=localhost:5137
+OPENPLEB_FRONTEND_URL=localhost:5137
 
 # Port on which the backend server will listen
-PORT=3004
+OPENPLEB_PORT=3004
 
 # Log file location
-LOG_FILE_NAME="../../data/logs/app.log"
+OPENPLEB_LOG_FILE_NAME="../../data/logs/app.log"
 
 # Seed phrase for Cashu wallet - KEEP THIS SECRET
-CASHU_SEED_PHRASE="because oxygen subway review excuse elder coconut kingdom govern scrub enact minimum"
+OPENPLEB_CASHU_SEED_PHRASE="because oxygen subway review excuse elder coconut kingdom govern scrub enact minimum"
 
 # Platform fee settings
 OPENPLEB_PLATFORM_FEE_PERCENTAGE=1
@@ -180,7 +180,7 @@ PUBLIC_API_VERSION=v1
 The common package requires the following environment variables in `packages/common/.env`:
 
 ```
-DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/postgres
+OPENPLEB_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/postgres
 ```
 
 ### Docker Deployment
