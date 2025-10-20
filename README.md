@@ -136,6 +136,9 @@ OPENPLEB_PORT=3004
 # Log file location
 OPENPLEB_LOG_FILE_NAME="../../data/logs/app.log"
 
+# Log level in the app: valid values: debug, info, error, warning, fatal
+OPENPLEB_LOG_LEVEL=debug
+
 # Seed phrase for Cashu wallet - KEEP THIS SECRET
 OPENPLEB_CASHU_SEED_PHRASE="because oxygen subway review excuse elder coconut kingdom govern scrub enact minimum"
 
@@ -159,6 +162,7 @@ OPENPLEB_CURRENCY=KRW
 
 # Maximum fiat amount allowed
 OPENPLEB_MAX_FIAT_AMOUNT=100000
+
 ```
 
 All these environment variables are required and checked at application startup. The service will not start if any of these variables are missing.
