@@ -1,7 +1,6 @@
 import { hash, verify } from "@node-rs/argon2";
 import { eq } from "drizzle-orm";
 import type Elysia from "elysia";
-import type { ElysiaWS } from "elysia/ws";
 
 import { db } from "@openPleb/common/db";
 import { userTable } from "@openPleb/common/db/schema";
@@ -151,5 +150,4 @@ export const auth = (app: Elysia) =>
 		})
 		.use(isAuthenticated)
 		// protected routes
-		.use(protectedRoutes)
-
+		.use(protectedRoutes);
