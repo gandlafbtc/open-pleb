@@ -81,7 +81,7 @@ export const createOffer = async (offerData: OfferData): Promise<Offer> => {
 		validForS: 120,
 		conversionRate,
 		platformFeeFlatRate,
-		takerFeeFlatRate: Number.parseInt(Bun.env.OPENPLEB_TAKER_FEE_FLAT_RATE!),
+		takerFeeFlatRate,
 		currency: Bun.env.OPENPLEB_CURRENCY!,
 		platformFeePercentage,
 		takerFeePercentage,

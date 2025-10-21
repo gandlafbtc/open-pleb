@@ -51,7 +51,7 @@ const createFiatProviderStore = () => {
   const addProvider = async (provider: { label: string; icon: string; matchTemplate?: string }) => {
     update((state) => ({ ...state, loading: true, error: null }));
     try {
-      const response = await fetch(`${PUBLIC_BACKEND_URL}/admin/fiat-providers`, {
+      const response = await fetch(`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/admin/fiat-providers`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -90,7 +90,7 @@ const createFiatProviderStore = () => {
   ) => {
     update((state) => ({ ...state, loading: true, error: null }));
     try {
-      const response = await fetch(`${PUBLIC_BACKEND_URL}/admin/fiat-providers/${id}`, {
+      const response = await fetch(`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/admin/fiat-providers/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -128,7 +128,7 @@ const createFiatProviderStore = () => {
   const deleteProvider = async (id: number) => {
     update((state) => ({ ...state, loading: true, error: null }));
     try {
-      const response = await fetch(`${PUBLIC_BACKEND_URL}/admin/fiat-providers${id}`, {
+      const response = await fetch(`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/admin/fiat-providers${id}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${get(userLoggedIn)?.access_token}`

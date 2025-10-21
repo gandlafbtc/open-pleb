@@ -31,7 +31,7 @@ export const createDataStore = () => {
 
 	const init = async () => {
 		const response = await fetch(
-			`${PUBLIC_BACKEND_URL}/admin/data`,
+			`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/admin/data`,
 			{
 				headers: {
 					Authorization: `Bearer ${get(userLoggedIn)?.access_token}`

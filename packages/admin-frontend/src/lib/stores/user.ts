@@ -7,6 +7,7 @@ import { env } from '$env/dynamic/public';
 import { scrypt } from "@noble/hashes/scrypt";
 import { bytesToHex } from "@noble/hashes/utils";
 import { dataStore } from "./data.svelte";
+import { PUBLIC_API_VERSION } from "$env/static/public";
 
 export let socket: undefined | WebSocket;
 
@@ -70,7 +71,7 @@ export const reconnectWebSocket = () => {
         return
     }
 	if (socket === undefined || socket.readyState === WebSocket.CLOSED) {
-		socket = new WebSocket(`${PUBLIC_BACKEND_URL}/admin/ws`, user.access_token);
+		socket = new WebSocket(`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/admin/ws`, user.access_token);
 		socket.onopen = () => {
 			if (wsInterval) {
 				clearInterval(wsInterval);
@@ -113,7 +114,7 @@ const createUserLoggedInStore = () => {
         const pwHash = bytesToHex(
             scrypt(password, 'openPlebSalt-110100100010', { N: 2 ** 16, r: 8, p: 1, dkLen: 32 })
         );
-        const response = await fetch(`${PUBLIC_BACKEND_URL}/admin/signup`, {
+        const response = await fetch(`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/admin/signup`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -130,14 +131,14 @@ const createUserLoggedInStore = () => {
         }
         userLoggedIn.set(data.data.user)
         await init()
-        socket = new WebSocket(`${PUBLIC_BACKEND_URL}/admin/ws`, [data.data.user.access_token])
+        socket = new WebSocket(`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/admin/ws`, [data.data.user.access_token])
         return data
     }
     const login = async (username: string, password: string) => {
         const pwHash = bytesToHex(
             scrypt(password, 'openPlebSalt-110100100010', { N: 2 ** 16, r: 8, p: 1, dkLen: 32 })
         );
-        let response = await fetch(`${PUBLIC_BACKEND_URL}/admin/login`, {
+        let response = await fetch(`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/admin/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -154,7 +155,7 @@ const createUserLoggedInStore = () => {
         }
         userLoggedIn.set(data.data.user)
         await init()
-        socket = new WebSocket(`${PUBLIC_BACKEND_URL}/admin/ws`, [data.data.user.access_token])
+        socket = new WebSocket(`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/admin/ws`, [data.data.user.access_token])
         return data
     }
 

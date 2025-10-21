@@ -6,6 +6,7 @@
 	import { appMode } from '$lib/stores/local/mode';
 	import { base64ToUint8Array } from '$lib/helper';
 	import { env } from '$env/dynamic/public';
+	import { PUBLIC_API_VERSION } from '$env/static/public';
 	const { PUBLIC_BACKEND_URL } = env;
 	// State variables
 	let showPrompt = $state(false);
@@ -94,7 +95,7 @@
 		// tab is closed.
 		const register = await navigator.serviceWorker.ready;
 
-        const res = await fetch(`${PUBLIC_BACKEND_URL}/vapid`)
+        const res = await fetch(`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/vapid`)
         const {publicKey} = await res.json()
         console.log('subscribe with vapid key', publicKey);
         const vapidKeyUint8Array = base64ToUint8Array(publicKey)
@@ -109,7 +110,7 @@
 			return;
 		}
         console.log(sub)
-		await fetch(`${PUBLIC_BACKEND_URL}/subscribe`, {
+		await fetch(`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/subscribe`, {
 			method: 'POST',
             headers: {
 				'Content-Type': 'application/json',

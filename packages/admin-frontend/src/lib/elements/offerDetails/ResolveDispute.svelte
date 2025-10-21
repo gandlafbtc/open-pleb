@@ -10,6 +10,7 @@
 	import { userLoggedIn } from "$lib/stores/user";
 	import { get } from "svelte/store";
 	import { ensureError } from "$lib/errors";
+	import { PUBLIC_API_VERSION } from "$env/static/public";
 
 	const { PUBLIC_BACKEND_URL } = env;
 
@@ -42,7 +43,7 @@
 			// This is a placeholder for the actual API call
 			// In a real implementation, we would make an API call to a backend endpoint
 			// that handles dispute resolution
-			const response = await fetch(`${PUBLIC_BACKEND_URL}/admin/resolvedispute`, {
+			const response = await fetch(`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/admin/resolvedispute`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
