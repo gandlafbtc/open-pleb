@@ -1,7 +1,7 @@
 import { CheckStateEnum, type ProofState } from "@cashu/cashu-ts";
 import { proofsTable } from "@openPleb/common/db/schema";
 import { eq } from "drizzle-orm";
-import { wallet } from "../cashu/wallet";
+import { wallet } from "../dynamic/wallet";
 import { db } from "../db/db";
 
 export const checkPendingProofs = async () => {

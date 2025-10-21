@@ -3,7 +3,7 @@ import { claimsTable, offerTable } from "@openPleb/common/db/schema";
 import { verifyPayload } from "@openPleb/common/payloads";
 import { DISPUTE_RESPONSE, OFFER_STATE } from "@openPleb/common/types";
 import { eq } from "drizzle-orm";
-import { eventEmitter } from "../../../events/emitter";
+import { eventEmitter } from "../../events/emitter";
 
 export const counterOrForfeitDispute = async (
 	offerId: string,

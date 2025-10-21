@@ -16,10 +16,10 @@ import {
 import { verifyPayload } from "@openPleb/common/payloads";
 import { OFFER_STATE } from "@openPleb/common/types";
 import { and, eq } from "drizzle-orm";
-import { parseSecret } from "../../../cashu/helper";
-import { wallet } from "../../../cashu/wallet";
-import { eventEmitter } from "../../../events/emitter";
-import { InternalProofState } from "../../../types";
+import { parseSecret } from "../../helper/cashu";
+import { wallet } from "../../dynamic/wallet";
+import { eventEmitter } from "../../events/emitter";
+import { InternalProofState } from "../../types";
 export const commitFeedback = async (
 	offerId: string,
 	feedbackData: {

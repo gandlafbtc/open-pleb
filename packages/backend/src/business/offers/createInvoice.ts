@@ -3,7 +3,7 @@ import { db } from "@openPleb/common/db";
 import { mintQuotesTable, offerTable } from "@openPleb/common/db/schema";
 import { OFFER_STATE } from "@openPleb/common/types";
 import { eq } from "drizzle-orm";
-import { eventEmitter } from "../../../events/emitter";
+import { eventEmitter } from "../../events/emitter";
 
 export const createInvoice = async (id: string) => {
 	if (!id) {

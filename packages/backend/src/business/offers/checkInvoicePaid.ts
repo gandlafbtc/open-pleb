@@ -1,7 +1,7 @@
 import { db } from "@openPleb/common/db";
 import { mintQuotesTable } from "@openPleb/common/db/schema";
 import { eq } from "drizzle-orm";
-import { checkInvoiceState } from "../../../business/checkInvoiceState";
+import { checkInvoiceState } from "../checkInvoiceState";
 
 export const checkInvoicePaid = async (id: string) => {
 	if (!id) {

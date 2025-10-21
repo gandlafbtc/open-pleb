@@ -6,9 +6,9 @@ import {
 	type TextChannel,
 } from "discord.js";
 import { eq } from "drizzle-orm";
-import { db } from "../db/db";
-import { eventEmitter } from "../events/emitter";
-import { log } from "../logger";
+import { db } from "../../db/db";
+import { eventEmitter } from "../../events/emitter";
+import { log } from "../../logger";
 
 // Initialize configuration
 const OPENPLEB_DISCORD_TOKEN = Bun.env.OPENPLEB_DISCORD_TOKEN || "";

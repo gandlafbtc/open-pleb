@@ -3,8 +3,8 @@ import { fiatProviderTable } from "@openPleb/common/db/schema";
 import { ensureError } from "@openPleb/common/errors";
 import { eq } from "drizzle-orm";
 import type Elysia from "elysia";
-import { takeUniqueOrUndefinded } from "../../../db/orm-helpers/orm-helper";
-import { log } from "../../../logger";
+import { takeUniqueOrUndefinded } from "../db/orm-helper";
+import { log } from "../logger";
 
 export const authFiatProviders = (app: Elysia) =>
 	app

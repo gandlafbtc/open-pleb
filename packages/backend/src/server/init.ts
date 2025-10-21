@@ -2,7 +2,7 @@ import * as webpush from "@negrel/webpush";
 import { subscriptionsTable, vapidKeysTable } from "@openPleb/common/db/schema";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { db } from "../db/db";
-import { initDiscordBot } from "../discord/bot";
+import { initDiscordBot } from "../integrations/discord/bot";
 import { subscribers } from "../dynamic/subscribers";
 import { VapidKeys } from "../dynamic/vapidKeys";
 import { log } from "../logger";

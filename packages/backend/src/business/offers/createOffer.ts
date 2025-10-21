@@ -5,7 +5,7 @@ import {
 	offerTable,
 } from "@openPleb/common/db/schema";
 import { OFFER_STATE } from "@openPleb/common/types";
-import { eventEmitter } from "../events/emitter";
+import { eventEmitter } from "../../events/emitter";
 /**
  * Represents the data required to create a new offer in the system.
  * An offer is created by a maker who wants to pay a banking QR code with Bitcoin.

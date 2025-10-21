@@ -8,10 +8,10 @@ import {
 import { ensureError } from "@openPleb/common/errors";
 import { OFFER_STATE } from "@openPleb/common/types";
 import { eq } from "drizzle-orm";
-import { wallet } from "../../../cashu/wallet";
-import { notifyNewOfferSubs } from "../../../dynamic/subscribers";
-import { eventEmitter } from "../../../events/emitter";
-import { InternalProofState } from "../../../types";
+import { wallet } from "../../dynamic/wallet";
+import { notifyNewOfferSubs } from "../../dynamic/subscribers";
+import { eventEmitter } from "../../events/emitter";
+import { InternalProofState } from "../../types";
 
 export const payWithTokens = async (id: string, tokenString: string) => {
 	if (!id) {

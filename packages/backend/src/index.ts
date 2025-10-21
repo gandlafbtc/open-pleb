@@ -1,6 +1,6 @@
 import { Elysia } from "elysia";
 import { version } from "../package.json";
-import { openAPI } from "./api/rest/open";
+import { v1 } from "./api/rest/v1";
 import { expireOffersCron } from "./jobs/expire";
 import { updateConnectedCorn } from "./jobs/updateConnected";
 import { apiLogger, log } from "./logger";
@@ -19,7 +19,7 @@ const app = new Elysia()
 	.use(rateLimiter)
 	.use(swaggerDocs)
 	.use(corsConfig)
-	.use(openAPI)
+	.use(v1)
 
 	.listen(Bun.env.OPENPLEB_PORT!);
 

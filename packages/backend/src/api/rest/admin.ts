@@ -1,6 +1,6 @@
 import jwt from "@elysiajs/jwt";
 import Elysia from "elysia";
-import { auth } from "../../server/auth/auth";
+import { auth } from "../auth/routes";
 
 export const adminAPI = new Elysia().group("/admin", (app) =>
 	app

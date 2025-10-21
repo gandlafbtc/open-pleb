@@ -10,9 +10,9 @@ import {
 import { ensureError } from "@openPleb/common/errors";
 import { OFFER_STATE } from "@openPleb/common/types";
 import { eq } from "drizzle-orm";
-import { wallet } from "../../../cashu/wallet";
-import { eventEmitter } from "../../../events/emitter";
-import { InternalProofState } from "../../../types";
+import { wallet } from "../../dynamic/wallet";
+import { eventEmitter } from "../../events/emitter";
+import { InternalProofState } from "../../types";
 
 export const claimOffer = async (
 	offerId: string,

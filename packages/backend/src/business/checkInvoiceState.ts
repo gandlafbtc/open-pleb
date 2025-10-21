@@ -8,7 +8,7 @@ import {
 } from "@openPleb/common/db/schema";
 import { OFFER_STATE } from "@openPleb/common/types";
 import { eq } from "drizzle-orm";
-import { wallet } from "../cashu/wallet";
+import { wallet } from "../dynamic/wallet";
 import { notifyNewOfferSubs } from "../dynamic/subscribers";
 import { eventEmitter } from "../events/emitter";
 import { InternalProofState } from "../types";

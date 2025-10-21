@@ -1,5 +1,5 @@
 import { getConversionRate } from "@openPleb/common/conversion";
-import { createOffer } from "../../../business/createOffer";
+import { createOffer } from "./createOffer";
 
 export const postOffer = async (body: {
 	amount: number;

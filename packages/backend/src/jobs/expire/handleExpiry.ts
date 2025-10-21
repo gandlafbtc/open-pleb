@@ -13,7 +13,7 @@ import {
 } from "@openPleb/common/db/schema";
 import { OFFER_STATE } from "@openPleb/common/types";
 import { and, eq } from "drizzle-orm";
-import { wallet } from "../../cashu/wallet";
+import { wallet } from "../../dynamic/wallet";
 import { eventEmitter } from "../../events/emitter";
 import { log } from "../../logger";
 import { InternalProofState } from "../../types";

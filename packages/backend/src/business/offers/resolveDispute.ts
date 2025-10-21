@@ -6,7 +6,7 @@
 import { offerTable } from "@openPleb/common/db/schema";
 import { OFFER_STATE, RESOLUTION_PATHS } from "@openPleb/common/types";
 import { eq } from "drizzle-orm";
-import { db } from "../../../db/db";
+import { db } from "../../db/db";
 import { handlePayouts } from "./feedback";
 
 //   }
