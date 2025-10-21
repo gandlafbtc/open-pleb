@@ -4,6 +4,24 @@ import { OFFER_STATE } from "@openPleb/common/types";
 import { and, inArray, sql } from "drizzle-orm";
 import { handlePayouts } from "../server/api/offers/feedback";
 import { expireOffer, expireOfferInvoicePaid } from "./expire/handleExpiry";
+import cron from "@elysiajs/cron";
+import { ensureError } from "@openPleb/common/errors";
+import { log } from "../logger";
+
+
+export const expireOffersCron = 		cron({
+			name: "expire-offers",
+			// run every 5 seconds
+			pattern: "*/5 * * * * *",
+			run() {
+				try {
+					expireOffers();
+				} catch (error) {
+					const err = ensureError(error);
+					log.error("Error: {error}", { error });
+				}
+			},
+		})
 
 export const expireOffers = async () => {
 	const expiredOffers = await db
@@ -56,7 +74,7 @@ export const expireOffers = async () => {
 			}
 			case OFFER_STATE.RECEIPT_SUBMITTED: {
 				//payout
-				await handlePayouts(offer, "Expired", OFFER_STATE.EXPIRED);
+				await handlePayouts(offer, OFFER_STATE.EXPIRED);
 				break;
 			}
 			default:

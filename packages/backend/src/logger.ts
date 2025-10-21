@@ -1,3 +1,4 @@
+import { logger } from "@grotto/logysia";
 import {
 	ansiColorFormatter,
 	configure,
@@ -11,22 +12,24 @@ if (!Bun.env.OPENPLEB_LOG_FILE_NAME) {
 	process.exit(1);
 }
 
-let logLevel = Bun.env.OPENPLEB_LOG_LEVEL as "debug" | "info" | "error" | "warning" | "fatal";
+let logLevel = Bun.env.OPENPLEB_LOG_LEVEL as
+	| "debug"
+	| "info"
+	| "error"
+	| "warning"
+	| "fatal";
 
 if (!logLevel) {
 	console.error(`OPENPLEB_LOG_LEVEL not set. defaulting to 'info'`);
-	logLevel = "info"
+	logLevel = "info";
+} else if (!["debug", "info", "error", "warning", "fatal"].includes(logLevel)) {
+	console.error(
+		`Unknown log level set in OPENPLEB_LOG_LEVEL = ${Bun.env.OPENPLEB_LOG_LEVEL}  defaulting to 'info'`,
+	);
+	logLevel = "info";
 }
-
-else if (!["debug" ,"info" ,"error" ,"warning" ,"fatal"].includes(logLevel)) {
-	console.error(`Unknown log level set in OPENPLEB_LOG_LEVEL = ${Bun.env.OPENPLEB_LOG_LEVEL}  defaulting to 'info'`);
-	logLevel = "info"
-}
-
 
 await configure({
-
-
 	sinks: {
 		console: getConsoleSink({ formatter: ansiColorFormatter }),
 		file: getRotatingFileSink(Bun.env.OPENPLEB_LOG_FILE_NAME, {
@@ -43,3 +46,13 @@ await configure({
 	],
 });
 export const log = getLogger(["openpleb-app"]);
+
+// Logs API calls
+export const apiLogger = logger({
+	logIP: false,
+	writer: {
+		write: (m: string) => {
+			log.debug(m);
+		},
+	},
+});

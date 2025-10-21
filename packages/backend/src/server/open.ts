@@ -10,7 +10,7 @@ import type { SocketEventData } from "../types";
 import { getData, getDataForId } from "./api/data";
 import { offers } from "./api/offers/offers";
 import { environment } from "../env";
-import {  fiatProviders } from "./api/fiat_providers/crud";
+import {  fiatProviders } from "./api/fiatProviders/providers";
 
 
 export const open = (app: Elysia) =>
