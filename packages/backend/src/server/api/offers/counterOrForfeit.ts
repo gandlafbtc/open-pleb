@@ -1,9 +1,5 @@
 import { db } from "@openPleb/common/db";
-import {
-	claimsTable,
-	offerTable,
-	type Offer,
-} from "@openPleb/common/db/schema";
+import { claimsTable, offerTable } from "@openPleb/common/db/schema";
 import { verifyPayload } from "@openPleb/common/payloads";
 import { DISPUTE_RESPONSE, OFFER_STATE } from "@openPleb/common/types";
 import { eq } from "drizzle-orm";
@@ -13,12 +9,12 @@ export const counterOrForfeitDispute = async (
 	offerId: string,
 	data: {
 		payload: {
-			response: string; 
-			message: string; 
-		}
+			response: string;
+			message: string;
+		};
 		signature: string;
 		nonce: string;
-		timestamp: number; 
+		timestamp: number;
 	},
 ) => {
 	const id = Number.parseInt(offerId);
@@ -38,41 +34,56 @@ export const counterOrForfeitDispute = async (
 		});
 	}
 
-    const claims = await db.select().from(claimsTable).where(eq(claimsTable.offerId, id))
+	const claims = await db
+		.select()
+		.from(claimsTable)
+		.where(eq(claimsTable.offerId, id));
 
 	if (!claims || claims.length === 0) {
 		return new Response("Claim not found", { status: 404 });
 	}
-    const claim = claims[0];
+	const claim = claims[0];
 
-	const res = verifyPayload(data.payload, data.signature, data.nonce, data.timestamp, claim.pubkey)
-    if (!res) {
+	const res = verifyPayload(
+		data.payload,
+		data.signature,
+		data.nonce,
+		data.timestamp,
+		claim.pubkey,
+	);
+	if (!res) {
 		return new Response("Invalid signature", { status: 400 });
-    }
-    return await handleCounterOrForfeitDispute(id, data.payload);
+	}
+	return await handleCounterOrForfeitDispute(id, data.payload);
 };
 
-const handleCounterOrForfeitDispute = async (id: number, payload: {response: string, message:string}) => {
-	let values = {}
+const handleCounterOrForfeitDispute = async (
+	id: number,
+	payload: { response: string; message: string },
+) => {
+	let values = {};
 	if (payload.response === DISPUTE_RESPONSE.COUNTER) {
 		values = {
 			status: OFFER_STATE.DISPUTED,
 			feedbackResponse: payload.message,
-		}
-	}
-	else if (payload.response === DISPUTE_RESPONSE.FORFEIT) {
+		};
+	} else if (payload.response === DISPUTE_RESPONSE.FORFEIT) {
 		values = {
 			status: OFFER_STATE.FOREFEIT,
 			feedbackResponse: payload.message,
-			validForS: 0
-	}
+			validForS: 0,
+		};
 	} else {
 		return new Response("Invalid dispute response", { status: 400 });
 	}
-    const [offer] = await db.update(offerTable).set(values).where(eq(offerTable.id, id)).returning();
+	const [offer] = await db
+		.update(offerTable)
+		.set(values)
+		.where(eq(offerTable.id, id))
+		.returning();
 	eventEmitter.emit("socket-event", {
 		command: "update-offer",
 		data: { offer },
 	});
-	return offer
+	return offer;
 };

@@ -4,12 +4,12 @@ import { t } from "elysia";
 import { log } from "../../../logger";
 import { checkInvoicePaid } from "./checkInvoicePaid";
 import { claimOffer } from "./claim";
+import { counterOrForfeitDispute } from "./counterOrForfeit";
 import { createInvoice } from "./createInvoice";
 import { commitFeedback } from "./feedback";
 import { payWithTokens } from "./payWithTokens";
 import { postOffer } from "./post";
 import { createReceipt, getReceipt } from "./receipt";
-import { counterOrForfeitDispute } from "./counterOrForfeit";
 
 export const offers = (app: Elysia) =>
 	app.group("/offers", (app) =>
@@ -188,4 +188,5 @@ export const offers = (app: Elysia) =>
 						pubkey: t.String(),
 					}),
 				},
-			));
+			),
+	);

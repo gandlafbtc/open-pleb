@@ -1,9 +1,9 @@
-import { eq } from "drizzle-orm";
-import type Elysia from "elysia";
 import { db } from "@openPleb/common/db";
 import { fiatProviderTable } from "@openPleb/common/db/schema";
-import { takeUniqueOrUndefinded } from "../../../db/orm-helpers/orm-helper";
 import { ensureError } from "@openPleb/common/errors";
+import { eq } from "drizzle-orm";
+import type Elysia from "elysia";
+import { takeUniqueOrUndefinded } from "../../../db/orm-helpers/orm-helper";
 import { log } from "../../../logger";
 
 export const authFiatProviders = (app: Elysia) =>
@@ -53,12 +53,15 @@ export const authFiatProviders = (app: Elysia) =>
 				}
 
 				// Create new fiat provider
-				const newProvider = await db.insert(fiatProviderTable).values({
-					label,
-					icon,
-					matchTemplate,
-					createdAt: Math.ceil(Date.now() / 1000),
-				}).returning();
+				const newProvider = await db
+					.insert(fiatProviderTable)
+					.values({
+						label,
+						icon,
+						matchTemplate,
+						createdAt: Math.ceil(Date.now() / 1000),
+					})
+					.returning();
 
 				return {
 					success: true,
@@ -124,7 +127,8 @@ export const authFiatProviders = (app: Elysia) =>
 				const updateData: Record<string, unknown> = {};
 				if (label !== undefined) updateData.label = label;
 				if (icon !== undefined) updateData.icon = icon;
-				if (matchTemplate !== undefined) updateData.matchTemplate = matchTemplate;
+				if (matchTemplate !== undefined)
+					updateData.matchTemplate = matchTemplate;
 
 				// If label is being updated, check for duplicates
 				if (label && label !== existingProvider.label) {
@@ -158,11 +162,11 @@ export const authFiatProviders = (app: Elysia) =>
 						message: "Fiat provider updated successfully",
 					};
 				}
-					return {
-						success: true,
-						data: existingProvider,
-						message: "No changes to update",
-					};
+				return {
+					success: true,
+					data: existingProvider,
+					message: "No changes to update",
+				};
 			} catch (error) {
 				set.status = 500;
 				const err = ensureError(error);

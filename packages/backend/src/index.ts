@@ -1,14 +1,14 @@
 import { Elysia } from "elysia";
 import { version } from "../package.json";
+import { openAPI } from "./api/rest/open";
 import { expireOffersCron } from "./jobs/expire";
 import { updateConnectedCorn } from "./jobs/updateConnected";
 import { apiLogger, log } from "./logger";
 import { afterInit, init } from "./server/init";
 import { corsConfig, rateLimiter, swaggerDocs } from "./server/serverConfig";
-import { openAPI } from "./api/rest/open";
 
 // pre-server start initialize
-await init()
+await init();
 
 log.info`Starting OpenPleb version ${version}...`;
 
@@ -25,4 +25,4 @@ const app = new Elysia()
 
 log.info`OpenPleb 🚶 is running at ${app.server?.hostname}:${app.server?.port}`;
 
-afterInit()
+afterInit();

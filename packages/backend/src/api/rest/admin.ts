@@ -3,13 +3,13 @@ import Elysia from "elysia";
 import { auth } from "../../server/auth/auth";
 
 export const adminAPI = new Elysia().group("/admin", (app) =>
-		app
-			.use(
-				jwt({
-					name: "jwt",
-					secret: Bun.env.OPENPLEB_JWT_SECRET!,
-					exp: "7d",
-				}),
-			)
-			.use(auth),
-	)
+	app
+		.use(
+			jwt({
+				name: "jwt",
+				secret: Bun.env.OPENPLEB_JWT_SECRET!,
+				exp: "7d",
+			}),
+		)
+		.use(auth),
+);

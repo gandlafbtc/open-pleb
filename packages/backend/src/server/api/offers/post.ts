@@ -20,9 +20,12 @@ export const postOffer = async (body: {
 		});
 	}
 	if (amount > Number.parseInt(Bun.env.OPENPLEB_MAX_FIAT_AMOUNT!)) {
-		return new Response(`Amount exceeds maximum allowed: ${Number.parseInt(Bun.env.OPENPLEB_MAX_FIAT_AMOUNT!)} ${Bun.env.OPENPLEB_CURRENCY!}`, {
-			status: 400,
-		});
+		return new Response(
+			`Amount exceeds maximum allowed: ${Number.parseInt(Bun.env.OPENPLEB_MAX_FIAT_AMOUNT!)} ${Bun.env.OPENPLEB_CURRENCY!}`,
+			{
+				status: 400,
+			},
+		);
 	}
 
 	const conversionRate = await getConversionRate();
@@ -38,7 +41,7 @@ export const postOffer = async (body: {
 		qrCode,
 		pubkey,
 		conversionRate,
-		fiatProviderId
+		fiatProviderId,
 	});
 
 	return { offer };

@@ -15,8 +15,8 @@ import { OFFER_STATE } from "@openPleb/common/types";
 import { and, eq } from "drizzle-orm";
 import { wallet } from "../../cashu/wallet";
 import { eventEmitter } from "../../events/emitter";
-import { InternalProofState } from "../../types";
 import { log } from "../../logger";
+import { InternalProofState } from "../../types";
 
 export const expireOffer = async (offer: Offer) => {
 	const offers = await db
@@ -32,15 +32,15 @@ export const expireOffer = async (offer: Offer) => {
 };
 
 export const expireOfferInvoicePaid = async (offer: Offer) => {
-	log.info(`${offer.id}`)
+	log.info(`${offer.id}`);
 	const keys = await wallet.getKeys();
 	//refund
 	const sendAmount =
 		offer.satsAmount +
 		offer.takerFeeFlatRate +
 		offer.takerFeePercentage +
-        offer.platformFeeFlatRate +
-        offer.platformFeePercentage +
+		offer.platformFeeFlatRate +
+		offer.platformFeePercentage +
 		offer.bondFlatRate +
 		offer.bondPercentage;
 

@@ -3,18 +3,18 @@ import { eq } from "drizzle-orm";
 import type Elysia from "elysia";
 import type { ElysiaWS } from "elysia/ws";
 
-import { isAuthenticated } from "./middleware";
 import { db } from "@openPleb/common/db";
 import { offerTable, userTable } from "@openPleb/common/db/schema";
-import { takeUniqueOrUndefinded } from "../../db/orm-helpers/orm-helper";
 import { ensureError } from "@openPleb/common/errors";
-import { log } from "../../logger";
-import { eventEmitter } from "../../events/emitter";
-import type { SocketEventData } from "../../types";
 import { desc } from "drizzle-orm";
+import { takeUniqueOrUndefinded } from "../../db/orm-helpers/orm-helper";
+import { environment } from "../../env";
+import { eventEmitter } from "../../events/emitter";
+import { log } from "../../logger";
+import type { SocketEventData } from "../../types";
 import { resolveDispute } from "../api/offers/resolveDispute";
 import { authFiatProviders } from "./fiat_providers/crud";
-import { environment } from "../../env";
+import { isAuthenticated } from "./middleware";
 export const auth = (app: Elysia) =>
 	app
 		//@ts-ignore
@@ -162,9 +162,11 @@ export const auth = (app: Elysia) =>
 					return;
 				}
 				//todo prioritize disputed offers
-				const offers = await db.select().from(offerTable).orderBy(
-					desc(offerTable.createdAt),
-				).limit(100);
+				const offers = await db
+					.select()
+					.from(offerTable)
+					.orderBy(desc(offerTable.createdAt))
+					.limit(100);
 				return { offers, env: environment };
 			} catch (error) {
 				set.status = 400;
@@ -195,7 +197,8 @@ export const auth = (app: Elysia) =>
 					data: {},
 				};
 			}
-		}).use(authFiatProviders)
+		})
+		.use(authFiatProviders)
 		.ws("/ws", {
 			//@ts-ignore
 			beforeHandle: async ({ headers, request, set, jwt }) => {
@@ -242,7 +245,6 @@ export const auth = (app: Elysia) =>
 
 			open: (ws) => {
 				try {
-					
 					ws.subscribe("message");
 					sendPing(ws);
 					setInterval(async () => {

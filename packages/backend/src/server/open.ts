@@ -4,45 +4,45 @@ import type { PingData } from "@openPleb/common/types";
 import type Elysia from "elysia";
 import type { ElysiaWS } from "elysia/ws";
 import { takerMakerData } from "../dynamic/takersMakers";
+import { environment } from "../env";
 import { eventEmitter } from "../events/emitter";
 import { log } from "../logger";
 import type { SocketEventData } from "../types";
 import { getData, getDataForId } from "./api/data";
+import { fiatProviders } from "./api/fiatProviders/providers";
 import { offers } from "./api/offers/offers";
-import { environment } from "../env";
-import {  fiatProviders } from "./api/fiatProviders/providers";
-
 
 export const open = (app: Elysia) =>
 	app
-.get("/conversion", async () => {
-	try {
-		const conversion = await getConversionRate();
-		return { conversion };
-	} catch (error) {
-		const err = ensureError(error);
-		log.error("Error getting conversion rate {error}", { error });
-		return new Response(err.message, {
-			status: 500,
-		});
-	}
-})		.get("/envsettings", async () => {
-		try {
-			return { 
-				env: environment
-			 };
-		} catch (error) {
-			const err = ensureError(error);
-			log.error("Error getting conversion rate {error}", { error });
-			return new Response(err.message, {
-				status: 500,
-			});
-		}
-})
+		.get("/conversion", async () => {
+			try {
+				const conversion = await getConversionRate();
+				return { conversion };
+			} catch (error) {
+				const err = ensureError(error);
+				log.error("Error getting conversion rate {error}", { error });
+				return new Response(err.message, {
+					status: 500,
+				});
+			}
+		})
+		.get("/envsettings", async () => {
+			try {
+				return {
+					env: environment,
+				};
+			} catch (error) {
+				const err = ensureError(error);
+				log.error("Error getting conversion rate {error}", { error });
+				return new Response(err.message, {
+					status: 500,
+				});
+			}
+		})
 		.get("/data/:pubkey", async ({ params }) => {
 			try {
-				const data = await getData(params.pubkey)
-				return {...data, env: environment};
+				const data = await getData(params.pubkey);
+				return { ...data, env: environment };
 			} catch (error) {
 				const err = ensureError(error);
 				log.error("Error getting data for pubkey {pubkey}: {error}", {
@@ -74,7 +74,6 @@ export const open = (app: Elysia) =>
 		.ws("/ws", {
 			open: (ws) => {
 				try {
-					
 					const headers = ws.data.request.headers;
 					const pubkey = JSON.parse(JSON.stringify(headers))[
 						"sec-websocket-protocol"
@@ -95,7 +94,6 @@ export const open = (app: Elysia) =>
 				} catch (error) {
 					const err = ensureError(error);
 					log.error("Error: {error}", { error });
-					
 				}
 			},
 			message(ws, message: string) {

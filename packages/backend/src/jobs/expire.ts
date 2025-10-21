@@ -1,27 +1,26 @@
+import cron from "@elysiajs/cron";
 import { db } from "@openPleb/common/db";
 import { offerTable } from "@openPleb/common/db/schema";
+import { ensureError } from "@openPleb/common/errors";
 import { OFFER_STATE } from "@openPleb/common/types";
 import { and, inArray, sql } from "drizzle-orm";
+import { log } from "../logger";
 import { handlePayouts } from "../server/api/offers/feedback";
 import { expireOffer, expireOfferInvoicePaid } from "./expire/handleExpiry";
-import cron from "@elysiajs/cron";
-import { ensureError } from "@openPleb/common/errors";
-import { log } from "../logger";
 
-
-export const expireOffersCron = 		cron({
-			name: "expire-offers",
-			// run every 5 seconds
-			pattern: "*/5 * * * * *",
-			run() {
-				try {
-					expireOffers();
-				} catch (error) {
-					const err = ensureError(error);
-					log.error("Error: {error}", { error });
-				}
-			},
-		})
+export const expireOffersCron = cron({
+	name: "expire-offers",
+	// run every 5 seconds
+	pattern: "*/5 * * * * *",
+	run() {
+		try {
+			expireOffers();
+		} catch (error) {
+			const err = ensureError(error);
+			log.error("Error: {error}", { error });
+		}
+	},
+});
 
 export const expireOffers = async () => {
 	const expiredOffers = await db

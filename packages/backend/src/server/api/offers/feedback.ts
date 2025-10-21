@@ -4,10 +4,7 @@ import {
 	type Proof,
 	getEncodedToken,
 } from "@cashu/cashu-ts";
-import { schnorr } from "@noble/curves/secp256k1";
-import { sha256 } from "@noble/hashes/sha256";
 import { db } from "@openPleb/common/db";
-import { verifyPayload } from "@openPleb/common/payloads";
 import {
 	type InsertProof,
 	type Offer,
@@ -16,6 +13,7 @@ import {
 	proofsTable,
 	receiptsTable,
 } from "@openPleb/common/db/schema";
+import { verifyPayload } from "@openPleb/common/payloads";
 import { OFFER_STATE } from "@openPleb/common/types";
 import { and, eq } from "drizzle-orm";
 import { parseSecret } from "../../../cashu/helper";
@@ -28,7 +26,7 @@ export const commitFeedback = async (
 		payload: {
 			status: string;
 			feedback: string;
-		}
+		};
 		signature: string;
 		nonce: string;
 		timestamp: number;
@@ -50,8 +48,14 @@ export const commitFeedback = async (
 		});
 	}
 
-	const isValidSig = verifyPayload(feedbackData.payload, feedbackData.signature, feedbackData.nonce, feedbackData.timestamp, offer.pubkey);
-	
+	const isValidSig = verifyPayload(
+		feedbackData.payload,
+		feedbackData.signature,
+		feedbackData.nonce,
+		feedbackData.timestamp,
+		offer.pubkey,
+	);
+
 	if (!isValidSig) {
 		return new Response("Invalid signature", { status: 401 });
 	}
@@ -63,56 +67,63 @@ export const commitFeedback = async (
 		return new Response("Invalid status", { status: 400 });
 	}
 	if (feedbackData.payload.status === OFFER_STATE.MARKED_WITH_ISSUE) {
-		return await handleMarkedWithIssue(offerId, feedbackData.payload.feedback)
+		return await handleMarkedWithIssue(offerId, feedbackData.payload.feedback);
 	}
-	return await handlePayouts(offer, feedbackData.payload.status, {feedback: feedbackData.payload.feedback});
+	return await handlePayouts(offer, feedbackData.payload.status, {
+		feedback: feedbackData.payload.feedback,
+	});
 };
 
- const handleMarkedWithIssue = async (offerId: string, feedback: string) => {
+const handleMarkedWithIssue = async (offerId: string, feedback: string) => {
 	const id = Number.parseInt(offerId);
 	const offers = await db
 		.select()
 		.from(offerTable)
 		.where(eq(offerTable.id, id));
-	
+
 	if (!offers || offers.length === 0) {
 		return new Response("Offer not found", { status: 404 });
 	}
-	
+
 	const offer = offers[0];
-	
+
 	// Add 250 seconds to the expiry time
 	const currentValidForS = offer.validForS || 0;
 	const updatedValidForS = currentValidForS + 250;
-	
+
 	// Update offer status, feedback, and validity period
 	const updatedOffer = await db
 		.update(offerTable)
-		.set({ 
+		.set({
 			status: OFFER_STATE.MARKED_WITH_ISSUE,
 			feedback,
-			validForS: updatedValidForS
+			validForS: updatedValidForS,
 		})
 		.where(eq(offerTable.id, id))
 		.returning();
-	
+
 	if (!updatedOffer || updatedOffer.length === 0) {
 		return new Response("Failed to update offer", { status: 500 });
 	}
-	
+
 	// Notify connected clients about the update
 	eventEmitter.emit("socket-event", {
 		command: "update-offer",
 		data: { offer: updatedOffer[0] },
 	});
-	
+
 	return updatedOffer[0];
 };
 
 export const handlePayouts = async (
 	offer: Offer,
 	status: string,
-	custom?: { maker?: number; taker?: number, resolutionReason?: string , feedback?: string},
+	custom?: {
+		maker?: number;
+		taker?: number;
+		resolutionReason?: string;
+		feedback?: string;
+	},
 ) => {
 	const receipts = await db
 		.select()
@@ -141,14 +152,16 @@ export const handlePayouts = async (
 		};
 	});
 
-	const sendAmount = custom?.taker ??
-		(offer.satsAmount +
-		offer.takerFeeFlatRate +
-		offer.takerFeePercentage +
-		offer.bondFlatRate +
-		offer.bondPercentage);
+	const sendAmount =
+		custom?.taker ??
+		offer.satsAmount +
+			offer.takerFeeFlatRate +
+			offer.takerFeePercentage +
+			offer.bondFlatRate +
+			offer.bondPercentage;
 
-	const makerBondAmount = custom?.maker ?? (offer.bondFlatRate + offer.bondPercentage);
+	const makerBondAmount =
+		custom?.maker ?? offer.bondFlatRate + offer.bondPercentage;
 
 	const keys = await wallet.getKeys();
 
@@ -242,7 +255,12 @@ export const handlePayouts = async (
 		return new Response("Could not update receipt", { status: 400 });
 	}
 
-	const values: {status: string, refund?: string, feedback?: string, resolutionReason?: string } = { status, refund: refundToken }
+	const values: {
+		status: string;
+		refund?: string;
+		feedback?: string;
+		resolutionReason?: string;
+	} = { status, refund: refundToken };
 
 	if (custom?.feedback) {
 		values.feedback = custom.feedback;

@@ -34,7 +34,7 @@ export interface OfferData {
 	 * The public key of the maker creating the offer.
 	 */
 	pubkey: string;
-	
+
 	fiatProviderId?: number;
 }
 /**
@@ -50,12 +50,13 @@ export interface OfferData {
  * @returns Promise resolving to the created Offer object
  */
 export const createOffer = async (offerData: OfferData): Promise<Offer> => {
-	const { amount, conversionRate, qrCode, pubkey, fiatProviderId  } = offerData;
+	const { amount, conversionRate, qrCode, pubkey, fiatProviderId } = offerData;
 
 	const satsAmount = Math.ceil((100000000 / conversionRate) * amount);
 
 	const platformFeePercentage = Math.ceil(
-		(satsAmount * Number.parseFloat(Bun.env.OPENPLEB_PLATFORM_FEE_PERCENTAGE!)) /
+		(satsAmount *
+			Number.parseFloat(Bun.env.OPENPLEB_PLATFORM_FEE_PERCENTAGE!)) /
 			100,
 	);
 
@@ -91,7 +92,7 @@ export const createOffer = async (offerData: OfferData): Promise<Offer> => {
 		amount,
 		qrCode,
 		pubkey,
-		fiatProviderId
+		fiatProviderId,
 	};
 
 	console.log(insertOffer);

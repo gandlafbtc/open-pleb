@@ -1,8 +1,8 @@
 import { db } from "@openPleb/common/db";
 import {
+	type Offer,
 	claimsTable,
 	fiatProviderTable,
-	type Offer,
 	offerTable,
 	receiptsTable,
 } from "@openPleb/common/db/schema";
@@ -31,14 +31,15 @@ export const getData = async (pubkey: string) => {
 		.select()
 		.from(receiptsTable)
 		.where(inArray(receiptsTable.offerId, offerIds));
-	const fiatProviders = await db.select().from(fiatProviderTable); 
+	const fiatProviders = await db.select().from(fiatProviderTable);
 	return { offers, claims, receipts, fiatProviders };
 };
 
 export const getDataForId = async (id: number) => {
-	const [offer] = await db.select().from(offerTable).where(
-		eq(offerTable.id, id),
-	);
+	const [offer] = await db
+		.select()
+		.from(offerTable)
+		.where(eq(offerTable.id, id));
 	if (!offer) {
 		return { offer: undefined, claim: undefined, receipt: undefined };
 	}
@@ -51,12 +52,14 @@ export const getDataForId = async (id: number) => {
 		.from(receiptsTable)
 		.where(eq(receiptsTable.offerId, id));
 
-	const [makerOfferCount] = await db.select({ count: count() }).from(
-		offerTable,
-	).where(eq(offerTable.pubkey, offer.pubkey));
-	const [makerClaimsCount] = await db.select({ count: count() }).from(
-		claimsTable,
-	).where(eq(claimsTable.pubkey, offer.pubkey));
+	const [makerOfferCount] = await db
+		.select({ count: count() })
+		.from(offerTable)
+		.where(eq(offerTable.pubkey, offer.pubkey));
+	const [makerClaimsCount] = await db
+		.select({ count: count() })
+		.from(claimsTable)
+		.where(eq(claimsTable.pubkey, offer.pubkey));
 
 	const makerInfo: UserInfo = {
 		pubkey: offer.pubkey,
@@ -68,12 +71,14 @@ export const getDataForId = async (id: number) => {
 	};
 	let takerInfo: UserInfo | undefined = undefined;
 	if (claim) {
-		const [takerOffersCount] = await db.select({ count: count() }).from(
-			offerTable,
-		).where(eq(offerTable.pubkey, claim.pubkey));
-		const [takerClaimsCount] = await db.select({ count: count() }).from(
-			claimsTable,
-		).where(eq(claimsTable.pubkey, claim.pubkey));
+		const [takerOffersCount] = await db
+			.select({ count: count() })
+			.from(offerTable)
+			.where(eq(offerTable.pubkey, claim.pubkey));
+		const [takerClaimsCount] = await db
+			.select({ count: count() })
+			.from(claimsTable)
+			.where(eq(claimsTable.pubkey, claim.pubkey));
 
 		takerInfo = {
 			pubkey: claim.pubkey,
