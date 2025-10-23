@@ -2,6 +2,8 @@
 	import { browser } from '$app/environment';
 	import { env } from '$env/dynamic/public';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import * as Dialog from '$lib/components/ui/dialog';
+	import Input from '$lib/components/ui/input/input.svelte';
 	import CopiableToken from '$lib/elements/CopiableToken.svelte';
 	import Expiry from '$lib/elements/Expiry.svelte';
 	import { ensureError } from '$lib/errors.js';
@@ -23,6 +25,8 @@
     let isPaid = $state(false);
 	let isLoading = $state(false);
 	let file = $state('');
+	let showSkipDialog = $state(false);
+	let skipReason = $state('');
 	let isDrawingMode = $state(false);
 	let penSize = $state(10); // Default: small
 	let canvas: HTMLCanvasElement | null = $state(null);
@@ -182,6 +186,49 @@ function toggleDrawingMode() {
 		}
 		// upload the file to the server
 	};
+	const skipReceipt = async () => {
+		if (!offer) {
+			toast.error('No offer found');
+			return;
+		}
+		const pubkey = $keysStore[0]?.publicKey;
+		if (!pubkey) {
+			toast.error('Wallet not found');
+			return;
+		}
+		const reason = skipReason.trim();
+		isLoading = true;
+		try {
+			const response = await fetch(
+				`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/offers/${offer?.id}/receipt`,
+				{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						pubkey,
+						skip: true,
+						reason
+					})
+				}
+			);
+			if (!response.ok) {
+				throw new Error(await response.text());
+			}
+			toast.success('Receipt upload skipped. Maker were notified.');
+			showSkipDialog = false;
+			skipReason = '';
+			file = '';
+			isPaid = false;
+		} catch (error) {
+			const err = ensureError(error);
+			console.error(err);
+			toast.error(err.message);
+		} finally {
+			isLoading = false;
+		}
+	};
 	function downloadSvgAsJpeg(svgElement: SVGElement, fileName: string, options = { quality: 0.95, scale: 50 }): void {
   // Clone the SVG to avoid modifying the original
   const svgClone = svgElement.cloneNode(true) as SVGElement;
@@ -335,14 +382,14 @@ function toggleDrawingMode() {
 							<div class="px-[20%]">
 								<canvas
 									bind:this={canvas}
-									on:mousedown={startDrawing}
-									on:mousemove={draw}
-									on:mouseup={stopDrawing}
-									on:mouseleave={stopDrawing}
-									on:touchstart={startDrawing}
-									on:touchmove={draw}
-									on:touchend={stopDrawing}
-									on:touchcancel={stopDrawing}
+									onmousedown={startDrawing}
+									onmousemove={draw}
+									onmouseup={stopDrawing}
+									onmouseleave={stopDrawing}
+									ontouchstart={startDrawing}
+									ontouchmove={draw}
+									ontouchend={stopDrawing}
+									ontouchcancel={stopDrawing}
 									class="touch-none w-full rounded-md border"
 								></canvas>
 							</div>
@@ -400,11 +447,57 @@ function toggleDrawingMode() {
 		</Button>
 		{/if}
 
+		{#if !offer.receiptSkipped}
+		<Button
+			class="mt-4 w-full"
+			variant="outline"
+			disabled={isLoading}
+			onclick={() => {
+				showSkipDialog = true;
+			}}
+		>
+			I can't upload a receipt
+		</Button>
+
+		<Dialog.Root bind:open={showSkipDialog}>
+			<Dialog.Content>
+				<Dialog.Header>
+					<Dialog.Title>Skip receipt upload</Dialog.Title>
+					<Dialog.Description>
+						Provide a short reason so maker can review your payment without a receipt.
+					</Dialog.Description>
+				</Dialog.Header>
+				<Input
+					placeholder="Reason for skipping"
+					bind:value={skipReason}
+					disabled={isLoading}
+				/>
+				<Dialog.Footer>
+					<Button
+						variant="outline"
+						disabled={isLoading}
+						onclick={() => {
+							showSkipDialog = false;
+							skipReason = '';
+						}}
+					>
+						Cancel
+					</Button>
+					<Button disabled={isLoading} onclick={skipReceipt}>
+						Confirm skip
+					</Button>
+				</Dialog.Footer>
+			</Dialog.Content>
+		</Dialog.Root>
+		{/if}
+
 		<Button
 			class="mt-10"
 			variant="link"
 			onclick={() => {
 				isPaid = false;
+				showSkipDialog = false;
+				skipReason = '';
 			}}
 		>
 			Back

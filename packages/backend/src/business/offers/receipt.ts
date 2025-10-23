@@ -41,8 +41,8 @@ export async function createReceipt(
 		return new Response("Unauthorized pubkey", { status: 401 });
 	}
 
-	if(skip && !receiptImg){
-		return new Response("either receipt or skip = true is required ", {status:400})
+	if(!skip && !receiptImg){
+		return new Response("either receipt or skip is required ", {status:400})
 	}
 	const now = Math.ceil(Date.now() / 1000);
 

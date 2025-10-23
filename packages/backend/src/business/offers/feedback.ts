@@ -130,9 +130,29 @@ export const handlePayouts = async (
 		.from(receiptsTable)
 		.where(eq(receiptsTable.offerId, offer.id));
 
-	if (receipts.length === 0) {
-		return new Response("No receipts found", { status: 404 });
+	let takerPubkeyHex: string | undefined = receipts[0]?.pubkey;
+
+	if (!takerPubkeyHex) {
+		if (!offer.receiptSkipped) {
+			return new Response("No receipts found", { status: 404 });
+		}
+
+		const takerClaim = await db
+			.select()
+			.from(claimsTable)
+			.where(eq(claimsTable.offerId, offer.id));
+
+		if (takerClaim.length === 0) {
+			return new Response("No taker claim found", { status: 404 });
+		}
+
+		takerPubkeyHex = takerClaim[0]?.pubkey;
 	}
+
+	if (!takerPubkeyHex) {
+		return new Response("Missing taker pubkey", { status: 400 });
+	}
+
 	const proofsFromDb = await db
 		.select()
 		.from(proofsTable)
@@ -166,7 +186,10 @@ export const handlePayouts = async (
 	const keys = await wallet.getKeys();
 
 	const makerPub = `02${offer.pubkey}`;
-	const takerPub = `02${receipts[0].pubkey}`;
+	const takerPub =
+		takerPubkeyHex.startsWith("02") || takerPubkeyHex.startsWith("03")
+			? takerPubkeyHex
+			: `02${takerPubkeyHex}`;
 	const makerBondAmountOutputData = OutputData.createP2PKData(
 		{
 			pubkey: makerPub,
