@@ -34,13 +34,21 @@
 		try {
 			isLoading = true;
 			toast.promise(
-				createNewOffer({ amount: amount, qrCode: scannedResult, pubkey: $keysStore[0].publicKey, fiatProviderId: provider?.id   }),
+				createNewOffer({
+					amount,
+					qrCode: scannedResult,
+					pubkey: $keysStore[0].publicKey,
+					fiatProviderId: provider?.id
+				}),
 				{
 					success: (data: OfferResponse) => {
 						goto(`/pay/${data.id}`);
 						return 'Offer created successfully';
 					},
-					error: (e)=> {return `Failed to create offer: ${e.message}`},
+					error: (e: unknown) => {
+						const err = ensureError(e);
+						return `Failed to create offer: ${err.message}`;
+					},
 					loading: 'Creating offer...'
 				}
 			);
@@ -101,7 +109,7 @@
 
 								try {
 									// Decode QR from the file
-									const result = await QrScanner.scanImage(blob, {});
+									const result = await QrScanner.scanImage(blob);
 									scannedResult = result;
 									isScanning = false;
 								} catch (error) {

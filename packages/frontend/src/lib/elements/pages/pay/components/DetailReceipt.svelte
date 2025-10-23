@@ -1,23 +1,25 @@
 <script lang="ts">
-	import * as Card from '$lib/components/ui/card/index.js';
-	import { formatCurrency } from '$lib/helper';
-	import type { Offer, Receipt } from "@openPleb/common/db/schema";
-	import Expiry from "$lib/elements/Expiry.svelte";
-	import { BadgeDollarSign, CalendarDays, Coins, CurrencyIcon, FileImage, Fullscreen, Info, Rotate3D, Stamp } from "lucide-svelte";
-	import { OFFER_STATE } from '@openPleb/common/types';
+import * as Card from '$lib/components/ui/card/index.js';
+import { formatCurrency } from '$lib/helper';
+import type { Offer, Receipt } from "@openPleb/common/db/schema";
+import Expiry from "$lib/elements/Expiry.svelte";
+import { BadgeDollarSign, Coins, FileImage, Fullscreen, Info, Rotate3D, Stamp } from "lucide-svelte";
+import { OFFER_STATE } from '@openPleb/common/types';
 
-    interface Props {offer: Offer, receipt: Receipt}
-    
-    const {offer, receipt} = $props() as Props;
-    
-	let showFullScreen = $state(false);
-    
-    
-    // Format date from unix timestamp
-    const formatDate = (timestamp: number | undefined) => {
-        if (!timestamp) return 'N/A';
-        return new Date(timestamp * 1000).toLocaleString();
-    };
+interface Props {
+	offer: Offer;
+	receipt?: Receipt | null;
+}
+
+let { offer, receipt = null }: Props = $props();
+
+let showFullScreen = $state(false);
+
+// Format date from unix timestamp
+const formatDate = (timestamp: number | null | undefined) => {
+	if (!timestamp) return 'N/A';
+	return new Date(timestamp * 1000).toLocaleString();
+};
 </script>
 
 
@@ -73,6 +75,11 @@
                 <img src={receipt.receiptImg} alt="" class="max-h-[100%] max-w-[100%] object-contain" />
             </div>
         {/if}
+        {:else if offer.receiptSkipped}
+        <div class="flex items-start gap-2 rounded-md border border-dashed p-3 text-sm text-muted-foreground">
+            <Info class="mt-0.5 h-4 w-4" />
+            <p>The payer skipped the receipt upload for this offer.</p>
+        </div>
         {/if}
 
         <div class="flex items-center gap-2">
@@ -116,4 +123,3 @@
         {/if}
     </Card.Content>
 </Card.Root>
-

@@ -8,7 +8,7 @@
 
     interface Props {offer: Offer, claim?: Claim}
     
-    const {offer, claim}: Props = $props();
+    let {offer, claim}: Props = $props();
 
     // Format date from unix timestamp
     const formatDate = (timestamp: number | undefined) => {
@@ -71,6 +71,12 @@
     
     const resolutionType = getResolutionType(offer.resolutionReason??'');
     const ResolutionIcon = getResolutionIcon(resolutionType);
+    const makerPayout = $derived(() =>
+        offer.refund ? formatCurrency(parseTokenAmount(offer.refund), 'SAT') : 'N/A'
+    );
+    const takerPayout = $derived(() =>
+        claim?.reward ? formatCurrency(parseTokenAmount(claim.reward), 'SAT') : 'N/A'
+    );
 </script> 
 
 <div class="flex flex-col justify-center items-center p-4 gap-4 w-full">
@@ -122,11 +128,11 @@
                 <div class="grid grid-cols-2 gap-2 mt-2">
                     <div>
                         <p class="text-sm text-muted-foreground">Maker (Offer Creator) Received</p>
-                        <p>{formatCurrency(parseTokenAmount(offer.refund), 'SAT')}</p>
+                        <p>{makerPayout}</p>
                     </div>
                     <div>
                         <p class="text-sm text-muted-foreground">Taker (Claim Creator) Received</p>
-                        <p>{formatCurrency(parseTokenAmount(claim?.reward), 'SAT')}</p>
+                        <p>{takerPayout}</p>
                     </div>
                 </div>
             </div>
