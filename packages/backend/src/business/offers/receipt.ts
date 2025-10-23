@@ -65,8 +65,8 @@ export async function createReceipt(
 		});
 		eventEmitter.emit("socket-event", {
 			command: "receipt-skipped",
-			data: {offerId: id, pubkeys:[claims[0].pubkey, offerUpdated.pubkey] },
-			pubkeys: [claims[0], PublicKeyCredential, offerUpdated.pubkey],
+			data: { offerId: id, pubkeys: [claims[0].pubkey, offerUpdated.pubkey] },
+			pubkeys: [claims[0].pubkey, offerUpdated.pubkey],
 		});
 		return {receipt:null, skipped: true};
 	}
