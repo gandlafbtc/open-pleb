@@ -3,16 +3,16 @@
 	import { env } from '$env/dynamic/public';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import CopiableToken from '$lib/elements/CopiableToken.svelte';
+	import Expiry from '$lib/elements/Expiry.svelte';
 	import { ensureError } from '$lib/errors.js';
 	import { formatCurrency, objectUrlToBase64 } from '$lib/helper';
 	import { dataStore } from '$lib/stores/session/data.svelte';
-	import type { Claim, FiatProvider, Offer } from '@openPleb/common/db/schema';
 	import { keysStore } from '@gandlaf21/cashu-wallet-engine';
-	import { LoaderCircle, Trash, Upload, Pencil, Check } from 'lucide-svelte';
+	import type { Claim, FiatProvider, Offer } from '@openPleb/common/db/schema';
+	import { Check, LoaderCircle, Pencil, Trash, Upload } from 'lucide-svelte';
 	import encodeQR from 'qr';
 	import Dropzone from 'svelte-file-dropzone';
 	import { toast } from 'svelte-sonner';
-	import Expiry from '$lib/elements/Expiry.svelte';
 	
     const { PUBLIC_API_VERSION, PUBLIC_BACKEND_URL} = env;
 	const { OPENPLEB_CURRENCY } = dataStore.env
@@ -162,7 +162,7 @@ function toggleDrawingMode() {
 							// todo, signature should be added here?
 							body: JSON.stringify({
 								pubkey: $keysStore[0]?.publicKey,
-								receipt: b64
+								receiptImg: b64
 							})
 							
 						}

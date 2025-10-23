@@ -1,4 +1,4 @@
-import { bigint, integer, pgTable, text } from 'drizzle-orm/pg-core';
+import { bigint, boolean, integer, pgTable, text } from 'drizzle-orm/pg-core';
 
 export const offerTable = pgTable('offers', {
 	id: integer().primaryKey().$defaultFn(()=> Math.ceil(Math.random()*100000000)),
@@ -24,7 +24,8 @@ export const offerTable = pgTable('offers', {
 	resolutionReason: text('resolution_reason'),
 	description: text('description'),
 	refund: text('refund'),
-	fiatProviderId: integer("fiat_provider_id").references(() => fiatProviderTable.id)
+	fiatProviderId: integer("fiat_provider_id").references(() => fiatProviderTable.id),
+	receiptSkipped: boolean("receipt_skipped").notNull().default(false),
 });
 
 export const mintQuotesTable = pgTable('mint_quotes', {
