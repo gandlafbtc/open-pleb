@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
 	import { goto } from "$app/navigation";
 	import Badge from "$lib/components/ui/badge/badge.svelte";
 	import FormButton from "$lib/components/ui/form/form-button.svelte";
-import Input from "$lib/components/ui/input/input.svelte";
+	import Input from "$lib/components/ui/input/input.svelte";
 	import SimpleScanner from "$lib/elements/SimpleScanner.svelte";
 	import { ensureError } from "$lib/errors";
 	import { formatCurrency } from "$lib/helper";
@@ -36,6 +36,24 @@ import Input from "$lib/components/ui/input/input.svelte";
             return "invoice";
         }
         return "unknown";
+    });
+    const invoicePreview = $derived.by(() => {
+        if (inputType !== 'invoice') {
+            return null;
+        }
+        try {
+            const decoded = decode(invoiceOrAddress);
+            const amountSection = decoded.sections.find((section) => {
+                const candidate = section as { value?: unknown };
+                return typeof candidate.value === 'number';
+            }) as { value: number } | undefined;
+            if (!amountSection) {
+                return null;
+            }
+            return { amountSats: amountSection.value / 1000 };
+        } catch {
+            return null;
+        }
     });
 
     const handleMelt = async () => {
@@ -78,22 +96,25 @@ let latest = $derived(
         {formatCurrency($proofsStore.reduce((acc, proof) => acc + proof.amount, 0), "SAT")}
     </p>
     <div class="relative">
-        <div onclick={(e)=> {
-            e.preventDefault()
-            showScanner=!showScanner;
-        }} class="absolute right-2 top-2">
+        <button
+			type="button"
+			class="absolute right-2 top-2 rounded-md p-1 text-muted-foreground hover:text-foreground focus:outline-none focus-visible:ring"
+			onclick={(e) => {
+				e.preventDefault();
+				showScanner = !showScanner;
+			}}
+			aria-label="Toggle scanner"
+		>
             <Scan></Scan>
-    </div>
+        </button>
         <Input type="text" placeholder="lnurl/address/invoice" bind:value={invoiceOrAddress}/>
     </div>
     <div class="flex flex-col gap-2 w-full h-40">
 
         {#if inputType === "invoice"}
-        {@const decoded = decode(invoiceOrAddress)}
-
-        {#if decoded?.sections[2]?.value}
+        {#if invoicePreview}
            <p class="">
-                Amount: {formatCurrency( decoded.sections[2].value/1000, "SAT")}
+                Amount: {formatCurrency(invoicePreview.amountSats, "SAT")}
             </p>
         {:else}
             <p class="text-red-500">
