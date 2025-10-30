@@ -5,7 +5,7 @@
 
     interface Props {offer: Offer}
     
-    const {offer} = $props() as Props;
+    let {offer}: Props = $props();
     
     // Format date from unix timestamp
     const formatDate = (timestamp: number | undefined) => {

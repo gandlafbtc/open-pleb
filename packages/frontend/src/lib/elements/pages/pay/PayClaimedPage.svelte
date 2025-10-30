@@ -4,7 +4,7 @@
 
     interface Props {offer: Offer}
     
-    let {offer}: Props = $props() as Props;
+    let {offer}: Props = $props();
 </script>
 
 

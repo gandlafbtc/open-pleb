@@ -20,14 +20,21 @@
             if (match) {
                 provider = match
             }
-            console.log('aaaaaaaaaaaaaaaaa')
         }
     });
 
   </script>
    
    
-   <Select.Root type="single" onValueChange={(value) => provider = dataStore.providers.find(p => p.id === value) }>
+   <Select.Root
+	type="single"
+	onValueChange={(value) => {
+		const id = Number(value);
+		provider = Number.isNaN(id)
+			? undefined
+			: dataStore.providers.find((p) => p.id === id);
+	}}
+>
        <Select.Trigger class="w-[180px]"> 
         {#if provider}
         <img src="{provider.icon}" alt="" class="w-4 h-4 "/>{provider.label}
@@ -38,7 +45,7 @@
     </Select.Trigger>
        <Select.Content>
            {#each dataStore.providers as p}
-           <Select.Item value={p.id} class="flex items-center gap-2">
+           <Select.Item value={String(p.id)} class="flex items-center gap-2">
                <img src="{p.icon}" alt="" class="w-4 h-4 ">
                {p.label}
             </Select.Item>
