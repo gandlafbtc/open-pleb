@@ -216,7 +216,7 @@ function toggleDrawingMode() {
 			if (!response.ok) {
 				throw new Error(await response.text());
 			}
-			toast.success('Receipt upload skipped. Maker were notified.');
+			toast.success('Receipt upload skipped. Maker was notified.');
 			showSkipDialog = false;
 			skipReason = '';
 			file = '';
