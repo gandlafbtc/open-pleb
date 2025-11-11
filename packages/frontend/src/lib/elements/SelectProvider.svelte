@@ -1,9 +1,9 @@
 	
 <script lang="ts">
     import * as Select from "$lib/components/ui/select/index.js";
-	import { dataStore } from "$lib/stores/session/data.svelte";
-	import type { FiatProvider } from "@openPleb/common/db/schema";
-	import { onMount } from "svelte";
+    import { dataStore } from "$lib/stores/session/data.svelte";
+    import type { FiatProvider } from "@openPleb/common/db/schema";
+    import { onMount } from "svelte";
     
     interface Props {provider: FiatProvider | undefined, matchAddress?: string}
     
@@ -26,14 +26,7 @@
   </script>
    
    
-   <Select.Root
-	type="single"
-	onValueChange={(value) => {
-		const id = Number(value);
-		provider = Number.isNaN(id)
-			? undefined
-			: dataStore.providers.find((p) => p.id === id);
-	}}
+    <Select.Root type="single" onValueChange={(value) => {provider = dataStore.providers.find((p) => p.id === value);}}
 >
        <Select.Trigger class="w-[180px]"> 
         {#if provider}
@@ -45,7 +38,7 @@
     </Select.Trigger>
        <Select.Content>
            {#each dataStore.providers as p}
-           <Select.Item value={String(p.id)} class="flex items-center gap-2">
+           <Select.Item value={p.id} class="flex items-center gap-2">
                <img src="{p.icon}" alt="" class="w-4 h-4 ">
                {p.label}
             </Select.Item>
