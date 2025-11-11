@@ -186,10 +186,8 @@ export const handlePayouts = async (
 	const keys = await wallet.getKeys();
 
 	const makerPub = `02${offer.pubkey}`;
-	const takerPub =
-		takerPubkeyHex.startsWith("02") || takerPubkeyHex.startsWith("03")
-			? takerPubkeyHex
-			: `02${takerPubkeyHex}`;
+	const takerPub = `02${receipts[0].pubkey}`;
+
 	const makerBondAmountOutputData = OutputData.createP2PKData(
 		{
 			pubkey: makerPub,
