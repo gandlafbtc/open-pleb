@@ -134,6 +134,6 @@
     <div class="max-w-3xl mx-auto px-4">
         <h2 class="text-3xl font-bold mb-4">Join the OpenPleb Project</h2>
         <p class="text-lg text-gray-600 mb-6">OpenPlen is an open-source initiative. Developers, Designers, and Bitcoiners are welcome to contribute!</p>
-        <a href="https://githuib.com/gandlafbtc/open-pleb" target="_blank" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-medium transition">View on Github</a>
+        <a href="https://github.com/gandlafbtc/open-pleb" target="_blank" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-medium transition">View on Github</a>
     </div>
 </section>
