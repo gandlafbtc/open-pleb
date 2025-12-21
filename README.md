@@ -99,7 +99,7 @@ Fiat banking usually doesn't offer open protocols that would allow us to make at
 
 ## Environment Configuration
 
-**IMPORTANT**: WHEN RUNNING IN PRODUCTION, YOU NEED TO CONFIGURE THE ENVIRONMENT VARIABLES FOR YOUR OWN ENVIRONMENT! ESPACIALLY THE `OPENPLEB_DATABASE_URL` SHOULD BE CHANGED TO USE NON DEFAULT CREDENTIALS
+**IMPORTANT**: WHEN RUNNING IN PRODUCTION, YOU NEED TO CONFIGURE THE ENVIRONMENT VARIABLES FOR YOUR OWN ENVIRONMENT! ESPECIALLY THE `OPENPLEB_DATABASE_URL` SHOULD BE CHANGED TO USE NON-DEFAULT CREDENTIALS
 
 
 OpenPleb requires several environment variables to be configured for proper operation. Below are instructions for configuring environment variables for both local development and Docker deployment.
