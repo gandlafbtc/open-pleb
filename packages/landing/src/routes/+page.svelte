@@ -47,7 +47,7 @@
                 <p class="text-gray-600">Using Cashu tokens as bonds to ensure incentives are aligned.</p>
             </div>
             <div class="bg-gray-50 p-6 rounded-lg shadow hover:shadow-lg transition">
-                <h3 class="text-xl font-semibold mb-2">QR code Intergration</h3>
+                <h3 class="text-xl font-semibold mb-2">QR code Integration</h3>
                 <p class="text-gray-600">Easily scan banking QR codes and create offers for payment.</p>
             </div>
             <div class="bg-gray-50 p-6 rounded-lg shadow hover:shadow-lg transition">
@@ -73,10 +73,10 @@
 <!--How it Works-->
 <section id="how-it-works" class="py-20 bg-gray-100">
     <div class="max-w-5xl mx-auto px-4">
-        <h2 class="text-3xl font-bold text-center mb-12">How it Works</h2>
+        <h2 class="text-3xl font-bold text-center mb-12">How It Works</h2>
         <ol class="space-y-8">
             <li class="bg-white p-6 rounded-lg shadow">
-                <h3 class="font-semibold text-lg mb-1">1.Maker Creates Offer</h3>
+                <h3 class="font-semibold text-lg mb-1">1. Maker Creates Offer</h3>
                 <p class="text-gray-600">User scans QR, enters amount, submits bond to open offer.</p>
             </li>
             <li class="bg-white p-6 rounded-lg shadow">
@@ -89,7 +89,7 @@
             </li>
             <li class="bg-white p-6 rounded-lg shadow">
                 <h3 class="font-semibold text-lg mb-1">4. Settlement</h3>
-                <p class="text-gray-600">Maker verifies, Lightning payout completes, bonds return.</p>
+                <p class="text-gray-600">Maker verifies, Lightning payout completes, bond returns.</p>
             </li>
 
         </ol>
