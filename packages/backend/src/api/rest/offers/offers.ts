@@ -172,8 +172,8 @@ export const offers = (app: Elysia) =>
 				"/:id/receipt",
 				async ({ params, body }) => {
 					try {
-						const { receipt, pubkey } = body;
-						return await createReceipt(params.id, pubkey, receipt);
+						const { receiptImg, pubkey, skip, reason } = body;
+						return await createReceipt(params.id, {pubkey, receiptImg, skip, reason});
 					} catch (error) {
 						const err = ensureError(error);
 						log.error("Error posting receipt  {error}", { error });
@@ -184,8 +184,10 @@ export const offers = (app: Elysia) =>
 				},
 				{
 					body: t.Object({
-						receipt: t.String(),
-						pubkey: t.String(),
+						pubkey:t.String(),
+						receiptImg: t.Optional(t.String()),
+						skip: t.Optional(t.Boolean()),
+						reason:t.Optional(t.String()),
 					}),
 				},
 			),

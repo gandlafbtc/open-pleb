@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import FormButton from "$lib/components/ui/form/form-button.svelte";
 	import Input from "$lib/components/ui/input/input.svelte";
 	import { ensureError } from "$lib/errors";
@@ -6,9 +6,14 @@
 	import { LoaderCircle, Pen } from "lucide-svelte";
 	import { toast } from "svelte-sonner";
 	import { getInvoiceForLNURLAddress  } from "@openPleb/common/lnurl";
-    let lnurl = $derived(($lnurlStore[0]?.address)??"")
-    let lnurlCopy = $state(lnurl)
+	import { onMount } from "svelte";
+    let lnurl = $derived.by(() => ($lnurlStore[0]?.address) ?? "")
+    let lnurlCopy = $state("")
     let isLoading = $state(false)
+
+	onMount(() => {
+		lnurlCopy = lnurl;
+	});
 
     const setLnurl = async () => {
         if (!lnurlCopy.toLowerCase().startsWith("LNURL") && !lnurlCopy.includes("@")) {

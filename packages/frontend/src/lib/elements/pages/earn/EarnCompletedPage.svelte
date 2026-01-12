@@ -17,8 +17,6 @@
 			dataStore.fetchForId(page.params.id);
 		}
 	});
-	$inspect(receipt);
-
 	$effect(() => {
 		if (claim?.reward) {
 			checkIfRedeemed(claim?.reward);
@@ -26,6 +24,6 @@
 	})
 </script>
 
-{#if receipt}
-	<DetailReceipt {offer} {receipt}></DetailReceipt>
+{#if receipt || offer.receiptSkipped}
+	<DetailReceipt {offer} receipt={receipt ?? null}></DetailReceipt>
 {/if}

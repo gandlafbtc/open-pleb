@@ -12,7 +12,8 @@
 	import { OFFER_STATE } from '@openPleb/common/types';
 	import ToggleDarkMode from '$lib/elements/settings/ToggleDarkMode.svelte';
 
-	let sidebar = $state();
+	type SidebarStore = ReturnType<typeof Sidebar.useSidebar>;
+	let sidebar = $state<SidebarStore | null>(null);
 	onMount(() => {
 		sidebar = Sidebar.useSidebar();
 	});
@@ -109,7 +110,7 @@
 				>Platform fee flat
 
 				<Sidebar.MenuBadge>
-					{formatCurrency(Number.parseInt(OPENPLEB_PLATFORM_FEE_FLAT_RATE), 'SAT')}
+					{formatCurrency(OPENPLEB_PLATFORM_FEE_FLAT_RATE, 'SAT')}
 				</Sidebar.MenuBadge>
 			</Sidebar.GroupLabel>
 			<Sidebar.GroupLabel
@@ -123,7 +124,7 @@
 				>Taker fee flat
 
 				<Sidebar.MenuBadge>
-					{formatCurrency(Number.parseInt(OPENPLEB_TAKER_FEE_FLAT_RATE), 'SAT')}
+					{formatCurrency(OPENPLEB_TAKER_FEE_FLAT_RATE, 'SAT')}
 				</Sidebar.MenuBadge>
 			</Sidebar.GroupLabel>
 			<Sidebar.GroupLabel
@@ -133,12 +134,12 @@
 				{OPENPLEB_BOND_PERCENTAGE}%
 			</Sidebar.MenuBadge>
 		</Sidebar.GroupLabel>
-		<Sidebar.GroupLabel
-		>Taker/Maker bond flat
-		<Sidebar.MenuBadge>
-			{formatCurrency(Number.parseInt(OPENPLEB_BOND_FLAT_RATE), 'SAT')}
-		</Sidebar.MenuBadge>
-	</Sidebar.GroupLabel>
+	<Sidebar.GroupLabel
+	>Taker/Maker bond flat
+	<Sidebar.MenuBadge>
+		{formatCurrency(OPENPLEB_BOND_FLAT_RATE, 'SAT')}
+	</Sidebar.MenuBadge>
+</Sidebar.GroupLabel>
 		</Sidebar.Group>
 		<!-- We create a Sidebar.Group for each parent. -->
 		{#each data.navMain as group (group.title)}
@@ -148,7 +149,14 @@
 					<Sidebar.Menu>
 						{#each group.items as item (item.title)}
 							<Sidebar.MenuItem>
-								<Sidebar.MenuButton isActive={page.url.pathname === item.url} onclick={() => (sidebar.isMobile ? sidebar.toggle() : '')}>
+								<Sidebar.MenuButton
+									isActive={page.url.pathname === item.url}
+									onclick={() => {
+										if (sidebar?.isMobile) {
+											sidebar.toggle();
+										}
+									}}
+								>
 									{#snippet child({ props })}
 										<a href={item.url} {...props}>{item.title}</a>
 									{/snippet}

@@ -1,9 +1,9 @@
 	
 <script lang="ts">
     import * as Select from "$lib/components/ui/select/index.js";
-	import { dataStore } from "$lib/stores/session/data.svelte";
-	import type { FiatProvider } from "@openPleb/common/db/schema";
-	import { onMount } from "svelte";
+    import { dataStore } from "$lib/stores/session/data.svelte";
+    import type { FiatProvider } from "@openPleb/common/db/schema";
+    import { onMount } from "svelte";
     
     interface Props {provider: FiatProvider | undefined, matchAddress?: string}
     
@@ -20,14 +20,14 @@
             if (match) {
                 provider = match
             }
-            console.log('aaaaaaaaaaaaaaaaa')
         }
     });
 
   </script>
    
    
-   <Select.Root type="single" onValueChange={(value) => provider = dataStore.providers.find(p => p.id === value) }>
+    <Select.Root type="single" onValueChange={(value) => {provider = dataStore.providers.find((p) => p.id === value);}}
+>
        <Select.Trigger class="w-[180px]"> 
         {#if provider}
         <img src="{provider.icon}" alt="" class="w-4 h-4 "/>{provider.label}
