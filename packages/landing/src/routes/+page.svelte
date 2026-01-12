@@ -73,10 +73,10 @@
 <!--How it Works-->
 <section id="how-it-works" class="py-20 bg-gray-100">
     <div class="max-w-5xl mx-auto px-4">
-        <h2 class="text-3xl font-bold text-center mb-12">How it Works</h2>
+        <h2 class="text-3xl font-bold text-center mb-12">How It Works</h2>
         <ol class="space-y-8">
             <li class="bg-white p-6 rounded-lg shadow">
-                <h3 class="font-semibold text-lg mb-1">1.Maker Creates Offer</h3>
+                <h3 class="font-semibold text-lg mb-1">1. Maker Creates Offer</h3>
                 <p class="text-gray-600">User scans QR, enters amount, submits bond to open offer.</p>
             </li>
             <li class="bg-white p-6 rounded-lg shadow">
@@ -89,7 +89,7 @@
             </li>
             <li class="bg-white p-6 rounded-lg shadow">
                 <h3 class="font-semibold text-lg mb-1">4. Settlement</h3>
-                <p class="text-gray-600">Maker verifies, Lightning payout completes, bonds return.</p>
+                <p class="text-gray-600">Maker verifies, Lightning payout completes, bond returns.</p>
             </li>
 
         </ol>
@@ -133,7 +133,7 @@
 <section class="py-20 text-center bg-gradient-to-br from-gray-50 to-gray-100">
     <div class="max-w-3xl mx-auto px-4">
         <h2 class="text-3xl font-bold mb-4">Join the OpenPleb Project</h2>
-        <p class="text-lg text-gray-600 mb-6">OpenPlen is an open-source initiative. Developers, Designers, and Bitcoiners are welcome to contribute!</p>
+        <p class="text-lg text-gray-600 mb-6">OpenPleb is an open-source initiative. Developers, Designers, and Bitcoiners are welcome to contribute!</p>
         <a href="https://githuib.com/gandlafbtc/open-pleb" target="_blank" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-medium transition">View on Github</a>
     </div>
 </section>
