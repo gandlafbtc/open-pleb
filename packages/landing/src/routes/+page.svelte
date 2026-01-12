@@ -47,7 +47,7 @@
                 <p class="text-gray-600">Using Cashu tokens as bonds to ensure incentives are aligned.</p>
             </div>
             <div class="bg-gray-50 p-6 rounded-lg shadow hover:shadow-lg transition">
-                <h3 class="text-xl font-semibold mb-2">QR code Intergration</h3>
+                <h3 class="text-xl font-semibold mb-2">QR code Integration</h3>
                 <p class="text-gray-600">Easily scan banking QR codes and create offers for payment.</p>
             </div>
             <div class="bg-gray-50 p-6 rounded-lg shadow hover:shadow-lg transition">
