@@ -1,0 +1,13 @@
+{
+  "name": "ui",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest",
+    "svelte": "catalog:sveltekit-dev"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
