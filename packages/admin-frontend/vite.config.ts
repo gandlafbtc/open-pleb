@@ -1,16 +1,12 @@
-// import { paraglide } from '@inlang/paraglide-sveltekit/vite';
-import { defineConfig } from 'vitest/config';
+import { paraglideVitePlugin } from '@inlang/paraglide-js';
+import tailwindcss from '@tailwindcss/vite';
 import { sveltekit } from '@sveltejs/kit/vite';
+import { defineConfig } from 'vite';
 
 export default defineConfig({
 	plugins: [
+		tailwindcss(),
 		sveltekit(),
-		// paraglide({
-		// 	project: './project.inlang',
-		// 	outdir: './src/lib/paraglide'
-		// })
-	],
-	test: {
-		include: ['src/**/*.{test,spec}.{js,ts}']
-	}
+		paraglideVitePlugin({ project: './project.inlang', outdir: './src/lib/paraglide' })
+	]
 });
