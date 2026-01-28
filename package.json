@@ -53,6 +53,10 @@
       "@scure/bip32": "^2.0.1",
       "@scure/bip39": "^2.0.1"
     },
+    "cashu": {
+    "coco-cashu-core": "1.1.2-rc.42",
+    "coco-cashu-sqlite3": "1.1.2-rc.42"
+    },
     "server": {
       "@elysiajs/cookie": "^0.8.0",
       "@elysiajs/cors": "^1.4.1",

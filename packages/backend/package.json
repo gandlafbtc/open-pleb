@@ -3,14 +3,35 @@
   "version": "0.0.1",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "bun run --watch src/index.ts"
+    "dev": "bun run --watch src/index.ts",
+    "start": "bun run src/index.ts"
   },
   "dependencies": {
     "@sinclair/typebox": "^0.34.48",
-    "elysia": "catalog:server"
+    "elysia": "catalog:server",
+    "@elysiajs/cookie": "catalog:server",
+    "@elysiajs/cors": "catalog:server",
+    "@elysiajs/cron": "catalog:server",
+    "@elysiajs/jwt": "catalog:server",
+    "@elysiajs/swagger": "catalog:server",
+    "elysia-rate-limit": "catalog:server",
+    "@grotto/logysia": "catalog:server",
+    "@node-rs/argon2": "catalog:server",
+    "@oslojs/crypto": "catalog:server",
+    "@oslojs/encoding": "catalog:server",
+    "socket.io": "catalog:server",
+    "postgres": "catalog:server",
+    "drizzle-orm": "catalog:db",
+    "@logtape/logtape": "catalog:utils",
+    "dotenv": "catalog:utils",
+    "@noble/curves": "catalog:crypto",
+    "@noble/hashes": "catalog:crypto",
+    "@scure/bip32": "catalog:crypto",
+    "@scure/bip39": "catalog:crypto"
   },
   "devDependencies": {
-    "bun-types": "latest"
+    "bun-types": "latest",
+    "drizzle-kit": "catalog:db"
   },
   "module": "src/index.js"
 }
