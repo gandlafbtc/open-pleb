@@ -27,7 +27,11 @@ export const offerTable = pgTable('offers', {
 
 	// sessions
 	makerSessionId: integer("maker_session_id").references(() => sessionTable.id).notNull().unique(),
-	takerSessionId: integer("taker_session_id").references(() => sessionTable.id).notNull().unique(),
+	takerSessionId: integer("taker_session_id").references(() => sessionTable.id),
+
+	// reputation stakes
+	makerReputationStake: text("maker_reputation_stake"),
+	takerReputationStake: text("taker_reputation_stake"),
 
 	makerBondAndEscrow: text("maker_bond_and_escrow"),
 	takerBond: text("taker_bond"),
@@ -43,19 +47,29 @@ export const offerTable = pgTable('offers', {
 	receiptImg: text('receipt_img').notNull(),
 
 	//dispute
-	maker_feedback: text('maker_feedback'),
-	taker_feedback: text('taker_feedback'),
+	makerFeedback: text('maker_feedback'),
+	takerFeedback: text('taker_feedback'),
 	resolutionReason: text('resolution_reason'),
 	description: text('description'),
-	takerRewardToken: text('taker_reward'),
+	
+	// rewards and refunds
+	takerRewardToken: text('taker_reward_token'),
 	makerRefundToken: text('maker_refund_token'),
+	makerReputationToken: text('maker_reputation_token'),
+	takerReputationToken: text('taker_reputation_token'),
+	
+	// pubkey locks for dispute resolution
+	takerRewardPubkeyLock: text('taker_reward_pubkey_lock'),
+	makerRefundPubkeyLock: text('maker_refund_pubkey_lock'),
 });
 
 export const sessionTable = pgTable("sessions", {
-	id: integer().primaryKey().generatedAlwaysAsIdentity(),
+	id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
 	// Blind auth token
 	bat: text("bat").unique().notNull(),
-	expiresAt: integer("expires_at")
+	userId: text("user_id").references(() => userTable.id),
+	expiresAt: integer("expires_at"),
+	createdAt: integer("created_at").notNull()
 })
 
 export const subscriptionTable = pgTable('subscriptions', {
@@ -67,17 +81,24 @@ export const subscriptionTable = pgTable('subscriptions', {
 
 export const adminTable = pgTable("admins", {
 	id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
-	pubkey: text("pubkey").notNull(),
+	pubkey: text("pubkey").unique().notNull(),
 	role: text("role").notNull() // roles: admin, oidc-api
 });
 
 export const userTable = pgTable('users', {
 	id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
 	inviteCode: text("invite_code").notNull().unique(),
+	codeCreatedAt: integer("code_created_at").notNull(),
 	codeExpiresAt: integer("code_expires_at"),
-	createdAt: integer("created_at").notNull(),
+	userCreatedAt: integer("user_created_at"),
 	pubkey: text("pubkey").unique(),
-	isActive: boolean("is_active")
+	isActive: boolean("is_active").notNull().default(true),
+	
+	// dispute stats (only populated when user reveals pubkey in dispute)
+	totalDisputes: integer("total_disputes").notNull().default(0),
+	disputesWon: integer("disputes_won").notNull().default(0),
+	disputesLost: integer("disputes_lost").notNull().default(0),
+	disputesPending: integer("disputes_pending").notNull().default(0)
 })
 
 export const fiatProviderTable = pgTable("fiat_providers", {

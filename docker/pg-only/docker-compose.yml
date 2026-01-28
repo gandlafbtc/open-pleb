@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:15.3
+    container_name: my-postgres-db
+    restart: unless-stopped
+    env_file: 
+     - ${PWD}/../../data/config/db/.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ${PWD}/../../data/config/db/.env:/app/data/config/db/.env
+
+      # Uncomment if you want to mount initialization scripts
+      # - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - postgres-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+volumes:
+  postgres-data:
+    driver: local
+
+networks:
+  postgres-network:
+    driver: bridge

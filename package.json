@@ -36,7 +36,9 @@
       "typescript-eslint": "^8.48.1",
       "vite": "^7.2.6"
     },
-    "frontend": {},
+    "frontend": {
+      "socket.io-client": "^4.8.3"
+    },
     "db": {
       "drizzle-kit": "^0.31.8",
       "drizzle-orm": "^0.45.1"
@@ -66,9 +68,8 @@
       "elysia": "^1.4.22",
       "@negrel/webpush": "npm:@jsr/negrel__webpush",
       "@std/encoding": "npm:@jsr/std__encoding@0.224.0/base64url",
-      "postgres": "^3.4.8"
+      "postgres": "^3.4.8",
+      "socket.io": "^4.8.3"
     }
-  },
-  "dependencies": {
   }
 }
