@@ -44,10 +44,6 @@ OpenPleb is a peer-to-peer fiat-to-bitcoin exchange platform. This API uses cryp
 - `POST /notifications/subscribe` - Subscribe to notifications (BAT required)
 - `DELETE /notifications/subscribe` - Unsubscribe from notifications (BAT required)
 
-#### User Settings
-- `GET /users/me/settings` - Get user settings (BAT required)
-- `PUT /users/me/settings/:key` - Update user setting (BAT required)
-
 #### Platform Statistics
 - `GET /stats` - Get platform statistics
 - `GET /config` - Get platform configuration
@@ -1012,6 +1008,7 @@ Authorization: Bearer <admin_token>
 - This ensures only the rightful party can claim the funds
 - Pubkey locks prevent token theft or misappropriation
 - Dispute outcomes are recorded in user dispute stats
+- Users in a dispute lose up to 3 reputation tokens
 
 ---
 
@@ -1218,88 +1215,9 @@ Authorization: Bearer <bat_token>
 
 ---
 
-## User Settings
-
-### 25. Get User Settings
-
-**Endpoint:** `GET /users/me/settings`
-
-**Description:** Retrieves user settings.
-
-**Request Headers:**
-```
-Authorization: Bearer <bat_token>
-```
-
-**Response:** `200 OK`
-```json
-{
-  "settings": [
-    {
-      "key": "notification_offers",
-      "label": "Notify on new offers",
-      "value": "true"
-    },
-    {
-      "key": "notification_claims",
-      "label": "Notify when offer is claimed",
-      "value": "true"
-    },
-    {
-      "key": "default_currency",
-      "label": "Default currency",
-      "value": "KRW"
-    }
-  ]
-}
-```
-
-**Error Responses:**
-- `401 Unauthorized` - Invalid or missing BAT
-
----
-
-### 26. Update User Setting
-
-**Endpoint:** `PUT /users/me/settings/:key`
-
-**Description:** Updates a specific user setting.
-
-**Request Parameters:**
-- `key` (path) - The setting key
-
-**Request Headers:**
-```
-Authorization: Bearer <bat_token>
-```
-
-**Request Body:**
-```json
-{
-  "value": "false"
-}
-```
-
-**Response:** `200 OK`
-```json
-{
-  "key": "notification_offers",
-  "label": "Notify on new offers",
-  "value": "false",
-  "updatedAt": 1706313600
-}
-```
-
-**Error Responses:**
-- `400 Bad Request` - Invalid value
-- `401 Unauthorized` - Invalid or missing BAT
-- `404 Not Found` - Setting not found
-
----
-
 ## Platform Statistics
 
-### 27. Get Platform Stats
+### 25. Get Platform Stats
 
 **Endpoint:** `GET /stats`
 
@@ -1321,7 +1239,7 @@ Authorization: Bearer <bat_token>
 
 ---
 
-### 28. Get Platform Configuration
+### 26. Get Platform Configuration
 
 **Endpoint:** `GET /config`
 
@@ -1346,19 +1264,22 @@ Authorization: Bearer <bat_token>
 
 ## Socket.IO Real-time API
 
-OpenPleb uses Socket.IO for real-time updates. There are three types of socket connections:
+OpenPleb uses Socket.IO for real-time updates. There are three types of socket connections with different paths:
 
-1. **Unauthenticated** - Public updates for listed offers
-2. **BAT-authenticated** - Session-specific updates for authenticated users
-3. **Admin** - Full platform updates for administrators
+1. **Unauthenticated** (`/ws`) - Public updates for listed offers
+2. **BAT-authenticated** (`/wsba`) - Session-specific updates for authenticated users
+3. **Admin** (`/wsa`) - Full platform updates for administrators
 
 **Note:** BAT and unauthenticated connections can be active simultaneously on the same client.
 
 ### Connection Endpoint
 
-**Endpoint:** `https://api.openpleb.com`
+**Base URL:** `wss://api.openpleb.com`
 
-**Socket.IO Path:** `/socket.io/`
+**Socket.IO Paths:**
+- Unauthenticated: `/ws`
+- BAT-authenticated: `/wsba`
+- Admin: `/wsa`
 
 ---
 
@@ -1366,12 +1287,14 @@ OpenPleb uses Socket.IO for real-time updates. There are three types of socket c
 
 **Description:** Receives public updates for offers with status `INVOICE_PAID` (listed offers).
 
+**Path:** `/ws`
+
 **Connection:**
 ```javascript
 import { io } from 'socket.io-client';
 
-const socket = io('https://api.openpleb.com', {
-  path: '/socket.io/',
+const socket = io('wss://api.openpleb.com', {
+  path: '/ws',
   transports: ['websocket', 'polling']
 });
 ```
@@ -1454,12 +1377,14 @@ None - unauthenticated connections are read-only.
 
 **Description:** Receives session-specific updates for the authenticated user's offers and trades.
 
+**Path:** `/wsba`
+
 **Connection:**
 ```javascript
 import { io } from 'socket.io-client';
 
-const socket = io('https://api.openpleb.com', {
-  path: '/socket.io/',
+const socket = io('wss://api.openpleb.com', {
+  path: '/wsba',
   transports: ['websocket', 'polling'],
   auth: {
     token: 'cashuAeyJ0b2tlbiI6W3sicHJvb2ZzIjpb...'  // BAT token
@@ -1682,12 +1607,14 @@ socket.emit('offer:unsubscribe', { offerId: 456 });
 
 **Description:** Receives all platform updates for administrative monitoring and management.
 
+**Path:** `/wsa`
+
 **Connection:**
 ```javascript
 import { io } from 'socket.io-client';
 
-const socket = io('https://api.openpleb.com', {
-  path: '/socket.io/',
+const socket = io('wss://api.openpleb.com', {
+  path: '/wsa',
   transports: ['websocket', 'polling'],
   auth: {
     adminToken: 'admin_token_here'
