@@ -34,9 +34,6 @@ OpenPleb is a peer-to-peer fiat-to-bitcoin exchange platform. This API uses cryp
 - `POST /offers/:id/dispute/respond` - Respond to dispute (BAT required)
 - `POST /admin/offers/:id/resolve` - Resolve dispute (Admin)
 
-#### Reputation System
-- `POST /reputation/verify` - Verify reputation token
-
 #### Fiat Providers
 - `GET /fiat-providers` - List fiat providers
 - `POST /admin/fiat-providers` - Create fiat provider (Admin)
@@ -479,7 +476,7 @@ Authorization: Bearer <bat_token>
 - Maker must pay the invoice to make the offer publicly visible
 - Once paid, status changes to `INVOICE_PAID` and offer appears in public listings
 - BAT tokens are never included in responses to protect authentication credentials
-- The platform internally tracks which BAT is associated with each offer
+- The platform internally tracks which BAT is associated with each offer (session)
 - Only the user who created the offer can perform maker actions
 
 **Error Responses:**
@@ -492,9 +489,6 @@ Authorization: Bearer <bat_token>
 - The BAT is linked to the offer as the maker's authentication
 - Session validity is checked in the backend sessions table
 
----t having full admin access
-T
-
 ### 9. Get Offer
 
 **Endpoint:** `GET /offers/:id`
@@ -505,6 +499,7 @@ T
 - `id` (path) - The offer ID
 
 **Request Headers (Optional):**
+
 ```
 Authorization: Bearer <bat_token>
 ```
@@ -658,7 +653,9 @@ Authorization: Bearer <bat_token>
 
 **Endpoint:** `POST /offers/:id/pay`
 
-**Description:** Confirms payment of the bond/escrow invoice. Requires session authentication.
+**Description:** Confirms payment of the bond/escrow invoice using Cashu tokens. Requires session authentication.
+
+**Payment Method:** For the first version, payment is done **in-band via Cashu token only**. Lightning invoice payment will be supported in future versions.
 
 **Request Parameters:**
 - `id` (path) - The offer ID
@@ -672,7 +669,7 @@ Authorization: Bearer <bat_token>
 ```json
 {
   "role": "maker",  // "maker" or "taker"
-  "paymentHash": "a1b2c3d4e5f6..."
+  "cashuToken": "cashuAeyJ0b2tlbiI6W3sicHJvb2ZzIjpb..."  // Cashu token for payment
 }
 ```
 
@@ -687,10 +684,16 @@ Authorization: Bearer <bat_token>
 ```
 
 **Error Responses:**
-- `400 Bad Request` - Invalid payment
+- `400 Bad Request` - Invalid payment or Cashu token
 - `401 Unauthorized` - Invalid or missing BAT
 - `403 Forbidden` - BAT not associated with this offer
 - `404 Not Found` - Offer not found
+- `422 Unprocessable Entity` - Cashu token amount insufficient or invalid
+
+**Notes:**
+- The Cashu token must have sufficient value to cover the bond/escrow amount
+- The backend verifies and melts the Cashu token upon receipt
+- Future versions will support out-of-band Lightning invoice payment
 
 ---
 
@@ -788,7 +791,7 @@ Authorization: Bearer <bat_token>
 
 **Endpoint:** `POST /offers/:id/issue`
 
-**Description:** Marks an offer as having an issue (maker). Requires session authentication.
+**Description:** Marks an offer as having an issue (maker). Requires session authentication. **Important:** Marking an issue reveals your pubkey to the platform.
 
 **Request Parameters:**
 - `id` (path) - The offer ID
@@ -801,7 +804,9 @@ Authorization: Bearer <bat_token>
 **Request Body:**
 ```json
 {
-  "reason": "Payment not received after 2 hours"
+  "pubkey": "02a1b2c3d4e5f6...",  // Maker's public key (hex-encoded)
+  "reason": "Payment not received after 2 hours",
+  "evidence": "data:image/png;base64,..."  // Optional evidence
 }
 ```
 
@@ -810,6 +815,7 @@ Authorization: Bearer <bat_token>
 {
   "offerId": 456,
   "status": "MARKED_WITH_ISSUE",
+  "makerFeedback": "Payment not received after 2 hours",
   "updatedAt": 1706314400
 }
 ```
@@ -820,13 +826,18 @@ Authorization: Bearer <bat_token>
 - `403 Forbidden` - BAT is not the maker of this offer
 - `404 Not Found` - Offer not found
 
+**Notes:**
+- **Privacy Warning:** Marking an issue requires revealing your pubkey to the platform
+- Your pubkey will be linked to this offer and used to lock ecash refunds/rewards after settlement
+- This allows the taker to respond by either forfeiting or escalating to dispute
+
 ---
 
-### 16. Dispute Offer
+### 16. Respond to Issue (Taker)
 
-**Endpoint:** `POST /offers/:id/dispute`
+**Endpoint:** `POST /offers/:id/issue/respond`
 
-**Description:** Initiates a dispute on an offer. Requires session authentication. **Important:** Initiating a dispute reveals your pubkey to the platform.
+**Description:** Responds to a marked issue (taker). Can either forfeit or escalate to dispute. Requires session authentication. **Important:** Responding reveals your pubkey to the platform.
 
 **Request Parameters:**
 - `id` (path) - The offer ID
@@ -836,15 +847,36 @@ Authorization: Bearer <bat_token>
 Authorization: Bearer <bat_token>
 ```
 
-**Request Body:**
+**Request Body (Forfeit):**
 ```json
 {
+  "pubkey": "02b2c3d4e5f6a7...",  // Taker's public key (hex-encoded)
+  "response": "FORFEIT"
+}
+```
+
+**Request Body (Escalate to Dispute):**
+```json
+{
+  "pubkey": "02b2c3d4e5f6a7...",  // Taker's public key (hex-encoded)
+  "response": "DISPUTE",
   "reason": "Payment was sent but not acknowledged",
   "evidence": "data:image/png;base64,..."  // Optional additional evidence
 }
 ```
 
-**Response:** `200 OK`
+**Response (Forfeit):** `200 OK`
+```json
+{
+  "offerId": 456,
+  "status": "RESOLVED",
+  "resolution": "MAKER_WINS",
+  "makerRefundToken": "cashuAeyJ0b2tlbiI6W3sicHJvb2ZzIjpb...",
+  "updatedAt": 1706314600
+}
+```
+
+**Response (Dispute):** `200 OK`
 ```json
 {
   "offerId": 456,
@@ -855,25 +887,26 @@ Authorization: Bearer <bat_token>
 ```
 
 **Error Responses:**
-- `400 Bad Request` - Invalid request
+- `400 Bad Request` - Invalid response
 - `401 Unauthorized` - Invalid or missing BAT
-- `403 Forbidden` - BAT is not associated with this offer
+- `403 Forbidden` - BAT is not the taker of this offer
 - `404 Not Found` - Offer not found
-- `409 Conflict` - Offer cannot be disputed in current status
+- `409 Conflict` - Offer is not in "MARKED_WITH_ISSUE" status
 
 **Notes:**
-- **Privacy Warning:** Initiating a dispute requires revealing your pubkey to the platform
-- Your pubkey will be linked to this dispute and used to lock ecash refunds/rewards after settlement
+- **Privacy Warning:** Responding requires revealing your pubkey to the platform
+- Your pubkey will be linked to this offer and used to lock ecash refunds/rewards after settlement
+- If you forfeit, the maker wins automatically and receives refunds
+- If you escalate to dispute, an admin must resolve the dispute
 - Dispute stats (wins/losses) will be associated with your pubkey
-- This is necessary for dispute resolution and preventing abuse
 
 ---
 
-### 17. Respond to Dispute
+### 17. Respond to Dispute (Maker)
 
 **Endpoint:** `POST /offers/:id/dispute/respond`
 
-**Description:** Responds to a dispute (forfeit or counter). Requires session authentication.
+**Description:** Responds to a dispute (maker). Can either forfeit or provide counter-evidence. Requires session authentication.
 
 **Request Parameters:**
 - `id` (path) - The offer ID
@@ -883,19 +916,38 @@ Authorization: Bearer <bat_token>
 Authorization: Bearer <bat_token>
 ```
 
-**Request Body:**
+**Request Body (Forfeit):**
 ```json
 {
-  "response": "COUNTER",  // "FORFEIT" or "COUNTER"
-  "counterEvidence": "data:image/png;base64,..."  // Required if COUNTER
+  "response": "FORFEIT"
 }
 ```
 
-**Response:** `200 OK`
+**Request Body (Counter-Evidence):**
+```json
+{
+  "response": "COUNTER",
+  "counterEvidence": "data:image/png;base64,..."  // Counter-evidence
+}
+```
+
+**Response (Forfeit):** `200 OK`
+```json
+{
+  "offerId": 456,
+  "status": "RESOLVED",
+  "resolution": "TAKER_WINS",
+  "takerRewardToken": "cashuAeyJ0b2tlbiI6W3sicHJvb2ZzIjpb...",
+  "updatedAt": 1706314800
+}
+```
+
+**Response (Counter):** `200 OK`
 ```json
 {
   "offerId": 456,
   "status": "DISPUTED",
+  "makerCounterEvidence": "data:image/png;base64,...",
   "updatedAt": 1706314800
 }
 ```
@@ -903,9 +955,14 @@ Authorization: Bearer <bat_token>
 **Error Responses:**
 - `400 Bad Request` - Invalid response
 - `401 Unauthorized` - Invalid or missing BAT
-- `403 Forbidden` - BAT is not associated with this offer
+- `403 Forbidden` - BAT is not the maker of this offer
 - `404 Not Found` - Offer not found
 - `409 Conflict` - Offer is not in disputed status
+
+**Notes:**
+- If maker forfeits, the taker wins automatically and receives rewards
+- If maker provides counter-evidence, the dispute remains open for admin resolution
+- Maker's pubkey was already revealed when marking the issue
 
 ---
 
@@ -958,46 +1015,9 @@ Authorization: Bearer <admin_token>
 
 ---
 
-## Reputation System
-
-### 19. Verify Reputation Token
-
-**Endpoint:** `POST /reputation/verify`
-
-**Description:** Verifies a reputation token and returns its value.
-
-**Request Body:**
-```json
-{
-  "reputationToken": "cashuAeyJ0b2tlbiI6W3sicHJvb2ZzIjpb..."
-}
-```
-
-**Response:** `200 OK`
-```json
-{
-  "valid": true,
-  "reputationValue": 1,
-  "issuedAt": 1706314200,
-  "mintUrl": "https://mint.openpleb.com"
-}
-```
-
-**Error Responses:**
-- `400 Bad Request` - Invalid token format
-- `404 Not Found` - Token not found or already spent
-
-**Notes:**
-- Reputation tokens are ecash tokens with "reputation" as backing value
-- Each successful trade completion earns 1 reputation point
-- Tokens can be combined or split like regular ecash
-- Reputation value represents number of successful trades completed
-
----
-
 ## Fiat Providers
 
-### 20. List Fiat Providers
+### 19. List Fiat Providers
 
 **Endpoint:** `GET /fiat-providers`
 
@@ -1027,7 +1047,7 @@ Authorization: Bearer <admin_token>
 
 ---
 
-### 21. Create Fiat Provider (Admin)
+### 20. Create Fiat Provider (Admin)
 
 **Endpoint:** `POST /admin/fiat-providers`
 
@@ -1065,7 +1085,7 @@ Authorization: Bearer <admin_token>
 
 ---
 
-### 22. Update Fiat Provider (Admin)
+### 21. Update Fiat Provider (Admin)
 
 **Endpoint:** `PATCH /admin/fiat-providers/:id`
 
@@ -1106,7 +1126,7 @@ Authorization: Bearer <admin_token>
 
 ---
 
-### 23. Delete Fiat Provider (Admin)
+### 22. Delete Fiat Provider (Admin)
 
 **Endpoint:** `DELETE /admin/fiat-providers/:id`
 
@@ -1132,7 +1152,7 @@ Authorization: Bearer <admin_token>
 
 ## Push Notifications
 
-### 24. Subscribe to Notifications
+### 23. Subscribe to Notifications
 
 **Endpoint:** `POST /notifications/subscribe`
 
@@ -1172,7 +1192,7 @@ Authorization: Bearer <bat_token>
 
 ---
 
-### 25. Unsubscribe from Notifications
+### 24. Unsubscribe from Notifications
 
 **Endpoint:** `DELETE /notifications/subscribe`
 
@@ -1200,7 +1220,7 @@ Authorization: Bearer <bat_token>
 
 ## User Settings
 
-### 26. Get User Settings
+### 25. Get User Settings
 
 **Endpoint:** `GET /users/me/settings`
 
@@ -1239,7 +1259,7 @@ Authorization: Bearer <bat_token>
 
 ---
 
-### 27. Update User Setting
+### 26. Update User Setting
 
 **Endpoint:** `PUT /users/me/settings/:key`
 
@@ -1279,7 +1299,7 @@ Authorization: Bearer <bat_token>
 
 ## Platform Statistics
 
-### 28. Get Platform Stats
+### 27. Get Platform Stats
 
 **Endpoint:** `GET /stats`
 
@@ -1301,7 +1321,7 @@ Authorization: Bearer <bat_token>
 
 ---
 
-### 29. Get Platform Configuration
+### 28. Get Platform Configuration
 
 **Endpoint:** `GET /config`
 
@@ -1981,6 +2001,8 @@ The API uses URL versioning. The current version is `v1`. Breaking changes will 
     - Staked reputation demonstrates trustworthiness and commitment
     - Staked reputation is returned upon successful completion along with new reputation
     - Traditional trade stats are not available due to blinded interactions
+    - **Reputation token verification and burning is a backend internal operation** (not exposed as API endpoint)
+    - Backend verifies and burns staked reputation tokens, then issues new ones after successful completion
 13. **Dispute Privacy Trade-off:**
     - Initiating a dispute requires revealing your pubkey to the platform
     - Pubkeys are used to lock ecash refunds/rewards after dispute settlement
