@@ -538,6 +538,125 @@ Offer status: RESOLVED
 
 ---
 
+## Server Architecture
+
+### Separate API Instances
+
+OpenPleb runs **two separate Elysia.js/Bun server instances** on different ports:
+
+1. **Public API Server** (Port 3000)
+   - User-facing endpoints
+   - Public offer listings
+   - Session management
+   - Offer creation and trading
+   - Socket.IO connections (`/ws`, `/wsba`)
+
+2. **Admin API Server** (Port 3001)
+   - Administrative endpoints only
+   - Invite code generation
+   - User management
+   - Dispute resolution
+   - Fiat provider management
+   - Admin Socket.IO connection (`/wsa`)
+   - OIDC API endpoints (for Cashu mint integration)
+
+#### Benefits of Separation
+
+1. **Network Isolation**
+   - Backend operators can expose admin API to specific networks only
+   - Admin API can be bound to localhost or internal network
+   - Public API exposed to the internet
+   - Firewall rules can restrict admin API access
+
+2. **Security**
+   - Admin endpoints not accessible from public internet
+   - Reduced attack surface for administrative functions
+   - Separate authentication mechanisms
+   - Independent rate limiting
+
+3. **Operational Flexibility**
+   - Admin API can be deployed on separate infrastructure
+   - Different scaling strategies for public vs admin
+   - Independent monitoring and logging
+   - Easier to implement IP whitelisting for admin access
+
+#### Example Configuration
+
+```typescript
+// Public API Server (port 3000)
+const publicApp = new Elysia()
+  .use(cors())
+  .use(rateLimit({ /* public limits */ }))
+  .get('/api/v1/offers', getOffers)
+  .post('/api/v1/offers', createOffer)
+  // ... other public endpoints
+  .listen(3000);
+
+// Admin API Server (port 3001)
+const adminApp = new Elysia()
+  .use(adminAuth) // Admin-only authentication
+  .use(rateLimit({ /* admin limits */ }))
+  .post('/admin/v1/invite-codes', generateInviteCode)
+  .patch('/admin/v1/users/:id/status', updateUserStatus)
+  .post('/admin/v1/offers/:id/resolve', resolveDispute)
+  // ... other admin endpoints
+  .listen({ 
+    port: 3001,
+    hostname: '127.0.0.1' // Bind to localhost only
+  });
+```
+
+#### Network Configuration Examples
+
+**Development:**
+```bash
+# Both servers accessible locally
+PUBLIC_API_HOST=0.0.0.0
+PUBLIC_API_PORT=3000
+ADMIN_API_HOST=127.0.0.1
+ADMIN_API_PORT=3001
+```
+
+**Production:**
+```bash
+# Public API exposed to internet
+PUBLIC_API_HOST=0.0.0.0
+PUBLIC_API_PORT=3000
+
+# Admin API only on internal network
+ADMIN_API_HOST=10.0.1.100  # Internal IP
+ADMIN_API_PORT=3001
+```
+
+**With Reverse Proxy:**
+```nginx
+# Public API - accessible from internet
+server {
+  listen 443 ssl;
+  server_name api.openpleb.com;
+  
+  location /api/v1 {
+    proxy_pass http://localhost:3000;
+  }
+}
+
+# Admin API - VPN or internal network only
+server {
+  listen 443 ssl;
+  server_name admin-api.openpleb.internal;
+  
+  # IP whitelist
+  allow 10.0.0.0/8;
+  deny all;
+  
+  location /admin/v1 {
+    proxy_pass http://localhost:3001;
+  }
+}
+```
+
+---
+
 ## Deployment Architecture
 
 ### Recommended Setup
@@ -596,6 +715,10 @@ WALLET_CLEANUP_INTERVAL=3600000  # 1 hour in ms
 # API
 API_PORT=3000
 API_BASE_PATH=/api/v1
+
+# Admin API (Separate Port)
+ADMIN_API_PORT=3001
+ADMIN_API_BASE_PATH=/admin/v1
 
 # Security
 SESSION_EXPIRY=3600  # 1 hour in seconds (maximum)

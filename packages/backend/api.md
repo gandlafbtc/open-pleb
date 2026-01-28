@@ -159,11 +159,46 @@ The signature is created by:
 
 **Note:** All other operations use BAT authentication. OIDC is handled externally by nostr-oidc and the Cashu mint.
 
-## Base URL
+## Base URLs
 
+OpenPleb runs **two separate API servers** on different ports for security and network isolation:
+
+### Public API
 ```
 https://api.openpleb.com/api/v1
 ```
+
+**Endpoints:**
+- User registration
+- Session management
+- Offer management (create, claim, trade)
+- Fiat providers (read-only)
+- Platform statistics
+- Public offer listings
+
+**Socket.IO:** `/ws` (unauthenticated), `/wsba` (BAT-authenticated)
+
+### Admin API
+```
+https://admin-api.openpleb.com/admin/v1
+```
+
+**Endpoints:**
+- Invite code generation
+- User management
+- Dispute resolution
+- Fiat provider management (create, update, delete)
+- OIDC API (for Cashu mint integration)
+
+**Socket.IO:** `/wsa` (admin-authenticated)
+
+**Note:** The admin API runs on a **separate port** (default: 3001) and can be configured to:
+- Bind to localhost only (`127.0.0.1`)
+- Bind to internal network IP (e.g., `10.0.1.100`)
+- Be accessible only via VPN or internal network
+- Use IP whitelisting for additional security
+
+This separation allows backend operators to make decisions about exposing admin APIs to specific networks while keeping the public API accessible to all users.
 
 ---
 
@@ -1780,10 +1815,13 @@ Clients can maintain both unauthenticated and BAT-authenticated connections simu
 
 ```javascript
 // Public updates
-const publicSocket = io('https://api.openpleb.com');
+const publicSocket = io('wss://api.openpleb.com', {
+  path: '/ws'
+});
 
 // Authenticated updates
-const authSocket = io('https://api.openpleb.com', {
+const authSocket = io('wss://api.openpleb.com', {
+  path: '/wsba',
   auth: { token: batToken }
 });
 ```
