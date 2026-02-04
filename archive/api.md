@@ -11,7 +11,6 @@ OpenPleb is a peer-to-peer fiat-to-bitcoin exchange platform. This API uses cryp
 ### REST API Endpoints
 
 #### User Registration & Authentication
-- `GET /oidc-api/pubkey/:pubkey` - Check if pubkey is registered (OIDC API only)
 - `POST /admin/invite-codes` - Generate invite code (Admin)
 - `GET /invite-codes/:code/validate` - Validate invite code
 - `POST /users/register` - Register new user
@@ -52,7 +51,15 @@ OpenPleb is a peer-to-peer fiat-to-bitcoin exchange platform. This API uses cryp
 
 ### Socket.IO Events
 
-#### Unauthenticated Connection (Public)
+OpenPleb uses a **single WebSocket connection** with internal authentication handling. All clients connect to the same endpoint and authenticate after connection to access different levels of functionality.
+
+#### Connection Levels
+
+1. **Unauthenticated** - Public updates (default after connection)
+2. **BAT-Authenticated** - Session-specific updates (after `auth:bat` event)
+3. **Admin-Authenticated** - Full platform updates (after `auth:admin` event)
+
+#### Public Events (No Authentication Required)
 
 **Events Received:**
 - `offer:created` - New public offer available
@@ -62,11 +69,13 @@ OpenPleb is a peer-to-peer fiat-to-bitcoin exchange platform. This API uses cryp
 - `stats:updated` - Platform statistics updated
 
 **Events Emitted:**
-- None (read-only)
+- `auth:bat` - Authenticate with BAT token
+- `auth:admin` - Authenticate as admin
 
-#### BAT-Authenticated Connection
+#### BAT-Authenticated Events (After `auth:bat`)
 
 **Events Received:**
+- All public events, plus:
 - `session:authenticated` - Session authenticated successfully
 - `session:error` - Session authentication error
 - `offer:maker:created` - Maker created offer
@@ -85,11 +94,12 @@ OpenPleb is a peer-to-peer fiat-to-bitcoin exchange platform. This API uses cryp
 **Events Emitted:**
 - `offer:subscribe` - Subscribe to offer updates
 - `offer:unsubscribe` - Unsubscribe from offer updates
+- `auth:logout` - Logout and return to unauthenticated state
 
-#### Admin Connection
+#### Admin Events (After `auth:admin`)
 
 **Events Received:**
-- All unauthenticated and BAT-authenticated events, plus:
+- All public and BAT-authenticated events, plus:
 - `admin:authenticated` - Admin authenticated
 - `admin:user:registered` - New user registered
 - `admin:offer:all` - All offer state changes
@@ -101,6 +111,7 @@ OpenPleb is a peer-to-peer fiat-to-bitcoin exchange platform. This API uses cryp
 - `admin:offer:subscribe:all` - Subscribe to all offers
 - `admin:offer:unsubscribe:all` - Unsubscribe from all offers
 - `admin:user:subscribe` - Subscribe to user updates
+- `auth:logout` - Logout and return to unauthenticated state
 
 ---
 
@@ -176,7 +187,7 @@ https://api.openpleb.com/api/v1
 - Platform statistics
 - Public offer listings
 
-**Socket.IO:** `/ws` (unauthenticated), `/wsba` (BAT-authenticated)
+**Socket.IO:** `/ws` (single connection with internal authentication)
 
 ### Admin API
 ```
@@ -190,7 +201,7 @@ https://admin-api.openpleb.com/admin/v1
 - Fiat provider management (create, update, delete)
 - OIDC API (for Cashu mint integration)
 
-**Socket.IO:** `/wsa` (admin-authenticated)
+**Socket.IO:** `/wsa` (separate endpoint for network isolation)
 
 **Note:** The admin API runs on a **separate port** (default: 3001) and can be configured to:
 - Bind to localhost only (`127.0.0.1`)
@@ -204,60 +215,20 @@ This separation allows backend operators to make decisions about exposing admin 
 
 ## Admin Roles
 
-OpenPleb has two distinct admin roles:
+OpenPleb has a single admin role:
 
-1. **`admin`** - Full administrative access
-   - Generate invite codes
-   - Manage fiat providers
-   - Resolve disputes
-   - Update user status
-   - All platform management operations
-
-2. **`oidc-api`** - Limited API access for OIDC integration
-   - Check if pubkey is registered
-   - Used by the Cashu mint for OIDC authentication flow
-   - Cannot perform other administrative operations
+**`admin`** - Full administrative access
+- Generate invite codes
+- Manage fiat providers
+- Resolve disputes
+- Update user status
+- All platform management operations
 
 ---
 
 ## User Registration & Authentication
 
-### 1. Check Pubkey Registration (OIDC API)
-
-**Endpoint:** `GET /oidc-api/pubkey/:pubkey`
-
-**Description:** Checks if a pubkey is registered (OIDC API role only). Used by the Cashu mint during OIDC authentication.
-
-**Request Parameters:**
-- `pubkey` (path) - The public key to check (hex-encoded)
-
-**Request Headers:**
-```
-Authorization: Bearer <oidc_api_token>
-```
-
-**Response:** `200 OK`
-```json
-{
-  "registered": true,
-  "userId": "550e8400-e29b-41d4-a716-446655440000",
-  "isActive": true
-}
-```
-
-**Error Responses:**
-- `401 Unauthorized` - Invalid or missing OIDC API token
-- `403 Forbidden` - Insufficient permissions (not oidc-api role)
-- `404 Not Found` - Pubkey not registered
-
-**Notes:**
-- This endpoint is specifically for the OIDC integration with the Cashu mint
-- Only accessible by admins with the `oidc-api` role
-- Returns minimal information for privacy
-
----
-
-### 2. Generate Invite Code (Admin Only)
+### 1. Generate Invite Code (Admin Only)
 
 **Endpoint:** `POST /admin/invite-codes`
 
@@ -290,7 +261,7 @@ Authorization: Bearer <admin_token>
 
 ---
 
-### 3. Validate Invite Code
+### 2. Validate Invite Code
 
 **Endpoint:** `GET /invite-codes/:code/validate`
 
@@ -313,7 +284,7 @@ Authorization: Bearer <admin_token>
 
 ---
 
-### 4. Register User
+### 3. Register User
 
 **Endpoint:** `POST /users/register`
 
@@ -1299,22 +1270,18 @@ Authorization: Bearer <bat_token>
 
 ## Socket.IO Real-time API
 
-OpenPleb uses Socket.IO for real-time updates. There are three types of socket connections with different paths:
-
-1. **Unauthenticated** (`/ws`) - Public updates for listed offers
-2. **BAT-authenticated** (`/wsba`) - Session-specific updates for authenticated users
-3. **Admin** (`/wsa`) - Full platform updates for administrators
-
-**Note:** BAT and unauthenticated connections can be active simultaneously on the same client.
+OpenPleb uses Socket.IO for real-time updates with a **single WebSocket connection** that supports internal authentication. All clients connect to the same endpoint and can authenticate after connection to access different levels of functionality.
 
 ### Connection Endpoint
 
 **Base URL:** `wss://api.openpleb.com`
 
-**Socket.IO Paths:**
-- Unauthenticated: `/ws`
-- BAT-authenticated: `/wsba`
-- Admin: `/wsa`
+**Socket.IO Path:** `/ws` (single endpoint for all connection types)
+
+**Authentication Levels:**
+1. **Unauthenticated** (default) - Public updates for listed offers
+2. **BAT-authenticated** - Session-specific updates (authenticate via `auth:bat` event)
+3. **Admin-authenticated** - Full platform updates (authenticate via `auth:admin` event)
 
 ---
 
@@ -1410,25 +1377,27 @@ None - unauthenticated connections are read-only.
 
 ### 2. BAT-Authenticated Connection
 
-**Description:** Receives session-specific updates for the authenticated user's offers and trades.
+**Description:** Receives session-specific updates for the authenticated user's offers and trades. Authenticate after connecting by emitting the `auth:bat` event.
 
-**Path:** `/wsba`
+**Path:** `/ws` (same as unauthenticated)
 
 **Connection:**
 ```javascript
 import { io } from 'socket.io-client';
 
 const socket = io('wss://api.openpleb.com', {
-  path: '/wsba',
-  transports: ['websocket', 'polling'],
-  auth: {
-    token: 'cashuAeyJ0b2tlbiI6W3sicHJvb2ZzIjpb...'  // BAT token
-  }
+  path: '/ws',
+  transports: ['websocket', 'polling']
+});
+
+// Authenticate after connection
+socket.emit('auth:bat', {
+  token: 'cashuAeyJ0b2tlbiI6W3sicHJvb2ZzIjpb...'  // BAT token
 });
 ```
 
 **Authentication:**
-The BAT token is verified with the Cashu mint upon connection. If invalid, the connection is rejected.
+The BAT token is verified with the Cashu mint when the `auth:bat` event is received. If invalid, a `session:error` event is emitted.
 
 **Events Received:**
 
@@ -1642,13 +1611,13 @@ socket.emit('offer:unsubscribe', { offerId: 456 });
 
 **Description:** Receives all platform updates for administrative monitoring and management.
 
-**Path:** `/wsa`
+**Path:** `/wsa` (separate endpoint for network isolation)
 
 **Connection:**
 ```javascript
 import { io } from 'socket.io-client';
 
-const socket = io('wss://api.openpleb.com', {
+const socket = io('wss://admin-api.openpleb.com', {
   path: '/wsa',
   transports: ['websocket', 'polling'],
   auth: {

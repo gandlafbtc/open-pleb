@@ -45,7 +45,8 @@
     },
     "utils": {
       "dotenv": "^17.2.3",
-      "@logtape/logtape": "^2.0.2"
+      "@logtape/logtape": "^2.0.2",
+      "@logtape/file": "^2.0.2"
     },
     "crypto": {
       "@noble/curves": "^2.0.1",
@@ -54,8 +55,9 @@
       "@scure/bip39": "^2.0.1"
     },
     "cashu": {
-    "coco-cashu-core": "1.1.2-rc.42",
-    "coco-cashu-sqlite3": "1.1.2-rc.42"
+      "coco-cashu-core": "1.1.2-rc.42",
+      "coco-cashu-sqlite3": "1.1.2-rc.42",
+      "coco-cashu-indexeddb": "^1.0.0-rc11"
     },
     "server": {
       "@elysiajs/cookie": "^0.8.0",
@@ -73,7 +75,8 @@
       "@negrel/webpush": "npm:@jsr/negrel__webpush",
       "@std/encoding": "npm:@jsr/std__encoding@0.224.0/base64url",
       "postgres": "^3.4.8",
-      "socket.io": "^4.8.3"
+      "socket.io": "^4.8.3",
+      "@socket.io/bun-engine": "^0.1.0"
     }
   }
 }

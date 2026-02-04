@@ -1,4 +1,4 @@
-# @mnt/common
+# common
 
 To install dependencies:
 

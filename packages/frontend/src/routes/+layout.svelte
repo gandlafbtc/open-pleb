@@ -3,8 +3,13 @@
 	import { locales, localizeHref } from '$lib/paraglide/runtime';
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
-  import { ModeWatcher } from "mode-watcher";
-
+  	import { ModeWatcher } from "mode-watcher";
+	import { onMount } from 'svelte';
+	import { init } from '$lib/app/init';
+	
+	onMount(async ()=> {
+		await init()
+	})
 	let { children } = $props();
 </script>
 

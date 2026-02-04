@@ -62,7 +62,6 @@ Each user session has its own isolated Cashu wallet to ensure:
 ##### Session Wallet Manager
 
 ```typescript
-import { CocoCashu } from 'coco-cashu';
 import path from 'path';
 import fs from 'fs/promises';
 

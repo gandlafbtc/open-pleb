@@ -1,5 +1,5 @@
 {
-  "name": "@openPleb/common",
+  "name": "common",
   "module": "index.ts",
   "type": "module",
   "scripts": {
@@ -29,6 +29,7 @@
     "./db/schema": "./src/db/schema.ts",
     "./db/types": "./src/db/types.ts",
     "./types": "./src/types.ts",
+    "./ws-types": "./src/ws-types.ts",
     "./errors": "./src/errors.ts",
     "./conversion": "./src/conversion.ts",
     "./lnurl": "./src/lnurl.ts",
