@@ -7,7 +7,7 @@
     "start": "bun run src/index.ts"
   },
   "dependencies": {
-    "@sinclair/typebox": "^0.34.48",
+    "@sinclair/typebox": "catalog:validation",
     "common": "workspace:*",
     "elysia": "catalog:server",
     "@elysiajs/cookie": "catalog:server",
@@ -20,7 +20,6 @@
     "@node-rs/argon2": "catalog:server",
     "@oslojs/crypto": "catalog:server",
     "@oslojs/encoding": "catalog:server",
-    "socket.io": "catalog:server",
     "postgres": "catalog:server",
     "drizzle-orm": "catalog:db",
     "@logtape/logtape": "catalog:utils",

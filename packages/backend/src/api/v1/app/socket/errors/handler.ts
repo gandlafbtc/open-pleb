@@ -32,7 +32,7 @@ export class WSErrorHandler {
 
 		try {
 			ws.send(JSON.stringify(response));
-			log.error`WebSocket error [${code}]: ${error.message}`;
+			log.error(`WebSocket error [${code}]: ${error.message} ${requestType}`);
 		} catch (sendError) {
 			log.error`Failed to send error response: ${sendError}`;
 		}

@@ -63,7 +63,7 @@ export const v1WS = new Elysia()
           typeof message.type === 'string' 
             ? message.type 
             : undefined;
-            
+        log.error("{message}", {message})
         WSErrorHandler.send(
           ws as any, // Type compatibility with existing error handler
           error instanceof Error ? error : new Error(String(error)),
