@@ -47,7 +47,7 @@
     <div bind:this={container} class="w-20 h-20 lottie-container">
       <canvas class=""></canvas>
     </div>
-    <p class="font-bold text-xl text-center text-[#b6ff00]">
+    <p class="font-bold text-xl text-center dark:text-[#b6ff00]">
       OPENPLEB
     </p>
   </div>
@@ -60,7 +60,7 @@
     height: 100%;
   }
   
-  .lottie-container canvas {
+  :global(.dark) .lottie-container canvas {
     filter: brightness(0) saturate(100%) invert(88%) sepia(73%) saturate(1352%) hue-rotate(25deg) brightness(104%) contrast(106%);
   }
 </style>
