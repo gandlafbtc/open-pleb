@@ -27,7 +27,7 @@
       setTimeout(() => {
         visible = false;
         onComplete();
-      }, 500); // Match this with the CSS transition duration
+      }, 200); // Match this with the CSS transition duration
     });
 
     return () => {
@@ -38,14 +38,20 @@
 
 {#if visible}
   <div 
-    class="fixed inset-0 z-50 flex items-center justify-center bg-background transition-opacity duration-500"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-background transition-opacity duration-200"
     class:opacity-0={fadeOut}
     class:opacity-100={!fadeOut}
   >
-    <div bind:this={container} class="w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 lottie-container">
-      <canvas class="opacity-65"></canvas>
+  <div class="flex flex-col gap-5 items-center">
+
+    <div bind:this={container} class="w-20 h-20 lottie-container">
+      <canvas class=""></canvas>
     </div>
+    <p class="font-bold text-xl text-center text-[#b6ff00]">
+      OPENPLEB
+    </p>
   </div>
+</div>
 {/if}
 
 <style>
