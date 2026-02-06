@@ -2,10 +2,12 @@
 	import { page } from '$app/state';
 	import { locales, localizeHref } from '$lib/paraglide/runtime';
 	import './layout.css';
-	import favicon from '$lib/assets/favicon.svg';
   	import { ModeWatcher } from "mode-watcher";
 	import { onMount } from 'svelte';
 	import { init } from '$lib/app/init';
+	import { localstore } from '$lib/state/persistent/local/localstore.svelte';
+	import Onboarding from '$lib/elements/Onboarding.svelte';
+	import SplashScreen from '$lib/components/SplashScreen.svelte';
 	
 	onMount(async ()=> {
 		await init()
@@ -13,10 +15,16 @@
 	let { children } = $props();
 </script>
 
-<svelte:head><link rel="icon" href={favicon} /></svelte:head>
+<svelte:head><link rel="icon" href='/logo/logo-mark-prim.svg' /></svelte:head>
 <ModeWatcher />
+<SplashScreen></SplashScreen>
 
+{#if localstore.isOnboarded}
 {@render children()}
+{:else}
+<Onboarding></Onboarding>
+{/if}
+
 <div style="display:none">
 	{#each locales as locale}
 		<a href={localizeHref(page.url.pathname, { locale })}>

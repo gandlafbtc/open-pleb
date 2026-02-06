@@ -109,6 +109,7 @@
         "@eslint/js": "catalog:sveltekit-dev",
         "@inlang/paraglide-js": "catalog:sveltekit-dev",
         "@internationalized/date": "catalog:ui",
+        "@lottiefiles/dotlottie-web": "catalog:ui",
         "@lucide/svelte": "catalog:ui",
         "@sveltejs/adapter-auto": "catalog:sveltekit-dev",
         "@sveltejs/kit": "catalog:sveltekit-dev",

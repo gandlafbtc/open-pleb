@@ -4,10 +4,6 @@ import type { ServerWebSocket } from "bun";
 import type { WSData } from "../types";
 import { AuthCheckFn, AuthChecks } from "./auth-checks";
 
-export interface AuthData {
-	bat?: string;
-	jwt?: string;
-}
 
 interface Room {
 	id: string;
@@ -43,7 +39,7 @@ export class RoomManager {
 		log.info(`Room created: ${id} (${type})`);
 	}
 
-	async subscribe(ws: ServerWebSocket<WSData>, roomId: string, auth?: AuthData): Promise<void> {
+	async subscribe(ws: ServerWebSocket<WSData>, roomId: string, auth: {bat?: string}): Promise<void> {
 		// Get or create room
 		let room = this.rooms.get(roomId);
 		

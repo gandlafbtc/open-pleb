@@ -12,7 +12,7 @@ export const handleSubscribe: CommandHandler = async (ws, message, roomManager) 
 	}
 
 	try {
-		await roomManager.subscribe(ws, data.room, message.auth);
+		await roomManager.subscribe(ws, data.room, message.auth as {bat: string});
 		
 		// Send success response
 		ws.send(JSON.stringify({

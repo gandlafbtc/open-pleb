@@ -4,7 +4,7 @@
 
   let { onComplete = () => {} }: { onComplete?: () => void } = $props();
   
-  let container: HTMLDivElement|undefined = $state();
+  let container: HTMLDivElement|undefined = $state()
   let visible = $state(true);
   let fadeOut = $state(false);
 
