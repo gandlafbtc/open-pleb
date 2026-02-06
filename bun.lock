@@ -78,6 +78,7 @@
       "devDependencies": {
         "bun-types": "latest",
         "drizzle-kit": "catalog:db",
+        "eslint": "^9.39.2",
       },
     },
     "packages/common": {

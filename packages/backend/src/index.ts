@@ -5,11 +5,10 @@ import { afterInit, init } from "./server/init";
 import { corsConfig, rateLimiter, swaggerDocs } from "./server/serverConfig";
 import { v1Open } from "./api/v1/app/rest/v1";
 import { v1WS } from "./api/v1/app/socket/v1";
-
 // pre-server start initialize
 await init();
 
-log.info`Starting OpenPleb version ${version}...`;
+log.info(`Starting OpenPleb version ${version}...`);
 
 const app = new Elysia()
 	.use(apiLogger)
@@ -22,6 +21,8 @@ const app = new Elysia()
 	.use(v1WS)
 	.listen(Bun.env.OPENPLEB_PORT!);
 
-log.info`OpenPleb 🚶 is running at ${app.server?.hostname}:${app.server?.port}`;
+log.info(`OpenPleb 🚶 is running at ${app.server?.hostname}:${app.server?.port}`);
 
 afterInit();
+
+

@@ -1,10 +1,11 @@
 import { RoomIds } from "common/ws-types";
 import { log } from "../../../../../util/logger";
-import { ElysiaWS } from "elysia/ws";
+import type { ServerWebSocket } from "bun";
+import type { WSData } from "../types";
 import { AuthData } from "./manager";
 
 export type AuthCheckFn = (
-    ws: ElysiaWS,
+    ws: ServerWebSocket<WSData>,
     roomId: string,
     auth?: AuthData
 ) => Promise<boolean>;
@@ -13,23 +14,23 @@ export type AuthCheckFn = (
 async function verifyBATForOffer(bat: string, offerId: string): Promise<boolean> {
 	// Placeholder: Verify that the BAT is valid for this specific offer
 	// The BAT should prove the user is either the maker or taker without revealing which
-	log.warn`BAT verification not yet implemented for offer ${offerId}`;
+	log.warn(`BAT verification not yet implemented for offer ${offerId}`);
 	return false; // TODO: Replace with actual verification
 }
 
 // TODO: Implement actual JWT verification
 async function verifyAdminJWT(jwt: string): Promise<boolean> {
 	// Placeholder: Verify admin JWT token
-	log.warn`Admin JWT verification not yet implemented`;
+	log.warn(`Admin JWT verification not yet implemented for token: ${jwt.substring(0, 10)}...`);
 	return false; // TODO: Replace with actual verification
 }
 
 export const AuthChecks = {
 	// Offer room: Only maker and taker can subscribe
 	// BAT proves they're one of the parties without revealing which
-	offer: async (ws, roomId, auth) => {
+	offer: async (_ws, roomId, auth) => {
 		if (!auth?.bat) {
-			log.warn`No BAT provided for offer room: ${roomId}`;
+			log.warn(`No BAT provided for offer room: ${roomId}`);
 			return false;
 		}
 		
@@ -37,7 +38,7 @@ export const AuthChecks = {
 			const offerId = RoomIds.extractOfferId(roomId);
 			return await verifyBATForOffer(auth.bat, offerId);
 		} catch (error) {
-			log.error`Error verifying BAT for offer room: ${error}`;
+			log.error(`Error verifying BAT for offer room: ${error}`);
 			return false;
 		}
 	},
@@ -46,16 +47,16 @@ export const AuthChecks = {
 	global: async () => true,
 	
 	// Admin room: Requires JWT
-	admin: async (ws, roomId, auth) => {
+	admin: async (_ws, _roomId, auth) => {
 		if (!auth?.jwt) {
-			log.warn`No JWT provided for admin room`;
+			log.warn(`No JWT provided for admin room`);
 			return false;
 		}
 		
 		try {
 			return await verifyAdminJWT(auth.jwt);
 		} catch (error) {
-			log.error`Error verifying admin JWT: ${error}`;
+			log.error(`Error verifying admin JWT: ${error}`);
 			return false;
 		}
 	}

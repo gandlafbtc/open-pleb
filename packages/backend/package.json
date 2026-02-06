@@ -1,10 +1,12 @@
 {
   "name": "backend",
   "version": "0.0.1",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun run --watch src/index.ts",
-    "start": "bun run src/index.ts"
+    "start": "bun run src/index.ts",
+    "lint":"eslint ."
   },
   "dependencies": {
     "@sinclair/typebox": "catalog:validation",
@@ -32,7 +34,8 @@
   },
   "devDependencies": {
     "bun-types": "latest",
-    "drizzle-kit": "catalog:db"
+    "drizzle-kit": "catalog:db",
+    "eslint": "^9.39.2"
   },
   "module": "src/index.js"
 }

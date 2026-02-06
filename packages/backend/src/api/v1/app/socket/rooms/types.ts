@@ -1,4 +1,5 @@
 import type { ServerWebSocket } from "bun";
+import type { WSData } from "../types";
 
 /**
  * Room types in the system
@@ -16,7 +17,7 @@ export type RoomType = typeof ROOM_TYPE[keyof typeof ROOM_TYPE];
  * Returns true if the WebSocket is authorized to access the room
  */
 export type RoomAuthCheck = (
-	ws: ServerWebSocket<any>,
+	ws: ServerWebSocket<WSData>,
 	roomId: string,
 	auth?: { bat?: string; jwt?: string }
 ) => Promise<boolean>;
@@ -36,6 +37,6 @@ export interface RoomSubscription {
 export interface Room {
 	id: string;
 	type: RoomType;
-	subscribers: Set<ServerWebSocket<any>>;
+	subscribers: Set<ServerWebSocket<WSData>>;
 	createdAt: number;
 }

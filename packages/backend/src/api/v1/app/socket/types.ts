@@ -4,12 +4,20 @@
  */
 
 import type { ServerWebSocket } from "bun";
-import type { WSClientMessage } from "common/ws-types";
+
+/**
+ * WebSocket data stored in the connection
+ */
+export interface WSData {
+	userId?: string;
+	isAdmin?: boolean;
+	connectedAt?: number;
+}
 
 /**
  * Extended WebSocket with custom data
  */
-export interface ExtendedWebSocket extends ServerWebSocket<any> {
+export interface ExtendedWebSocket extends ServerWebSocket<WSData> {
 	// Add any custom properties here if needed
 	userId?: string;
 	isAdmin?: boolean;
@@ -19,7 +27,7 @@ export interface ExtendedWebSocket extends ServerWebSocket<any> {
  * WebSocket connection context
  */
 export interface WSContext {
-	ws: ServerWebSocket<any>;
+	ws: ServerWebSocket<WSData>;
 	userId?: string;
 	isAdmin?: boolean;
 	connectedAt: number;

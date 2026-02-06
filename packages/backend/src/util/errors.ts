@@ -18,6 +18,6 @@ export class ContextError extends Error {
 	constructor(message: string, options?: { cause?: Error; context?: unknown }) {
 		super(message, options);
 		this.name = "ContextError";
-		this.context = this.context;
+		this.context = options?.context;
 	}
 }

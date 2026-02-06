@@ -5,6 +5,8 @@ import { createCommandRegistry } from "./handlers";
 import { WSErrorHandler, WSError } from "./errors/handler";
 import { WS_ERROR_CODE, type WSClientMessage } from "common/ws-types";
 import type { ElysiaWS } from "elysia/ws";
+import type { ServerWebSocket } from "bun";
+import type { WSData } from "./types";
 
 // Global instances
 const roomManager = new RoomManager();
@@ -17,9 +19,9 @@ export const v1WS = new Elysia()
       try {
         // Register WebSocket connection
         wsRegistry.set(ws.id, ws);
-        log.info`WebSocket connected: ${ws.id}`;
+        log.info(`WebSocket connected: ${ws.id}`);
       } catch (error) {
-        log.error`Error in WebSocket open handler: ${error}`;
+        log.error(`Error in WebSocket open handler: ${error}`);
       }
     },
     
@@ -31,7 +33,7 @@ export const v1WS = new Elysia()
         if (typeof message === 'string') {
           try {
             parsedMessage = JSON.parse(message);
-          } catch (error) {
+          } catch {
             throw new WSError(
               WS_ERROR_CODE.INVALID_MESSAGE,
               "Invalid JSON message"
@@ -49,10 +51,10 @@ export const v1WS = new Elysia()
           );
         }
 
-        log.debug`Message from ${ws.id}: ${parsedMessage.type}`;
+        log.debug(`Message from ${ws.id}: ${parsedMessage.type}`);
 
         // Handle the command
-        await commandRegistry.handle(ws, parsedMessage, roomManager);
+        await commandRegistry.handle(ws.raw as ServerWebSocket<WSData>, parsedMessage, roomManager);
         
       } catch (error) {
         // Send error response to client
@@ -63,9 +65,9 @@ export const v1WS = new Elysia()
           typeof message.type === 'string' 
             ? message.type 
             : undefined;
-        log.error("{message}", {message})
+        log.error("{message}", {message});
         WSErrorHandler.send(
-          ws as any, // Type compatibility with existing error handler
+          ws.raw as ServerWebSocket<WSData>,
           error instanceof Error ? error : new Error(String(error)),
           requestType
         );
@@ -75,19 +77,19 @@ export const v1WS = new Elysia()
     close(ws, code, reason) {
       try {
         // Clean up subscriptions
-        roomManager.cleanup(ws);
+        roomManager.cleanup(ws.raw as ServerWebSocket<WSData>);
         
         // Remove from registry
         wsRegistry.delete(ws.id);
         
-        log.info`WebSocket disconnected: ${ws.id} (code: ${code}, reason: ${reason})`;
+        log.info(`WebSocket disconnected: ${ws.id} (code: ${code}, reason: ${reason})`);
       } catch (error) {
-        log.error`Error in WebSocket close handler: ${error}`;
+        log.error(`Error in WebSocket close handler: ${error}`);
       }
     }
   });
 
 // Export for broadcasting
-export function broadcastToRoom(roomId: string, message: any): void {
-  roomManager.broadcast(roomId, message, wsRegistry);
+export function broadcastToRoom(roomId: string, message: unknown): void {
+  roomManager.broadcast(roomId, message);
 }

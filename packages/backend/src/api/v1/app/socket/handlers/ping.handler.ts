@@ -3,7 +3,7 @@ import { WS_COMMAND } from "common/ws-types";
 import type { PingData } from "common/ws-types";
 import { log } from "../../../../../util/logger";
 
-export const handlePing: CommandHandler = async (ws, message, roomManager) => {
+export const handlePing: CommandHandler = async (ws, message) => {
 	const data = message.data as PingData;
 	
 	// Send pong response
@@ -15,5 +15,5 @@ export const handlePing: CommandHandler = async (ws, message, roomManager) => {
 		}
 	}));
 	
-	log.debug`Ping from ${ws.id}`;
+	log.debug(`Ping from ${ws.data.userId || 'unknown'}`);
 };

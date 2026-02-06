@@ -23,7 +23,7 @@ export const handleSubscribe: CommandHandler = async (ws, message, roomManager) 
 			}
 		}));
 		
-		log.info`WebSocket ${ws.id} subscribed to ${data.room}`;
+		log.info(`WebSocket ${ws.data.userId || 'unknown'} subscribed to ${data.room}`);
 	} catch (error) {
 		if (error instanceof Error) {
 			if (error.message.includes("Forbidden")) {

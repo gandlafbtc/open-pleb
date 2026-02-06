@@ -6,6 +6,8 @@ export const admin = (app: Elysia) =>
 	app
 		.get("/conversion", async () => {
 			try {
+				// TODO: Implement conversion logic
+				return { message: "Not implemented" };
 			} catch (error) {
 				const err = ensureError(error);
 				log.error("Error {error}", { error });

@@ -1,12 +1,13 @@
 import type { WSClientMessage } from "common/ws-types";
 import type { RoomManager } from "../rooms/manager";
-import { WSError, WSErrorHandler } from "../errors/handler";
+import { WSError } from "../errors/handler";
 import { WS_ERROR_CODE } from "common/ws-types";
 import { log } from "../../../../../util/logger";
-import { ElysiaWS } from "elysia/ws";
+import type { ServerWebSocket } from "bun";
+import type { WSData } from "../types";
 
 export type CommandHandler = (
-	ws: ElysiaWS,
+	ws: ServerWebSocket<WSData>,
 	message: WSClientMessage,
 	roomManager: RoomManager
 ) => Promise<void>;
@@ -16,15 +17,15 @@ export class CommandRegistry {
 
 	register(command: string, handler: CommandHandler): void {
 		if (this.handlers.has(command)) {
-			log.warn`Command handler already registered: ${command}`;
+			log.warn(`Command handler already registered: ${command}`);
 			return;
 		}
 		this.handlers.set(command, handler);
-		log.info`Registered command handler: ${command}`;
+		log.info(`Registered command handler: ${command}`);
 	}
 
 	async handle(
-		ws: ElysiaWS,
+		ws: ServerWebSocket<WSData>,
 		message: WSClientMessage,
 		roomManager: RoomManager
 	): Promise<void> {

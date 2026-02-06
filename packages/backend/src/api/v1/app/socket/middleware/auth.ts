@@ -1,4 +1,3 @@
-import type { ServerWebSocket } from "bun";
 import { log } from "../../../../../util/logger";
 
 /**
@@ -24,7 +23,7 @@ export async function validateBAT(bat: string): Promise<AuthResult> {
 	// 2. Check if it's not expired
 	// 3. Extract user information
 	
-	log.debug`Validating BAT: ${bat.substring(0, 10)}...`;
+	log.debug(`Validating BAT: ${bat.substring(0, 10)}...`);
 	
 	// For now, accept any non-empty BAT
 	if (bat && bat.length > 0) {
@@ -52,7 +51,7 @@ export async function validateJWT(jwt: string): Promise<AuthResult> {
 	// 2. Check if it's not expired
 	// 3. Extract user information and roles
 	
-	log.debug`Validating JWT: ${jwt.substring(0, 10)}...`;
+	log.debug(`Validating JWT: ${jwt.substring(0, 10)}...`);
 	
 	// For now, accept any non-empty JWT
 	if (jwt && jwt.length > 0) {

@@ -1,7 +1,5 @@
-import { subscriptionTable, vapidKeysTable } from "common/db/schema";
-import { migrate } from "drizzle-orm/postgres-js/migrator";
-import { db } from "../db/db";
 import { log } from "../util/logger";
+import { MigrationRepository } from "../repository/migration.repository";
 // import * as webpush from "@negrel/webpush";
 // import { subscribers } from "../dynamic/subscribers";
 // import { VapidKeys } from "../dynamic/vapidKeys";
@@ -23,13 +21,13 @@ const migrateDb = async () => {
 		process.exit(1);
 	}
 
-	log.info`migrating db...`;
-	await migrate(db, { migrationsFolder: process.env.OPENPLEB_MIGRATIONS_DIR });
-	log.info`DB migration:✅`;
+	log.info("migrating db...");
+	await MigrationRepository.runMigrations(process.env.OPENPLEB_MIGRATIONS_DIR);
+	log.info("DB migration:✅");
 };
 
 const checkEnv = () => {
-	log.info`Checking env...`;
+	log.info("Checking env...");
 	// Check all required environment variables before starting the service
 	const requiredEnvVars = [
 		"OPENPLEB_MIGRATIONS_DIR",
@@ -58,7 +56,7 @@ const checkEnv = () => {
 			process.exit(1);
 		}
 	}
-	log.info`Env: ✅`;
+	log.info("Env: ✅");
 };
 
 // const setUpVapid = async () => {

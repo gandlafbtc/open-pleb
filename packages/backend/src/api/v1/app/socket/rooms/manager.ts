@@ -1,6 +1,7 @@
 import { ROOM_TYPE, RoomIds, type RoomType } from "common/ws-types";
 import { log } from "../../../../../util/logger";
-import { ElysiaWS } from "elysia/ws";
+import type { ServerWebSocket } from "bun";
+import type { WSData } from "../types";
 import { AuthCheckFn, AuthChecks } from "./auth-checks";
 
 export interface AuthData {
@@ -8,18 +9,16 @@ export interface AuthData {
 	jwt?: string;
 }
 
-
-
 interface Room {
 	id: string;
 	type: RoomType;
-	subscribers: Set<string>;
+	subscribers: Set<ServerWebSocket<WSData>>;
 	authCheck: AuthCheckFn;
 }
 
 export class RoomManager {
 	private rooms = new Map<string, Room>();
-	private wsToRooms = new Map<string, Set<string>>();
+	private wsToRooms = new WeakMap<ServerWebSocket<WSData>, Set<string>>();
 
 	constructor() {
 		// Initialize global room (always available)
@@ -30,7 +29,7 @@ export class RoomManager {
 
 	createRoom(id: string, type: RoomType, authCheck: AuthCheckFn): void {
 		if (this.rooms.has(id)) {
-			log.warn`Room ${id} already exists`;
+			log.warn(`Room ${id} already exists`);
 			return;
 		}
 
@@ -41,10 +40,10 @@ export class RoomManager {
 			authCheck,
 		});
 
-		log.info`Room created: ${id} (${type})`;
+		log.info(`Room created: ${id} (${type})`);
 	}
 
-	async subscribe(ws: ElysiaWS, roomId: string, auth?: AuthData): Promise<void> {
+	async subscribe(ws: ServerWebSocket<WSData>, roomId: string, auth?: AuthData): Promise<void> {
 		// Get or create room
 		let room = this.rooms.get(roomId);
 		
@@ -60,7 +59,7 @@ export class RoomManager {
 		}
 
 		// Check if already subscribed
-		if (room.subscribers.has(ws.id)) {
+		if (room.subscribers.has(ws)) {
 			throw new Error(`Already subscribed to room: ${roomId}`);
 		}
 
@@ -71,90 +70,88 @@ export class RoomManager {
 		}
 
 		// Add subscriber
-		room.subscribers.add(ws.id);
+		room.subscribers.add(ws);
 
 		// Track subscription
-		if (!this.wsToRooms.has(ws.id)) {
-			this.wsToRooms.set(ws.id, new Set());
+		if (!this.wsToRooms.has(ws)) {
+			this.wsToRooms.set(ws, new Set());
 		}
-		this.wsToRooms.get(ws.id)!.add(roomId);
+		this.wsToRooms.get(ws)!.add(roomId);
 
-		log.info`WebSocket ${ws.id} subscribed to room: ${roomId}`;
+		log.info(`WebSocket ${ws.data.userId || 'unknown'} subscribed to room: ${roomId}`);
 	}
 
-	unsubscribe(ws: ElysiaWS, roomId: string): void {
+	unsubscribe(ws: ServerWebSocket<WSData>, roomId: string): void {
 		const room = this.rooms.get(roomId);
 		if (!room) {
 			throw new Error(`Room not found: ${roomId}`);
 		}
 
-		if (!room.subscribers.has(ws.id)) {
+		if (!room.subscribers.has(ws)) {
 			throw new Error(`Not subscribed to room: ${roomId}`);
 		}
 
-		room.subscribers.delete(ws.id);
-		this.wsToRooms.get(ws.id)?.delete(roomId);
+		room.subscribers.delete(ws);
+		this.wsToRooms.get(ws)?.delete(roomId);
 
-		log.info`WebSocket ${ws.id} unsubscribed from room: ${roomId}`;
+		log.info(`WebSocket ${ws.data.userId || 'unknown'} unsubscribed from room: ${roomId}`);
 
 		// Clean up empty offer rooms (but keep global and admin)
 		if (room.subscribers.size === 0 && room.type === ROOM_TYPE.OFFER) {
 			this.rooms.delete(roomId);
-			log.info`Empty offer room deleted: ${roomId}`;
+			log.info(`Empty offer room deleted: ${roomId}`);
 		}
 	}
 
 	broadcast(
 		roomId: string,
-		message: any,
-		wsRegistry: Map<string, ElysiaWS>
+		message: unknown
 	): void {
 		const room = this.rooms.get(roomId);
 		if (!room) {
-			log.warn`Cannot broadcast to non-existent room: ${roomId}`;
+			log.warn(`Cannot broadcast to non-existent room: ${roomId}`);
 			return;
 		}
 
 		const payload = JSON.stringify(message);
 		let sentCount = 0;
 
-		room.subscribers.forEach((wsId) => {
-			const ws = wsRegistry.get(wsId);
-			if (ws?.readyState === 1) { // WebSocket.OPEN
+		room.subscribers.forEach((ws) => {
+			if (ws.readyState === 1) { // WebSocket.OPEN
 				try {
 					ws.send(payload);
 					sentCount++;
 				} catch (error) {
-					log.error`Failed to send to ${wsId}: ${error}`;
+					log.error(`Failed to send to ${ws.data.userId || 'unknown'}: ${error}`);
 				}
 			}
 		});
 
-		log.debug`Broadcast to room ${roomId}: ${sentCount}/${room.subscribers.size} clients`;
+		log.debug(`Broadcast to room ${roomId}: ${sentCount}/${room.subscribers.size} clients`);
 	}
 
-	cleanup(ws: ElysiaWS): void {
-		const rooms = this.wsToRooms.get(ws.id);
+	cleanup(ws: ServerWebSocket<WSData>): void {
+		const rooms = this.wsToRooms.get(ws);
 		if (!rooms) return;
 
 		rooms.forEach((roomId) => {
 			const room = this.rooms.get(roomId);
 			if (room) {
-				room.subscribers.delete(ws.id);
+				room.subscribers.delete(ws);
 				
 				// Clean up empty offer rooms
 				if (room.subscribers.size === 0 && room.type === ROOM_TYPE.OFFER) {
 					this.rooms.delete(roomId);
-					log.info`Empty offer room deleted: ${roomId}`;
+					log.info(`Empty offer room deleted: ${roomId}`);
 				}
 			}
 		});
 
-		this.wsToRooms.delete(ws.id);
-		log.info`Cleaned up subscriptions for WebSocket: ${ws.id}`;
+		this.wsToRooms.delete(ws);
+		log.info(`Cleaned up subscriptions for WebSocket: ${ws.data.userId || 'unknown'}`);
 	}
 
-	getSubscriptions(ws: ElysiaWS): string[] {
-		return Array.from(this.wsToRooms.get(ws.id) || []);
+	getSubscriptions(ws: ServerWebSocket<WSData>): string[] {
+		return Array.from(this.wsToRooms.get(ws) || []);
 	}
 }

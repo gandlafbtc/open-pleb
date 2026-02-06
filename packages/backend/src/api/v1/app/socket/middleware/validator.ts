@@ -9,7 +9,7 @@ import { WS_ERROR_CODE, type WSClientMessage } from "common/ws-types";
 /**
  * Validate that a message has the required structure
  */
-export function validateMessageStructure(message: any): message is WSClientMessage {
+export function validateMessageStructure(message: unknown): message is WSClientMessage {
 	if (!message || typeof message !== 'object') {
 		throw new WSError(
 			WS_ERROR_CODE.INVALID_MESSAGE,
@@ -17,14 +17,16 @@ export function validateMessageStructure(message: any): message is WSClientMessa
 		);
 	}
 	
-	if (!message.type || typeof message.type !== 'string') {
+	const msg = message as Record<string, unknown>;
+	
+	if (!msg.type || typeof msg.type !== 'string') {
 		throw new WSError(
 			WS_ERROR_CODE.INVALID_MESSAGE,
 			"Message must have a 'type' field of type string"
 		);
 	}
 	
-	if (!message.data || typeof message.data !== 'object') {
+	if (!msg.data || typeof msg.data !== 'object') {
 		throw new WSError(
 			WS_ERROR_CODE.INVALID_MESSAGE,
 			"Message must have a 'data' field of type object"
@@ -37,15 +39,24 @@ export function validateMessageStructure(message: any): message is WSClientMessa
 /**
  * Validate subscribe message data
  */
-export function validateSubscribeData(data: any): void {
-	if (!data.room || typeof data.room !== 'string') {
+export function validateSubscribeData(data: unknown): void {
+	if (!data || typeof data !== 'object') {
+		throw new WSError(
+			WS_ERROR_CODE.INVALID_MESSAGE,
+			"Data must be an object"
+		);
+	}
+	
+	const d = data as Record<string, unknown>;
+	
+	if (!d.room || typeof d.room !== 'string') {
 		throw new WSError(
 			WS_ERROR_CODE.MISSING_REQUIRED_FIELD,
 			"Subscribe message must have a 'room' field of type string"
 		);
 	}
 	
-	if (data.room.length === 0) {
+	if (d.room.length === 0) {
 		throw new WSError(
 			WS_ERROR_CODE.INVALID_MESSAGE,
 			"Room name cannot be empty"
@@ -56,15 +67,24 @@ export function validateSubscribeData(data: any): void {
 /**
  * Validate unsubscribe message data
  */
-export function validateUnsubscribeData(data: any): void {
-	if (!data.room || typeof data.room !== 'string') {
+export function validateUnsubscribeData(data: unknown): void {
+	if (!data || typeof data !== 'object') {
+		throw new WSError(
+			WS_ERROR_CODE.INVALID_MESSAGE,
+			"Data must be an object"
+		);
+	}
+	
+	const d = data as Record<string, unknown>;
+	
+	if (!d.room || typeof d.room !== 'string') {
 		throw new WSError(
 			WS_ERROR_CODE.MISSING_REQUIRED_FIELD,
 			"Unsubscribe message must have a 'room' field of type string"
 		);
 	}
 	
-	if (data.room.length === 0) {
+	if (d.room.length === 0) {
 		throw new WSError(
 			WS_ERROR_CODE.INVALID_MESSAGE,
 			"Room name cannot be empty"
@@ -75,8 +95,14 @@ export function validateUnsubscribeData(data: any): void {
 /**
  * Validate ping message data (optional timestamp)
  */
-export function validatePingData(data: any): void {
-	if (data.timestamp !== undefined && typeof data.timestamp !== 'number') {
+export function validatePingData(data: unknown): void {
+	if (!data || typeof data !== 'object') {
+		return; // Ping data is optional
+	}
+	
+	const d = data as Record<string, unknown>;
+	
+	if (d.timestamp !== undefined && typeof d.timestamp !== 'number') {
 		throw new WSError(
 			WS_ERROR_CODE.INVALID_MESSAGE,
 			"Ping timestamp must be a number if provided"

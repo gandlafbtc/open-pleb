@@ -23,7 +23,7 @@ export const handleUnsubscribe: CommandHandler = async (ws, message, roomManager
 			}
 		}));
 		
-		log.info`WebSocket ${ws.id} unsubscribed from ${data.room}`;
+		log.info(`WebSocket ${ws.data.userId || 'unknown'} unsubscribed from ${data.room}`);
 	} catch (error) {
 		if (error instanceof Error) {
 			if (error.message.includes("not found")) {
