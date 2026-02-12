@@ -33,7 +33,7 @@
 	}
 
 	// Determine button text based on current step
-	const nextButtonText = $derived(currentStep === totalSteps ? 'Ready to create wallet?' : 'Next');
+	const nextButtonText = $derived(currentStep === totalSteps ? "Let's go!" : 'Next');
 	const showBackButton = $derived(currentStep > 1);
 </script>
 

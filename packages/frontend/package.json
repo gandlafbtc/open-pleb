@@ -18,11 +18,14 @@
 		"@eslint/js": "catalog:sveltekit-dev",
 		"@inlang/paraglide-js": "catalog:sveltekit-dev",
 		"@internationalized/date": "catalog:ui",
+		"@lottiefiles/dotlottie-web": "catalog:ui",
 		"@lucide/svelte": "catalog:ui",
+		"@noble/hashes": "catalog:crypto",
+		"@scure/bip32": "catalog:crypto",
+		"@scure/bip39": "catalog:crypto",
 		"@sveltejs/adapter-auto": "catalog:sveltekit-dev",
 		"@sveltejs/kit": "catalog:sveltekit-dev",
 		"@sveltejs/vite-plugin-svelte": "catalog:sveltekit-dev",
-		"@lottiefiles/dotlottie-web": "catalog:ui",
 		"@tailwindcss/vite": "catalog:sveltekit-dev",
 		"@types/node": "catalog:sveltekit-dev",
 		"bits-ui": "catalog:ui",
@@ -31,11 +34,13 @@
 		"eslint-config-prettier": "catalog:sveltekit-dev",
 		"eslint-plugin-svelte": "catalog:sveltekit-dev",
 		"globals": "catalog:sveltekit-dev",
+		"idb": "^8.0.3",
 		"prettier": "catalog:sveltekit-dev",
 		"prettier-plugin-svelte": "catalog:sveltekit-dev",
 		"prettier-plugin-tailwindcss": "catalog:sveltekit-dev",
 		"svelte": "catalog:sveltekit-dev",
 		"svelte-check": "catalog:sveltekit-dev",
+		"svelte-sonner": "^1.0.7",
 		"tailwind-merge": "catalog:ui",
 		"tailwind-variants": "catalog:ui",
 		"tailwindcss": "catalog:sveltekit-dev",
@@ -45,6 +50,7 @@
 		"vite": "catalog:sveltekit-dev"
 	},
 	"dependencies": {
+		"@noble/ciphers": "catalog:crypto",
 		"mode-watcher": "catalog:ui"
 	}
 }

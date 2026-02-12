@@ -17,6 +17,7 @@
     "@logtape/logtape": "catalog:utils",
     "@noble/curves": "catalog:crypto",
     "@noble/hashes": "catalog:crypto",
+    "@noble/ciphers": "catalog:crypto",
     "dotenv": "catalog:utils",
     "drizzle-orm": "catalog:db"
   },
@@ -33,6 +34,8 @@
     "./errors": "./src/errors.ts",
     "./conversion": "./src/conversion.ts",
     "./lnurl": "./src/lnurl.ts",
-    "./payloads": "./src/payloads.ts"
+    "./payloads": "./src/payloads.ts",
+    "./encryption": "./src/encryption.ts"
+    
   }
 }

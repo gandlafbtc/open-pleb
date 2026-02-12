@@ -1,6 +1,12 @@
-import { socket } from "$lib/interface/ws";
+import { key } from "$lib/state/dynamic/key.svelte";
+import { lnurl } from "$lib/state/persistent/db/repos/lnurl";
+import { DEFAULT_PASS } from "$lib/state/static/pass";
 
 export const init = async () => {
-	// Socket is automatically initialized when imported
-	// You can add other initialization logic here
+	await key.initKeyFromPass(new TextEncoder().encode(DEFAULT_PASS))
+	await initStores()
 };
+
+const initStores = async () => {
+	await lnurl.init()
+}

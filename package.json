@@ -62,8 +62,10 @@
     "crypto": {
       "@noble/curves": "^2.0.1",
       "@noble/hashes": "^2.0.1",
+      "@noble/ciphers": "^2.1.1",
       "@scure/bip32": "^2.0.1",
       "@scure/bip39": "^2.0.1"
+      
     },
     "cashu": {
       "coco-cashu-core": "1.1.2-rc.42",
