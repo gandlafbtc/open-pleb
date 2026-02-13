@@ -5,6 +5,7 @@
 	import { lnurl } from '$lib/state/persistent/db/repos/lnurl';
 
 	let addressInput: string = $state('');
+	let isValid = $state(true)
 
 	const currentAddress = $derived(lnurl.data[0]?.address ?? '');
 
@@ -18,7 +19,7 @@
 
 <div class="flex flex-col gap-4">
 	<div class="flex flex-col gap-2">
-		<Label for="lnurl-input">LNURL Address</Label>
+		<Label for="lnurl-input" class="font-bold">Auto-withdraw Address</Label>
 		{#if currentAddress}
 			<p class="text-muted-foreground text-sm">
 				Current: <span class="text-foreground font-medium">{currentAddress}</span>
@@ -34,7 +35,7 @@
 					if (e.key === 'Enter') saveLnurl();
 				}}
 			/>
-			<Button onclick={saveLnurl} disabled={!addressInput.trim()}>Save</Button>
+			<Button onclick={saveLnurl} disabled={!addressInput.trim()} onchange={()=>isValid == lnurl.validate(addressInput)}>Save</Button>
 		</div>
 	</div>
 </div>

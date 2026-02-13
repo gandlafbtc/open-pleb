@@ -19,7 +19,7 @@
 		"@inlang/paraglide-js": "catalog:sveltekit-dev",
 		"@internationalized/date": "catalog:ui",
 		"@lottiefiles/dotlottie-web": "catalog:ui",
-		"@lucide/svelte": "catalog:ui",
+		"@lucide/svelte": "^0.561.0",
 		"@noble/hashes": "catalog:crypto",
 		"@scure/bip32": "catalog:crypto",
 		"@scure/bip39": "catalog:crypto",
@@ -51,6 +51,6 @@
 	},
 	"dependencies": {
 		"@noble/ciphers": "catalog:crypto",
-		"mode-watcher": "catalog:ui"
+		"mode-watcher": "^1.1.0"
 	}
 }

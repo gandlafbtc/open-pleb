@@ -13,3 +13,7 @@ export type KeyPair = {
 export type LNURL = {
 	address: string;
 };
+
+export type SeedPhrase = {
+	seedPhrase: string;
+};

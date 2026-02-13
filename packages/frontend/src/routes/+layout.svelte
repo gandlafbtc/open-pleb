@@ -9,10 +9,13 @@
 	import Onboarding from '$lib/elements/onboarding/Onboarding.svelte';
 	import SplashScreen from '$lib/components/SplashScreen.svelte';
 	import SettingsButton from '$lib/elements/settings/SettingsButton.svelte';
-
+	import Header from '$lib/elements/page/Header.svelte';
+	import { seedPhrase } from '$lib/state/persistent/db/repos/seedPhrase';
+	import IDCreation from '$lib/elements/onboarding/idcreation/IDCreation.svelte';
+	import { Toaster } from 'svelte-sonner';
 
 	onMount(async () => {
-			await init();
+		await init();
 	});
 	let { children } = $props();
 </script>
@@ -20,12 +23,24 @@
 <svelte:head><link rel="icon" href="/logo/logo-mark-prim.svg" /></svelte:head>
 <ModeWatcher />
 <SplashScreen></SplashScreen>
-
-{#if localstore.isOnboarded}
-		<SettingsButton></SettingsButton>
-		{@render children()}
-{:else}
+<Toaster richColors />
+<!-- If not onboarded, show onboarding -->
+{#if !localstore.isOnboarded}
 	<Onboarding></Onboarding>
+{:else}
+	<!-- if no ID, create ID -->
+	{#if !seedPhrase.data.length}
+		<IDCreation></IDCreation>
+	{:else}
+	
+	{#if !page.url.pathname.startsWith("/id")}
+		<Header></Header>
+	{/if}
+	<div class="m-2">
+		{@render children()}
+	</div>
+
+	{/if}
 {/if}
 
 <div style="display:none">

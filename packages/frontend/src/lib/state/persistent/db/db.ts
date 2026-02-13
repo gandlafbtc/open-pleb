@@ -23,6 +23,7 @@ export class DB {
 			upgrade: (db, oldVersion) => {
 				if (!oldVersion) {
 					db.createObjectStore('encrypted-lnurl');
+					db.createObjectStore('encrypted-seed');
 				}
 			},
 			blocked: () => {

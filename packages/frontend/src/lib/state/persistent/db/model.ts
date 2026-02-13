@@ -6,4 +6,8 @@ export interface OpenPlebDB extends DBSchema {
 		key: string;
 		value: EncryptedStore;
 	};
+	'encrypted-seed': {
+		key: string;
+		value: EncryptedStore;
+	};
 }

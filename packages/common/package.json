@@ -35,7 +35,8 @@
     "./conversion": "./src/conversion.ts",
     "./lnurl": "./src/lnurl.ts",
     "./payloads": "./src/payloads.ts",
-    "./encryption": "./src/encryption.ts"
+    "./encryption": "./src/encryption.ts",
+    "./util": "./src/util.ts"
     
   }
 }
