@@ -61,7 +61,9 @@
     "utils": {
       "dotenv": "^17.2.3",
       "@logtape/logtape": "^2.0.2",
-      "@logtape/file": "^2.0.2"
+      "@logtape/file": "^2.0.2",
+      "qr": "^0.5.4"
+
     },
     "crypto": {
       "@noble/curves": "^2.0.1",
@@ -93,5 +95,6 @@
       "postgres": "^3.4.8"
     }
   },
-  "dependencies": {}
+  "dependencies": {
+  }
 }
