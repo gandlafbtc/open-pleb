@@ -7,19 +7,20 @@
     let isDisplay = $state(false)
 
 </script>
-<div class="w-full flex items-center gap-10 flex-col">
+<div class="flex min-h-screen flex-col items-center justify-center bg-background px-6 py-8">
+	<div class="flex w-full max-w-md flex-col items-center space-y-8">
+		<div class="max-w-2xl">
+			<DisplaySeed bind:isDisplay></DisplaySeed>
+		</div>
 
-    <div class="max-w-2xl">
-        <DisplaySeed bind:isDisplay></DisplaySeed>
-    </div>
+		<div class="flex w-full flex-col space-y-5">
+			<Button disabled={!isDisplay} onclick={()=> {goto('/id/npub')}} size="lg">
+				I have stored it securely
+			</Button>
 
-    <div class="flex gap-2 justify-between w-full">
-
-        <Button variant="link" onclick={()=>copyTextToClipboard(seedPhrase.data[0]?.seedPhrase??"")}>
-            dangerously copy
-        </Button>
-        <Button disabled={!isDisplay} onclick={()=> {goto('/id/npub')}}>
-            I have stored it securely
-        </Button>
-    </div>
+			<Button variant="link" onclick={()=>copyTextToClipboard(seedPhrase.data[0]?.seedPhrase??"")} size="lg">
+				dangerously copy
+			</Button>
+		</div>
+	</div>
 </div>

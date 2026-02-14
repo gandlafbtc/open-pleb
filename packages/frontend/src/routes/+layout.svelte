@@ -8,14 +8,20 @@
 	import { localstore } from '$lib/state/persistent/local/localstore.svelte';
 	import Onboarding from '$lib/elements/onboarding/Onboarding.svelte';
 	import SplashScreen from '$lib/components/SplashScreen.svelte';
-	import SettingsButton from '$lib/elements/settings/SettingsButton.svelte';
 	import Header from '$lib/elements/page/Header.svelte';
 	import { seedPhrase } from '$lib/state/persistent/db/repos/seedPhrase';
 	import IDCreation from '$lib/elements/onboarding/idcreation/IDCreation.svelte';
-	import { Toaster } from 'svelte-sonner';
+	import { toast, Toaster } from 'svelte-sonner';
+	import { ensureError } from 'common/errors';
 
 	onMount(async () => {
-		await init();
+		try {
+			await init();
+		} catch (error) {
+			console.error(error)
+			const err = ensureError(error)
+			toast.error(`Failed to initialize: ${err.message}`)
+		}
 	});
 	let { children } = $props();
 </script>

@@ -9,6 +9,7 @@
     "dev": "bun run --filter './packages/*' dev "
   },
   "devDependencies": {
+    "@scure/base": "^2.0.0",
     "@types/bun": "latest"
   },
   "peerDependencies": {
@@ -68,7 +69,6 @@
       "@noble/ciphers": "^2.1.1",
       "@scure/bip32": "^2.0.1",
       "@scure/bip39": "^2.0.1"
-      
     },
     "cashu": {
       "coco-cashu-core": "1.1.2-rc.42",
