@@ -1,14 +1,16 @@
-import { schnorr } from "@noble/curves/secp256k1";
-import { sha256 } from "@noble/hashes/sha2";
-import { bytesToHex } from "@noble/hashes/utils";
+import { schnorr } from "@noble/curves/secp256k1.js";
+import { sha256 } from "@noble/hashes/sha2.js";
+import { bytesToHex, hexToBytes } from "@noble/hashes/utils.js";
 
 export const signPayload = <T extends object>(payload: T, privateKey: string): {payload: T}&{signature: string, nonce: string, timestamp: number} => {
     const sorted = sortObjectByKeys(payload);
-    const nonce = bytesToHex(schnorr.utils.randomPrivateKey());
+    const nonce = bytesToHex(schnorr.utils.randomSecretKey());
     const timestamp = Date.now();
     const message = nonce + timestamp + JSON.stringify(sorted);
-    const messageHash = sha256(message);
-    const signature = bytesToHex(schnorr.sign(messageHash, privateKey));
+    const encoder = new TextEncoder();
+    const messageHash = sha256(encoder.encode(message));
+    const privKeyBytes = hexToBytes(privateKey);
+    const signature = bytesToHex(schnorr.sign(messageHash, privKeyBytes));
     return {payload: sorted, signature, nonce, timestamp};
 };
 
@@ -19,8 +21,11 @@ export const verifyPayload = (payload: object, signature: string, nonce: string,
     }
     const sorted = sortObjectByKeys(payload);
     const message = nonce + timestamp + JSON.stringify(sorted);
-    const messageHash = sha256(message);
-    return schnorr.verify(signature, messageHash, publicKey); 
+    const encoder = new TextEncoder();
+    const messageHash = sha256(encoder.encode(message));
+    const pubKeyBytes = hexToBytes(publicKey);
+    const sigBytes = hexToBytes(signature);
+    return schnorr.verify(sigBytes, messageHash, pubKeyBytes); 
 }
 
 export const sortObjectByKeys = <T extends object>(obj: T): T => {

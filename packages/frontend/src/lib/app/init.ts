@@ -13,7 +13,13 @@ export const init = async () => {
 const initStores = async () => {
 	await lnurl.init()
 	await seedPhrase.init()
-	// must run after seedPhrase.init
+	if (seedPhrase.data.length) {
+		// must run after seedPhrase.init
+		await initSeedAndKeys()	
+	}
+}
+
+export const initSeedAndKeys = async () => {
 	await seed.initSeedFromSeedPhrase()
 	// must run after seed.init
 	idKeys.initKeysFromSeed()

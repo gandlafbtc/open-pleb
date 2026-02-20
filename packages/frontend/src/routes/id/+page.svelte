@@ -18,7 +18,7 @@
 				I have stored it securely
 			</Button>
 
-			<Button variant="link" onclick={()=>copyTextToClipboard(seedPhrase.data[0]?.seedPhrase??"")} size="lg">
+			<Button variant="link" disabled={!isDisplay} onclick={()=>copyTextToClipboard(seedPhrase.data[0]?.seedPhrase??"")} size="lg">
 				dangerously copy
 			</Button>
 		</div>

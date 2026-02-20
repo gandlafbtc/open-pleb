@@ -1,14 +1,14 @@
 import { DefaultStore } from '../helper/storeHelper.svelte';
 import { createEncryptionHelper } from '../helper/encryptionHelper';
 import type { SeedPhrase } from '../models/types';
-import { generateMnemonic } from "@scure/bip39";
+import { generateMnemonic, validateMnemonic } from "@scure/bip39";
 import { wordlist } from '@scure/bip39/wordlists/english.js';
 
-const lnurlEncryptionHelper = createEncryptionHelper<SeedPhrase>('encrypted-seed');
+const encryptionHelper = createEncryptionHelper<SeedPhrase>('encrypted-seed');
 
 class SeedStore extends DefaultStore<SeedPhrase> {
 	constructor() {
-		super(lnurlEncryptionHelper);
+		super(encryptionHelper);
 	}
 	generateNew() {
 		if (!this.data.length) {
@@ -16,6 +16,9 @@ class SeedStore extends DefaultStore<SeedPhrase> {
 		}
 	}
 	replace(seedPhrase: SeedPhrase) {
+		if (!validateMnemonic(seedPhrase.seedPhrase, wordlist)) {
+			throw new Error("Could not replace seed: invalid seed");
+		}
 		this.data[0] = seedPhrase
 	}
 }

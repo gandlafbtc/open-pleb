@@ -1,4 +1,24 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
-	"hello_world": "Hello, {name} from en!"
+	"hello_world": "Hello, {name} from en!",
+	"id_created_title": "Your Open Pleb ID Has Been Created!",
+	"id_created_description": "Your unique identifier has been generated. You can now register it with an Open Pleb instance or connect if you've already registered.",
+	"register_id": "Register ID",
+	"connect_existing_id": "Connect Existing ID",
+	"registering": "Registering...",
+	"connecting": "Connecting...",
+	"registered": "Registered",
+	"copied_to_clipboard": "Copied to clipboard!",
+	"failed_to_copy": "Failed to copy to clipboard",
+	"id_keys_not_available": "ID keys not available",
+	"registration_failed": "Registration failed",
+	"successfully_registered": "Successfully registered your Open Pleb ID!",
+	"connected_existing_id": "Connected to your existing Open Pleb ID!",
+	"id_not_found": "ID not found. Please register first.",
+	"failed_to_connect": "Failed to connect. Please try again.",
+	"loading_id": "Loading your ID...",
+	"register_id_info": "First-time setup. Registers your ID with the Open Pleb instance.",
+	"connect_existing_id_info": "Use this if you've already registered this ID on another device.",
+	"invite_code": "Invite Code",
+	"invite_code_placeholder": "Enter invite code if you have one"
 }

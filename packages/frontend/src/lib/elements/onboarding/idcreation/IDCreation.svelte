@@ -4,6 +4,7 @@
 	import { seedPhrase } from '$lib/state/persistent/db/repos/seedPhrase';
 	import { delay } from 'common/util';
 	import Restore from './Restore.svelte';
+	import { initSeedAndKeys } from '$lib/app/init';
 
 	let showRestoreScreen = $state(false);
 
@@ -11,9 +12,10 @@
 	const handleCreateID = async () => {
         goto('/id')
 	};
-	afterNavigate((n)=> {
+	afterNavigate(async (n)=> {
 		if (n.to?.url.pathname==="/id") {
 			seedPhrase.generateNew()
+			await initSeedAndKeys()
 		}
 	})
 </script>

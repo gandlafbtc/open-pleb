@@ -3,6 +3,8 @@
 	import LanguageSelector from "$lib/components/ui/custom/LanguageSelector.svelte";
 	import DeleteButton from "$lib/elements/settings/DeleteButton.svelte";
     import LnurlSettings from "$lib/elements/settings/LnurlSettings.svelte";
+	import SeedSettings from "$lib/elements/settings/SeedSettings.svelte";
+	import Seed from "$lib/elements/settings/SeedSettings.svelte";
 </script>
 
 <div class="container mx-auto space-y-4">
@@ -39,6 +41,14 @@
         </div>
         <LnurlSettings />
     </section>
+
+    <section class="space-y-4 border border-border rounded-2xl p-3 shadow-sm shadow-black/5">
+            <div>
+                <p class="text-sm uppercase tracking-[0.3em] text-muted-foreground">ID</p>
+        </div>
+        <SeedSettings />
+    </section>
+
     <section class="space-y-4 border border-secondary rounded-2xl p-6 bg-secondary/5">
         <div class="flex items-center justify-between">
             <div>

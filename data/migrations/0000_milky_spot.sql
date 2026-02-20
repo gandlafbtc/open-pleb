@@ -1,7 +1,8 @@
 CREATE TABLE "admins" (
 	"id" text PRIMARY KEY NOT NULL,
 	"pubkey" text NOT NULL,
-	"role" text NOT NULL
+	"role" text NOT NULL,
+	CONSTRAINT "admins_pubkey_unique" UNIQUE("pubkey")
 );
 --> statement-breakpoint
 CREATE TABLE "fiat_providers" (
@@ -30,8 +31,10 @@ CREATE TABLE "offers" (
 	"maker_bond_flat_rate" integer NOT NULL,
 	"maker_bond_percentage" integer NOT NULL,
 	"taker_bond_percentage" integer NOT NULL,
-	"maker_session_id" integer NOT NULL,
-	"taker_session_id" integer NOT NULL,
+	"maker_session_id" text NOT NULL,
+	"taker_session_id" text,
+	"maker_reputation_stake" text,
+	"taker_reputation_stake" text,
 	"maker_bond_and_escrow" text,
 	"taker_bond" text,
 	"updated_at" integer NOT NULL,
@@ -44,16 +47,21 @@ CREATE TABLE "offers" (
 	"taker_feedback" text,
 	"resolution_reason" text,
 	"description" text,
-	"taker_reward" text,
+	"taker_reward_token" text,
 	"maker_refund_token" text,
-	CONSTRAINT "offers_maker_session_id_unique" UNIQUE("maker_session_id"),
-	CONSTRAINT "offers_taker_session_id_unique" UNIQUE("taker_session_id")
+	"maker_reputation_token" text,
+	"taker_reputation_token" text,
+	"taker_reward_pubkey_lock" text,
+	"maker_refund_pubkey_lock" text,
+	CONSTRAINT "offers_maker_session_id_unique" UNIQUE("maker_session_id")
 );
 --> statement-breakpoint
 CREATE TABLE "sessions" (
-	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "sessions_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"id" text PRIMARY KEY NOT NULL,
 	"bat" text NOT NULL,
+	"user_id" text,
 	"expires_at" integer,
+	"created_at" integer NOT NULL,
 	CONSTRAINT "sessions_bat_unique" UNIQUE("bat")
 );
 --> statement-breakpoint
@@ -77,10 +85,15 @@ CREATE TABLE "subscriptions" (
 CREATE TABLE "users" (
 	"id" text PRIMARY KEY NOT NULL,
 	"invite_code" text NOT NULL,
+	"code_created_at" integer NOT NULL,
 	"code_expires_at" integer,
-	"created_at" integer NOT NULL,
+	"user_created_at" integer,
 	"pubkey" text,
-	"is_active" boolean,
+	"is_active" boolean DEFAULT true NOT NULL,
+	"total_disputes" integer DEFAULT 0 NOT NULL,
+	"disputes_won" integer DEFAULT 0 NOT NULL,
+	"disputes_lost" integer DEFAULT 0 NOT NULL,
+	"disputes_pending" integer DEFAULT 0 NOT NULL,
 	CONSTRAINT "users_invite_code_unique" UNIQUE("invite_code"),
 	CONSTRAINT "users_pubkey_unique" UNIQUE("pubkey")
 );
@@ -94,4 +107,5 @@ CREATE TABLE "vapid_keys" (
 ALTER TABLE "offers" ADD CONSTRAINT "offers_fiat_provider_id_fiat_providers_id_fk" FOREIGN KEY ("fiat_provider_id") REFERENCES "public"."fiat_providers"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "offers" ADD CONSTRAINT "offers_maker_session_id_sessions_id_fk" FOREIGN KEY ("maker_session_id") REFERENCES "public"."sessions"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "offers" ADD CONSTRAINT "offers_taker_session_id_sessions_id_fk" FOREIGN KEY ("taker_session_id") REFERENCES "public"."sessions"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "sessions" ADD CONSTRAINT "sessions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "settings" ADD CONSTRAINT "settings_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;

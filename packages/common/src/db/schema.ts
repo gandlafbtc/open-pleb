@@ -26,8 +26,8 @@ export const offerTable = pgTable('offers', {
 	takerBondPercentage: integer('taker_bond_percentage').notNull(),
 
 	// sessions
-	makerSessionId: integer("maker_session_id").references(() => sessionTable.id).notNull().unique(),
-	takerSessionId: integer("taker_session_id").references(() => sessionTable.id),
+	makerSessionId: text("maker_session_id").references(() => sessionTable.id).notNull().unique(),
+	takerSessionId: text("taker_session_id").references(() => sessionTable.id),
 
 	// reputation stakes
 	makerReputationStake: text("maker_reputation_stake"),

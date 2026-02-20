@@ -1,5 +1,5 @@
 {
-  "id": "658f252e-0916-41d9-b512-87f9c2426a36",
+  "id": "2e8dec42-6dcd-412b-87e1-e42f08f00db7",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -30,7 +30,15 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "admins_pubkey_unique": {
+          "name": "admins_pubkey_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "pubkey"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -210,15 +218,27 @@
         },
         "maker_session_id": {
           "name": "maker_session_id",
-          "type": "integer",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
         "taker_session_id": {
           "name": "taker_session_id",
-          "type": "integer",
+          "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
+        },
+        "maker_reputation_stake": {
+          "name": "maker_reputation_stake",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "taker_reputation_stake": {
+          "name": "taker_reputation_stake",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "maker_bond_and_escrow": {
           "name": "maker_bond_and_escrow",
@@ -292,14 +312,38 @@
           "primaryKey": false,
           "notNull": false
         },
-        "taker_reward": {
-          "name": "taker_reward",
+        "taker_reward_token": {
+          "name": "taker_reward_token",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
         "maker_refund_token": {
           "name": "maker_refund_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "maker_reputation_token": {
+          "name": "maker_reputation_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "taker_reputation_token": {
+          "name": "taker_reputation_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "taker_reward_pubkey_lock": {
+          "name": "taker_reward_pubkey_lock",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "maker_refund_pubkey_lock": {
+          "name": "maker_refund_pubkey_lock",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -355,13 +399,6 @@
           "columns": [
             "maker_session_id"
           ]
-        },
-        "offers_taker_session_id_unique": {
-          "name": "offers_taker_session_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "taker_session_id"
-          ]
         }
       },
       "policies": {},
@@ -374,20 +411,9 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "integer",
+          "type": "text",
           "primaryKey": true,
-          "notNull": true,
-          "identity": {
-            "type": "always",
-            "name": "sessions_id_seq",
-            "schema": "public",
-            "increment": "1",
-            "startWith": "1",
-            "minValue": "1",
-            "maxValue": "2147483647",
-            "cache": "1",
-            "cycle": false
-          }
+          "notNull": true
         },
         "bat": {
           "name": "bat",
@@ -395,15 +421,41 @@
           "primaryKey": false,
           "notNull": true
         },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "expires_at": {
           "name": "expires_at",
           "type": "integer",
           "primaryKey": false,
           "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "sessions_user_id_users_id_fk": {
+          "name": "sessions_user_id_users_id_fk",
+          "tableFrom": "sessions",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "sessions_bat_unique": {
@@ -564,17 +616,23 @@
           "primaryKey": false,
           "notNull": true
         },
+        "code_created_at": {
+          "name": "code_created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
         "code_expires_at": {
           "name": "code_expires_at",
           "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
-        "created_at": {
-          "name": "created_at",
+        "user_created_at": {
+          "name": "user_created_at",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "pubkey": {
           "name": "pubkey",
@@ -586,7 +644,36 @@
           "name": "is_active",
           "type": "boolean",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": true
+        },
+        "total_disputes": {
+          "name": "total_disputes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "disputes_won": {
+          "name": "disputes_won",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "disputes_lost": {
+          "name": "disputes_lost",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "disputes_pending": {
+          "name": "disputes_pending",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
         }
       },
       "indexes": {},

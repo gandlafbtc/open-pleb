@@ -2,11 +2,11 @@ import { DefaultStore } from '../helper/storeHelper.svelte';
 import { createEncryptionHelper } from '../helper/encryptionHelper';
 import type { LNURL } from '../models/types';
 import { lnurlCallback, validateLnAddress } from "common/lnurl";
-const lnurlEncryptionHelper = createEncryptionHelper<LNURL>('encrypted-lnurl');
+const encryptionHelper = createEncryptionHelper<LNURL>('encrypted-lnurl');
 
 class LnurlStore extends DefaultStore<LNURL> {
 	constructor() {
-		super(lnurlEncryptionHelper);
+		super(encryptionHelper);
 	}
 	validate(lnurl: string) {
 		return validateLnAddress(lnurl)
