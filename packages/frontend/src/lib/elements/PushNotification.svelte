@@ -6,8 +6,7 @@
 	import { appMode } from '$lib/stores/local/mode';
 	import { base64ToUint8Array } from '$lib/helper';
 	import { env } from '$env/dynamic/public';
-	import { PUBLIC_API_VERSION } from '$env/static/public';
-	const { PUBLIC_BACKEND_URL } = env;
+	const { PUBLIC_BACKEND_URL, PUBLIC_API_VERSION  } = env;
 	// State variables
 	let showPrompt = $state(false);
 	let permissionStatus = $state<NotificationPermission | null>(null);
