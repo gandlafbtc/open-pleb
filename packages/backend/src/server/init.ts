@@ -48,6 +48,7 @@ const checkEnv = () => {
 		"OPENPLEB_CURRENCY",
 		"OPENPLEB_MAX_FIAT_AMOUNT",
 		"OPENPLEB_JWT_SECRET",
+		"OPENPLEB_ADMIN_NPUB"
 	];
 
 	for (const envVar of requiredEnvVars) {

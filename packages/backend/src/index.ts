@@ -5,6 +5,8 @@ import { afterInit, init } from "./server/init";
 import { corsConfig, rateLimiter, swaggerDocs } from "./server/serverConfig";
 import { v1Open } from "./api/v1/app/rest/v1";
 import { v1WS } from "./api/v1/app/socket/v1";
+import { v1WSA } from "./api/v1/admin/socket/v1";
+import { v1Admin } from "./api/v1/admin/rest/v1";
 // pre-server start initialize
 await init();
 
@@ -23,6 +25,16 @@ const app = new Elysia()
 
 log.info(`OpenPleb 🚶 is running at ${app.server?.hostname}:${app.server?.port}`);
 
+const adminApp = new Elysia()
+	.use(apiLogger)
+	.use(rateLimiter)
+	.use(swaggerDocs)
+	.use(corsConfig)
+	.use(v1Admin)
+	.use(v1WSA)
+	.listen(Bun.env.OPENPLEB_ADMIN_PORT!);
+
+log.info(`OpenPleb 🚶 is running at ${adminApp.server?.hostname}:${adminApp.server?.port}`);
 afterInit();
 
 

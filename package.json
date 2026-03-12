@@ -73,9 +73,9 @@
       "@scure/bip39": "^2.0.1"
     },
     "cashu": {
-      "coco-cashu-core": "1.1.2-rc.42",
-      "coco-cashu-sqlite3": "1.1.2-rc.42",
-      "coco-cashu-indexeddb": "^1.0.0-rc11"
+      "coco-cashu-core": "1.1.2-rc.47",
+      "coco-cashu-sqlite3": "1.1.2-rc.47",
+      "coco-cashu-indexeddb": "1.1.2-rc.47"
     },
     "server": {
       "@elysiajs/cookie": "^0.8.0",
