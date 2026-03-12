@@ -16,8 +16,18 @@
       platform: string;
     }>;
   }
-  
-  let deferredPrompt: BeforeInstallPromptEvent | null = browser? window.deferredOnInstallPrompt: null;
+
+  const getDeferredPrompt = () => {
+    if (!browser) {
+      return null;
+    }
+    const typedWindow = window as typeof window & {
+      deferredOnInstallPrompt?: BeforeInstallPromptEvent | null;
+    };
+    return typedWindow.deferredOnInstallPrompt ?? null;
+  };
+
+  let deferredPrompt: BeforeInstallPromptEvent | null = getDeferredPrompt();
   let showPrompt = $state(false);
   let isPWAInstalled = $state(false);
 

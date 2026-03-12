@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import Button from '$lib/components/ui/button/button.svelte';
 	import { dataStore } from '$lib/stores/session/data.svelte';
 	import type { Offer } from '@openPleb/common/db/schema';
 	import { checkIfRedeemed } from '$lib/actions';
@@ -9,7 +8,6 @@
     interface Props {offer: Offer}
     
     let {offer}: Props = $props();
-	let showFullScreen = $state(false);
 	const id = Number.parseInt(page.params.id);
 	const receipt = $derived(dataStore.receipts.find((r) => r.offerId === id));
 
@@ -21,7 +19,7 @@
 </script> 
 
 <div>
-		{#if receipt}
-			<DetailReceipt {offer} {receipt}></DetailReceipt>	
-		{/if}
+	{#if receipt || offer.receiptSkipped}
+		<DetailReceipt {offer} receipt={receipt ?? null}></DetailReceipt>	
+	{/if}
 </div>

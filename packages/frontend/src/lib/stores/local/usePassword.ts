@@ -1,9 +1,9 @@
 import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
 
-const initial: 'true' | 'false' | undefined = browser
-	? window.localStorage.getItem('use-password')
-	: undefined;
+const storedValue = browser ? window.localStorage.getItem('use-password') ?? undefined : undefined;
+const initial: 'true' | 'false' | undefined =
+	storedValue === 'true' || storedValue === 'false' ? storedValue : undefined;
 
 const getInitial = (initial: 'true' | 'false' | undefined) => {
 	switch (initial) {
@@ -18,9 +18,11 @@ const getInitial = (initial: 'true' | 'false' | undefined) => {
 
 export let usePassword = writable<boolean | undefined>(getInitial(initial));
 
-usePassword.subscribe(async (value) => {
-	const stringValue = JSON.stringify(value);
-	if (browser) {
-		window.localStorage.setItem('use-password', stringValue);
+usePassword.subscribe((value) => {
+	if (!browser) return;
+	if (value === undefined) {
+		window.localStorage.removeItem('use-password');
+		return;
 	}
+	window.localStorage.setItem('use-password', value ? 'true' : 'false');
 });

@@ -8,7 +8,7 @@
 
     interface Props {offer: Offer}
     
-    const {offer} = $props() as Props;
+    let {offer}: Props = $props();
 
     const provider = dataStore.providers.find(p => p.id === offer.fiatProviderId);
     

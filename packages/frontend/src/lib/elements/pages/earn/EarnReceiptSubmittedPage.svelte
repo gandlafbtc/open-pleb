@@ -14,7 +14,7 @@
 		offer: Offer;
 	}
 
-	const { offer } = $props();
+	let { offer }: Props = $props();
 
 	let receipt = $derived(dataStore.receipts.find((r) => r.offerId === offer.id));
 	onMount(() => {
@@ -30,13 +30,24 @@
 	};
 </script>
 
-{#if receipt}
-	<div class="flex w-full flex-col items-center justify-center gap-4">
-		<p class="text-lg font-bold">Receipt uploaded successfully!</p>
-		<div class="flex items-center gap-2">
-			<p>Waiting for approval...</p>
-			<LoaderCircle class="h-5 w-5 animate-spin"></LoaderCircle>
-		</div>
-		<DetailReceipt {offer} {receipt}></DetailReceipt>
+{#if receipt || offer.receiptSkipped}
+	<div class="flex w-full flex-col items-center justify-center gap-4 text-center">
+		{#if receipt}
+			<p class="text-lg font-bold">Receipt uploaded successfully!</p>
+			<p class="flex items-center gap-2 text-sm text-muted-foreground">
+				Waiting for approval...
+				<LoaderCircle class="h-4 w-4 animate-spin"></LoaderCircle>
+			</p>
+		{:else}
+			<p class="text-lg font-bold">Receipt upload skipped</p>
+			<p class="text-sm text-muted-foreground">
+				Operators will review the payment details shortly.
+			</p>
+		{/if}
+		<DetailReceipt {offer} receipt={receipt ?? null}></DetailReceipt>
+	</div>
+{:else}
+	<div class="flex justify-center p-6 text-muted-foreground">
+		<LoaderCircle class="h-6 w-6 animate-spin" />
 	</div>
 {/if}

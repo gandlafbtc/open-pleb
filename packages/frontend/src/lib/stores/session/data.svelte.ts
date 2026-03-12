@@ -21,7 +21,7 @@ export const createDataStore = () => {
 	let receipts: Receipt[]  = $state([])
 	let takers: number  = $state(0)
 	let makers: number  = $state(0)
-	let env: Environment = $state()
+	let env: Environment = $state({} as Environment)
 	let providers: FiatProvider[]  = $state([])
 	const init = async () => {
 		const response = await fetch(

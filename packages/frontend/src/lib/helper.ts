@@ -72,7 +72,9 @@ export const getDivider = (currentUnit: string) => {
 export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 export const css = (element: HTMLElement, style: Record<string, string>) => {
-	for (const property in style) element.style[property] = style[property];
+	for (const property in style) {
+		element.style.setProperty(property, style[property]);
+	}
 };
 
 export const getImgMeta = async (url: string): Promise<HTMLImageElement> => {
