@@ -1,7 +1,7 @@
-import { env } from '$env/dynamic/public';
 import { authState } from '$lib/state/auth.svelte';
+import { ADMIN_API_BASE_URL } from './const';
+import { loadUsers } from './user.service';
 
-const { PUBLIC_ADMIN_BACKEND_URL, PUBLIC_API_VERSION } = env;
 
 export interface InviteCode {
 	inviteCode: string;
@@ -16,11 +16,7 @@ export interface GenerateCodesResponse {
 }
 
 export class InviteCodesService {
-	private baseUrl: string;
-
-	constructor() {
-		this.baseUrl = `${PUBLIC_ADMIN_BACKEND_URL}/api/${PUBLIC_API_VERSION}/admin`;
-	}
+	
 
 	/**
 	 * Generate invite codes
@@ -36,7 +32,7 @@ export class InviteCodesService {
 			body.expiresAt = expiresAt;
 		}
 
-		const response = await fetch(`${this.baseUrl}/generate-codes`, {
+		const response = await fetch(`${ADMIN_API_BASE_URL}/generate-codes`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -55,7 +51,7 @@ export class InviteCodesService {
 		if (!data.success) {
 			throw new Error('Failed to generate codes');
 		}
-
+		await loadUsers()
 		return data.codes;
 	}
 }

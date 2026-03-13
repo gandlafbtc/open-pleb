@@ -1,22 +1,20 @@
 <script lang="ts">
-	import { inviteCodesService, type InviteCode } from '$lib/services/invite-codes.service';
+	import { inviteCodesService } from '$lib/services/invite-codes.service';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import * as Card from '$lib/components/ui/card';
 	import * as Alert from '$lib/components/ui/alert';
-	import { ScrollArea } from '$lib/components/ui/scroll-area';
-	import { Loader2, Copy, Check, Calendar, Clock } from '@lucide/svelte';
+	import { Loader2 } from '@lucide/svelte';
+
 
 	let count = $state(10);
 	let expiresInDays = $state<number | undefined>(undefined);
 	let useExpiration = $state(false);
 	let isLoading = $state(false);
 	let error = $state<string | null>(null);
-	let generatedCodes = $state<InviteCode[]>([]);
-	let copiedIndex = $state<number | null>(null);
-	let copiedAll = $state(false);
+
 
 	async function handleGenerate() {
 		isLoading = true;
@@ -30,8 +28,7 @@
 				expiresAt = now + expiresInDays * 24 * 60 * 60;
 			}
 
-			const codes = await inviteCodesService.generateCodes(count, expiresAt);
-			generatedCodes = codes;
+			await inviteCodesService.generateCodes(count, expiresAt);
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Failed to generate codes';
 			console.error('Generate codes error:', err);
@@ -40,34 +37,9 @@
 		}
 	}
 
-	async function copyCode(code: string, index: number) {
-		try {
-			await navigator.clipboard.writeText(code);
-			copiedIndex = index;
-			setTimeout(() => {
-				copiedIndex = null;
-			}, 2000);
-		} catch (err) {
-			console.error('Failed to copy:', err);
-		}
-	}
 
-	async function copyAllCodes() {
-		try {
-			const allCodes = generatedCodes.map((c) => c.inviteCode).join('\n');
-			await navigator.clipboard.writeText(allCodes);
-			copiedAll = true;
-			setTimeout(() => {
-				copiedAll = false;
-			}, 2000);
-		} catch (err) {
-			console.error('Failed to copy all codes:', err);
-		}
-	}
 
-	function formatDate(timestamp: number): string {
-		return new Date(timestamp * 1000).toLocaleString();
-	}
+
 </script>
 
 <div class="space-y-6">
@@ -130,62 +102,4 @@
 		</Card.Content>
 	</Card.Root>
 
-	{#if generatedCodes.length > 0}
-		<Card.Root>
-			<Card.Header>
-				<div class="flex items-center justify-between">
-					<div>
-						<Card.Title>Generated Codes</Card.Title>
-						<Card.Description>{generatedCodes.length} codes created</Card.Description>
-					</div>
-					<Button variant="outline" size="sm" onclick={copyAllCodes}>
-						{#if copiedAll}
-							<Check class="mr-2 h-4 w-4" />
-							Copied!
-						{:else}
-							<Copy class="mr-2 h-4 w-4" />
-							Copy All
-						{/if}
-					</Button>
-				</div>
-			</Card.Header>
-			<Card.Content>
-				<ScrollArea class="h-96 w-full">
-					<div class="space-y-3">
-						{#each generatedCodes as code, index (code.inviteCode)}
-							<div class="flex items-start justify-between rounded-lg border bg-muted/50 p-4">
-								<div class="flex-1 space-y-2">
-									<code class="text-sm font-mono break-all">{code.inviteCode}</code>
-									<div class="flex flex-wrap gap-3 text-xs text-muted-foreground">
-										<span class="flex items-center gap-1">
-											<Clock class="h-3 w-3" />
-											Created: {formatDate(code.codeCreatedAt)}
-										</span>
-										{#if code.codeExpiresAt}
-											<span class="flex items-center gap-1">
-												<Calendar class="h-3 w-3" />
-												Expires: {formatDate(code.codeExpiresAt)}
-											</span>
-										{/if}
-									</div>
-								</div>
-								<Button
-									variant="ghost"
-									size="sm"
-									onclick={() => copyCode(code.inviteCode, index)}
-									class="ml-4 shrink-0"
-								>
-									{#if copiedIndex === index}
-										<Check class="h-4 w-4" />
-									{:else}
-										<Copy class="h-4 w-4" />
-									{/if}
-								</Button>
-							</div>
-						{/each}
-					</div>
-				</ScrollArea>
-			</Card.Content>
-		</Card.Root>
-	{/if}
 </div>

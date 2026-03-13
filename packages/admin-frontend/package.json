@@ -23,6 +23,7 @@
 		"@sveltejs/kit": "catalog:sveltekit-dev",
 		"@sveltejs/vite-plugin-svelte": "catalog:sveltekit-dev",
 		"@tailwindcss/vite": "catalog:sveltekit-dev",
+		"@tanstack/table-core": "catalog:ui",
 		"@types/node": "catalog:sveltekit-dev",
 		"bits-ui": "catalog:ui",
 		"clsx": "catalog:ui",
@@ -35,6 +36,7 @@
 		"prettier-plugin-tailwindcss": "catalog:sveltekit-dev",
 		"svelte": "catalog:sveltekit-dev",
 		"svelte-check": "catalog:sveltekit-dev",
+		"svelte-sonner": "^1.0.7",
 		"tailwind-merge": "catalog:ui",
 		"tailwind-variants": "catalog:ui",
 		"tailwindcss": "catalog:sveltekit-dev",
@@ -44,6 +46,6 @@
 		"vite": "catalog:sveltekit-dev"
 	},
 	"dependencies": {
-		"mode-watcher": "catalog:ui"
+		"mode-watcher": "^1.1.0"
 	}
 }
