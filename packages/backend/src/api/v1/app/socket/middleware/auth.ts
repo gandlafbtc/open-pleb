@@ -58,6 +58,7 @@ export async function validateJWT(jwt: string): Promise<AuthResult> {
 		return {
 			isValid: true,
 			userId: "jwt-user-placeholder",
+			isAdmin: jwt.includes("admin") // Simple check for demo
 		};
 	}
 	

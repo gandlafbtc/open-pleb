@@ -8,7 +8,7 @@ export const generateCodes = async (count: number, expiresAt?: number): Promise<
   const codes: InsertUser[] = []
   for (let i = 0; i < count; i++) {
     const codeBytes = randomBytes(16)
-    const code = bytesToHex(codeBytes)
+    const code = bytesToHex(codeBytes).toUpperCase()
     const insertUser: InsertUser = {
       codeCreatedAt: getUnixNow(),
       inviteCode: code,

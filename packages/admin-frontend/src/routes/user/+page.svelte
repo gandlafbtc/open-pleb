@@ -17,6 +17,8 @@
 	} from '@tanstack/table-core';
 	import type { User } from 'common/db/schema';
 	import { copyTextToClipboard } from '$lib/utils';
+	import { pubkeyToNpub } from "common/encoding";
+	import { hexToBytes } from "@noble/hashes/utils.js";
 
 	// State management using Svelte runes
 	let showInviteCodes = $state(false);
@@ -44,7 +46,7 @@
 			}
 		},
 		{
-			accessorKey: 'usedAt',
+			accessorKey: 'userCreatedAt',
 			header: 'Status',
 			cell: (info) => {
 				const usedAt = info.getValue() as number | null;
@@ -52,7 +54,7 @@
 			}
 		},
 		{
-			accessorKey: 'usedAt',
+			accessorKey: 'userCreatedAt',
 			header: 'Used At',
 			cell: (info) => {
 				const usedAt = info.getValue() as number | null;
@@ -60,12 +62,12 @@
 			}
 		},
 		{
-			accessorKey: 'npub',
+			accessorKey: 'pubkey',
 			header: 'Npub',
 			cell: (info) => {
-				const npub = info.getValue() as string | null;
-				if (!npub) return '-';
-				return `${npub.substring(0, 12)}...${npub.substring(npub.length - 8)}`;
+				const pubkey = info.getValue() as string | null;
+				if (!pubkey) return '-';
+				return `${pubkeyToNpub(hexToBytes(pubkey)).substring(0, 20)}...`;
 			}
 		}
 	];
@@ -218,6 +220,24 @@
 															size="icon"
 															class="h-8 w-8"
 															onclick={() => copyTextToClipboard(code, 'invite code')}
+														>
+															<Copy class="h-4 w-4" />
+														</Button>
+													</div>
+												{:else}
+													-
+												{/if}
+											{:else if cell.column.id === 'pubkey'}
+												{@const pubkey = cell.getValue() as string | null}
+												{#if pubkey}
+													{@const fullNpub = pubkeyToNpub(hexToBytes(pubkey))}
+													<div class="flex items-center gap-2">
+														<span class="font-mono text-sm">{fullNpub.substring(0, 20)}...</span>
+														<Button
+															variant="ghost"
+															size="icon"
+															class="h-8 w-8"
+															onclick={() => copyTextToClipboard(fullNpub, 'npub')}
 														>
 															<Copy class="h-4 w-4" />
 														</Button>

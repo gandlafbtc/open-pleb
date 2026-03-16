@@ -29,7 +29,7 @@ function fallbackCopyTextToClipboard(text: string, thingThatWasCopied?:string) {
        try {
                const successful = document.execCommand('copy');
                if (successful) {
-                       toast.info(`copied${thingThatWasCopied?"":" "+thingThatWasCopied}!`);
+                       toast.info(`copied${!thingThatWasCopied?"":" "+thingThatWasCopied}!`);
                }
        } catch (err) {
                console.error('Fallback: Oops, unable to copy', err);
@@ -44,7 +44,7 @@ export function copyTextToClipboard(text: string, thingThatWasCopied: string) {
        }
        navigator.clipboard.writeText(text).then(
                function () {
-                       toast.info(`copied${thingThatWasCopied?"":" "+thingThatWasCopied}!`);
+                       toast.info(`copied${!thingThatWasCopied?"":" "+thingThatWasCopied}!`);
                },
                function (err) {
                        console.error('Async: Could not copy text: ', err);

@@ -38,17 +38,15 @@
 			};			
 			payload.inviteCode = inviteCode.trim();
 			
-			const signedPayload = signPayload(payload, bytesToHex(idKeys.privkey));
-			
 			// Send registration request to backend
 			const response = await fetch(
-				`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/register`,
+				`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/user/register`,
 				{
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json'
 					},
-					body: JSON.stringify(signedPayload)
+					body: JSON.stringify(payload)
 				}
 			);
 

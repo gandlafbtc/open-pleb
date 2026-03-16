@@ -1,13 +1,9 @@
-import { db } from "@openPleb/common/db";
-import { userTable } from "@openPleb/common/db/schema";
-import { eq } from "drizzle-orm";
 import type Elysia from "elysia";
 import { log } from "../../../../util/logger";
-import { takeUniqueOrUndefinded } from "../../../../util/orm-helper";
 
 export const isAuthenticated = (app: Elysia) =>
 	//@ts-expect-error jwt
-	app.derive(async ({ jwt, set, headers }) => {
+	app.onBeforeHandle(async ({ jwt, set, headers }) => {
 		log.debug(`Accessing protected endpoint...`);
 		const auth = headers.authorization;
 		const token = auth?.startsWith("Bearer ") ? auth.slice(7) : null;
@@ -32,13 +28,7 @@ export const isAuthenticated = (app: Elysia) =>
 			};
 		}
 
-		const user = await db
-			.select()
-			.from(userTable)
-			.where(eq(userTable.id, userId))
-			.then(takeUniqueOrUndefinded);
-
-		if (user !== Bun.env.OPENPLEB_ADMIN_NPUB) {
+		if (userId !== Bun.env.OPENPLEB_ADMIN_NPUB) {
 			log.warn(`No such admin: ${userId}`);
 			set.status = 401;
 			return {
@@ -48,8 +38,5 @@ export const isAuthenticated = (app: Elysia) =>
 			};
 		}
 		log.debug(`Authorized: ${userId}`);
-
-		return {
-			user,
-		};
+		// Don't return anything on success - let the request continue to the route handler
 	});
