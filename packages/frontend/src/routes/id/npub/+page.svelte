@@ -1,17 +1,13 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { idKeys } from '$lib/state/dynamic/id.svelte';
-	import { Copy, CheckCircle2, Loader2, LoaderCircle, CheckCircle, CheckCircleIcon } from '@lucide/svelte';
+	import { Copy, Loader2, LoaderCircle, CheckCircleIcon } from '@lucide/svelte';
 	import { encodeQR } from 'qr';
-	import { Loader, toast } from 'svelte-sonner';
+	import { toast } from 'svelte-sonner';
 	import { goto } from '$app/navigation';
-	import { env } from '$env/dynamic/public';
-	import { signPayload } from 'common/payloads';
-	import { bytesToHex } from '@noble/hashes/utils.js';
 	import { copyTextToClipboard } from '$lib/utils';
 	import { ensureError } from 'common/errors';
-
-	const { PUBLIC_BACKEND_URL, PUBLIC_API_VERSION } = env;
+	import { registerUser, checkUserStatus } from '$lib/interface/rest/user.service';
 
 	let isRegistering = $state(false);
 	let isConnecting = $state(false);
@@ -26,42 +22,19 @@
 
 		if (!inviteCode) {
 			toast.warning('No invite code provided');
-			return
+			return;
 		}
 
 		isRegistering = true;
-		
-		try {
-			// Create registration payload with signature
-			const payload: { pubkey: string; inviteCode?: string } = {
-				pubkey: idKeys.getHexPubKey()
-			};			
-			payload.inviteCode = inviteCode.trim();
-			
-			// Send registration request to backend
-			const response = await fetch(
-				`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/user/register`,
-				{
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					body: JSON.stringify(payload)
-				}
-			);
 
-			if (!response.ok) {
-				const errorData = await response.json().catch(() => ({ message: 'Registration failed' }));
-				throw new Error(errorData.message || 'Registration failed');
-			}
+		try {
+			await registerUser(idKeys.getHexPubKey(), inviteCode);
 
 			registrationStatus = 'registered';
 			toast.success('Successfully registered your Open Pleb ID!');
-			
+
 			// Redirect to main page after successful registration
-			setTimeout(() => {
-				goto('/');
-			}, 2000);
+			goto('/');
 		} catch (error) {
 			console.error('Registration error:', error);
 			registrationStatus = 'error';
@@ -78,28 +51,16 @@
 		}
 
 		isConnecting = true;
-		
-		try {
-			// Check if ID is already registered
-			const response = await fetch(
-				`${PUBLIC_BACKEND_URL}/api/${PUBLIC_API_VERSION}/user/${idKeys.getHexPubKey()}`,
-				{
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json'
-					}
-				}
-			);
 
-			if (!response.ok) {
-				throw new Error('Failed to connect');
+		try {
+			const status = await checkUserStatus(idKeys.getHexPubKey());
+			if (!status.isInvited) {
+				throw new Error('ID is not yet invited. Register with invite code.');
 			}
-			const body = await response.json()
-			if (!body.isInvited) {
-				throw new Error('ID is not yet invited. Register with invite code.');				
-			}
+			toast.success('Welcome back!');
+			goto('/');
 		} catch (error) {
-			const err = ensureError(error)
+			const err = ensureError(error);
 			console.error('Connection error:', error);
 			toast.error(err.message);
 		} finally {

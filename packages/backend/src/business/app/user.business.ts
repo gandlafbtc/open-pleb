@@ -49,7 +49,7 @@ export const registerUser = async (pubkey:string, inviteCode:string) => {
         throw new Error("Invalid pubkey. Should be 64 hex char, got: "+pubkey);
     }
 
-    if (!isValidInviteCode(inviteCode)) {
+    if (!await isValidInviteCode(inviteCode)) {
         throw new Error("Invalid invite code.");
     }
 

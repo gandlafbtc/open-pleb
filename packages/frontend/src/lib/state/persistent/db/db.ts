@@ -3,7 +3,7 @@ import { toast } from 'svelte-sonner';
 import { ensureError } from 'common/errors';
 import type { OpenPlebDB } from './model';
 
-export const DB_VERSION = 1;
+export const DB_VERSION = 2;
 export const DB_NAME = 'openpleb-db';
 
 export class DB {
@@ -24,6 +24,12 @@ export class DB {
 				if (!oldVersion) {
 					db.createObjectStore('encrypted-lnurl');
 					db.createObjectStore('encrypted-seed');
+					db.createObjectStore('encrypted-settings');
+				}
+				if (oldVersion < 2) {
+					if (!db.objectStoreNames.contains('encrypted-settings')) {
+						db.createObjectStore('encrypted-settings');
+					}
 				}
 			},
 			blocked: () => {

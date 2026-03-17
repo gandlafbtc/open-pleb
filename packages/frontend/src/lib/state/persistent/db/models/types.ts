@@ -17,3 +17,8 @@ export type LNURL = {
 export type SeedPhrase = {
 	seedPhrase: string;
 };
+
+export type Setting = {
+	key: string;
+	value: string;
+};

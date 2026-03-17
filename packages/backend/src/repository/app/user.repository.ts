@@ -12,7 +12,7 @@ export const registerUser = async (pubkey:string, inviteCode: string) => {
     const res = await db.update(userTable).set({pubkey,
         userCreatedAt: getUnixNow(),
         isActive: true
-    }).where(and(eq(userTable.inviteCode, inviteCode), isNull(userTable.pubkey)))
+    }).where(and(eq(userTable.inviteCode, inviteCode), isNull(userTable.pubkey))).returning()
     return res.length?true:false
 }
 

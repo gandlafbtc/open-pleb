@@ -1,10 +1,13 @@
 <script>
 	import DarkmodeToggle from "$lib/components/ui/custom/DarkmodeToggle.svelte";
 	import LanguageSelector from "$lib/components/ui/custom/LanguageSelector.svelte";
+	import RefreshBackend from "$lib/components/ui/custom/RefreshBackend.svelte";
 	import DeleteButton from "$lib/elements/settings/DeleteButton.svelte";
     import LnurlSettings from "$lib/elements/settings/LnurlSettings.svelte";
 	import SeedSettings from "$lib/elements/settings/SeedSettings.svelte";
-	import Seed from "$lib/elements/settings/SeedSettings.svelte";
+	import EnvSettings from "$lib/elements/settings/EnvSettings.svelte";
+	import BackendSettings from "$lib/elements/settings/BackendSettings.svelte";
+	import { getAppApiBaseUrl } from "$lib/interface/rest/const";
 </script>
 
 <div class="container mx-auto space-y-4">
@@ -32,6 +35,31 @@
 				</div>
             </div>
         </div>
+    </section>
+
+        <section class="space-y-4 border border-border rounded-2xl p-3 shadow-sm shadow-black/5">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm uppercase tracking-[0.3em] text-muted-foreground">Backend</p>
+            </div>
+        </div>
+        <div class="text-sm text-muted-foreground">
+            <div class="space-y-3">
+                <div class="rounded-xl border border-border p-3 flex justify-between items-center">
+                    <div>
+
+                        <p class="font-medium">Connected Backend</p>
+                        <p class="text-xs">
+
+                            {getAppApiBaseUrl()}
+                        </p>
+                    </div>
+					<RefreshBackend/>
+				</div>
+            </div>
+        </div>
+        <EnvSettings />
+        <BackendSettings />
     </section>
 
 
