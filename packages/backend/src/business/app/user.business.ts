@@ -19,13 +19,22 @@ const isValidPubkey = (pubkey: string): boolean => {
  * @param inviteCode - The invite code to validate
  * @returns true if valid, false otherwise
  */
-const isValidInviteCode = (inviteCode: string): boolean => {
+const isValidInviteCode = async (inviteCode: string): Promise<boolean> => {
     if (!inviteCode || typeof inviteCode !== 'string') {
         return false
     }
     // Check if it's exactly 32 characters and all are valid hex characters (0-9, a-f, A-F)
     const hexRegex = /^[0-9a-fA-F]{32}$/
-    return hexRegex.test(inviteCode)
+
+    if (!hexRegex.test(inviteCode)) {
+        return false
+    }
+
+    if(!(await repo.verifyInviteCode(inviteCode))){
+        return false
+    }
+
+    return true
 }
 
 export const isUserInvited = async (pubkey:string) =>{
@@ -41,7 +50,8 @@ export const registerUser = async (pubkey:string, inviteCode:string) => {
     }
 
     if (!isValidInviteCode(inviteCode)) {
-        throw new Error("Invalid invite code. Should be 32 hex char, got: "+pubkey);
+        throw new Error("Invalid invite code.");
     }
+
     return await repo.registerUser(pubkey, inviteCode)
 }

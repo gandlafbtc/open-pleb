@@ -34,7 +34,7 @@ const adminApp = new Elysia()
 	.use(v1WSA)
 	.listen(Bun.env.OPENPLEB_ADMIN_PORT!);
 
-log.info(`OpenPleb 🚶 is running at ${adminApp.server?.hostname}:${adminApp.server?.port}`);
+log.info(`OpenPleb admin is running at ${adminApp.server?.hostname}:${adminApp.server?.port}`);
 afterInit();
 
 
