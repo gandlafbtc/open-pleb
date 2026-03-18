@@ -16,6 +16,9 @@ class Env {
 	async init() {
 		try {
 			this._settings = await getEnvSettings();
+			if (!this.settings?.OPENPLEB_MINT_URL) {
+				throw new Error("could not get mint env");
+			}
 		} catch (error) {
 			console.error('Failed to fetch environment settings:', error);
 			// Don't throw - allow app to continue even if env fetch fails

@@ -14,7 +14,7 @@ export type WithoutChildrenOrChild<T> = WithoutChildren<WithoutChild<T>>;
 export type WithElementRef<T, U extends HTMLElement = HTMLElement> = T & { ref?: U | null };
 
 
-function fallbackCopyTextToClipboard(text: string) {
+function fallbackCopyTextToClipboard(text: string, thingThatWasCopied?:string) {
        const textArea = document.createElement('textarea');
        textArea.value = text;
 
@@ -30,7 +30,7 @@ function fallbackCopyTextToClipboard(text: string) {
        try {
                const successful = document.execCommand('copy');
                if (successful) {
-                       toast.info('copied!');
+                       toast.info(`copied${!thingThatWasCopied?"":" "+thingThatWasCopied}!`);
                }
        } catch (err) {
                console.error('Fallback: Oops, unable to copy', err);
@@ -38,14 +38,14 @@ function fallbackCopyTextToClipboard(text: string) {
 
        document.body.removeChild(textArea);
 }
-export function copyTextToClipboard(text: string) {
+export function copyTextToClipboard(text: string, thingThatWasCopied: string) {
        if (!navigator.clipboard) {
-               fallbackCopyTextToClipboard(text);
+               fallbackCopyTextToClipboard(text,thingThatWasCopied);
                return;
        }
        navigator.clipboard.writeText(text).then(
                function () {
-                       toast.info('copied!');
+                       toast.info(`copied${!thingThatWasCopied?"":" "+thingThatWasCopied}!`);
                },
                function (err) {
                        console.error('Async: Could not copy text: ', err);

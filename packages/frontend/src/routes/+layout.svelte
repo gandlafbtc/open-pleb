@@ -13,6 +13,7 @@
 	import IDCreation from '$lib/elements/onboarding/idcreation/IDCreation.svelte';
 	import { toast, Toaster } from 'svelte-sonner';
 	import { ensureError } from 'common/errors';
+	import FloatingWallet from '$lib/components/wallet/FloatingWallet.svelte';
 
 	onMount(async () => {
 		try {
@@ -45,6 +46,9 @@
 	<div class="m-2">
 		{@render children()}
 	</div>
+
+	<!-- Floating Wallet Button -->
+	<FloatingWallet />
 
 	{/if}
 {/if}

@@ -24,8 +24,6 @@ export const createEncryptionHelper = <T>(
 
 	const decrypt = async <T>(): Promise<T[]> => {
 			const db = await DB.getInstance();
-			console.log("bb")
-
 			const encrypted = (await db.get(dbStoreName, 'default')) as EncryptedStore;
 			if (!encrypted) {
 				return [];

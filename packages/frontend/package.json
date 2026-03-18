@@ -20,7 +20,7 @@
 		"@inlang/paraglide-js": "catalog:sveltekit-dev",
 		"@internationalized/date": "catalog:ui",
 		"@lottiefiles/dotlottie-web": "catalog:ui",
-		"@lucide/svelte": "^0.561.0",
+		"@lucide/svelte": "catalog:ui",
 		"@noble/curves": "catalog:crypto",
 		"@noble/hashes": "catalog:crypto",
 		"@scure/bip32": "catalog:crypto",

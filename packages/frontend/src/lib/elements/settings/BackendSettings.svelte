@@ -2,7 +2,6 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { backendUrl } from '$lib/state/dynamic/backendUrl.svelte';
-	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import { toast } from 'svelte-sonner';
 
 	let urlInput: string = $state('');
@@ -10,7 +9,6 @@
 	let errorMessage: string = $state('');
 
 	const currentUrl = $derived(backendUrl.url);
-	const isDefault = $derived(currentUrl === PUBLIC_BACKEND_URL);
 
 	function validateUrl(url: string): boolean {
 		errorMessage = '';

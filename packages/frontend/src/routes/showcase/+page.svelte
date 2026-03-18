@@ -6,7 +6,6 @@
 	import { Checkbox } from "$lib/components/ui/checkbox";
 	import { RadioGroup, RadioGroupItem } from "$lib/components/ui/radio-group";
 	import { Switch } from "$lib/components/ui/switch";
-	import { Slider } from "$lib/components/ui/slider";
 	import { Badge } from "$lib/components/ui/badge";
 	import { Alert, AlertDescription, AlertTitle } from "$lib/components/ui/alert";
 	import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "$lib/components/ui/card";
@@ -19,7 +18,6 @@
 	import { Progress } from "$lib/components/ui/progress";
 	import { Toggle } from "$lib/components/ui/toggle";
 	import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "$lib/components/ui/breadcrumb";
-	import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "$lib/components/ui/pagination";
 	import DarkmodeToggle from "$lib/components/ui/custom/DarkmodeToggle.svelte";
 	
 	let checked = $state(false);
