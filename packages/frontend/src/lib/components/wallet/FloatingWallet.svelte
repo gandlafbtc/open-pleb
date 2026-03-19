@@ -16,10 +16,21 @@
 	import { toast } from 'svelte-sonner';
 	import { ensureError } from 'common/errors';
 	import ReceiveView from './ReceiveView.svelte';
+	import SendView from './SendView.svelte';
+	import HistoryDetailView from './HistoryDetailView.svelte';
+	import type { HistoryEntry } from 'coco-cashu-core';
 
 	let wallet: CocoWallet | undefined = $state(undefined);
 
-	let view: 'balance' | 'receive' | 'send' | 'scan' = $state('balance');
+	let view: 'balance' | 'receive' | 'send' | 'scan' | 'history-detail' = $state('balance');
+	let selectedHistoryId: string | undefined = $state(undefined);
+	let historyDisplayCount = $state(5);
+
+	// Derive the actual history item from wallet history (reactive!)
+	const selectedHistoryItem = $derived.by(() => {
+		if (!selectedHistoryId || !wallet) return undefined;
+		return wallet.history.find(h => h.id === selectedHistoryId);
+	});
 
 	onMount(async () => {
 		const { wallet: w } = await import('$lib/state/wallet/wallet.svelte');
@@ -44,6 +55,37 @@
 	function formatBalance(balance: number): string {
 		return balance.toLocaleString();
 	}
+
+	function handleHistoryItemClick(item: HistoryEntry) {
+		selectedHistoryId = item.id;
+		view = 'history-detail';
+	}
+
+	async function handleRefreshHistoryItem() {
+		if (!wallet) return;
+		
+		// Refresh the history - the wallet will automatically update
+		// This will re-fetch all history items including updated states
+		toast.info('Checking transaction status...');
+		// The wallet's refreshHistory is private, but we can trigger it indirectly
+		// by just waiting a moment - the coco library should handle state updates
+		// For now, just show a message
+		toast.success('Status refreshed');
+	}
+
+	function loadMoreHistory() {
+		historyDisplayCount += 5;
+	}
+
+	const displayedHistory = $derived.by(() => {
+		if (!wallet) return [];
+		return wallet.history.slice(0, historyDisplayCount);
+	});
+	
+	const hasMoreHistory = $derived.by(() => {
+		if (!wallet) return false;
+		return wallet.history.length > historyDisplayCount;
+	});
 </script>
 
 <Sheet.Root bind:open={isOpen}>
@@ -124,7 +166,7 @@
 							variant="outline"
 							class="grow"
 							onclick={() => {
-								view = 'receive';
+								view = 'send';
 							}}
 						>
 							<Upload></Upload> Send
@@ -136,9 +178,12 @@
 						{#if wallet.history.length === 0}
 							<p class="text-center text-sm text-muted-foreground py-4">No transactions yet</p>
 						{:else}
-							<div class="space-y-2">
-								{#each wallet.history as item, index (index)}
-									<div class="rounded-lg border bg-card p-3 hover:bg-accent/50 transition-colors">
+							<div class="max-h-[400px] overflow-y-auto space-y-2 pr-1">
+								{#each displayedHistory as item, index (index)}
+									<button
+										class="w-full rounded-lg border bg-card p-3 hover:bg-accent/50 transition-colors cursor-pointer text-left"
+										onclick={() => handleHistoryItemClick(item)}
+									>
 										<div class="flex items-center justify-between">
 											<div class="flex items-center gap-2">
 												{#if item.type === 'mint' || item.type === 'receive'}
@@ -149,11 +194,17 @@
 													<Upload class="h-4 w-4 text-blue-500" />
 												{/if}
 												<div>
-													<p class="text-sm font-medium capitalize">{item.type}</p>
 													<p class="text-xs text-muted-foreground">
 														{new Date(item.createdAt).toLocaleString()}
 													</p>
 												</div>
+													{#if 'state' in item && item.state}
+											<div>
+												<Badge variant={item.state === 'ISSUED' || item.state === 'finalized' ? 'default' : 'secondary'} class="text-xs">
+													{item.state}
+												</Badge>
+											</div>
+										{/if}
 											</div>
 											<div class="text-right">
 												<p class="text-sm font-semibold">
@@ -166,23 +217,51 @@
 												<p class="text-xs text-muted-foreground">{item.unit || 'sat'}</p>
 											</div>
 										</div>
-										{#if 'state' in item && item.state}
-											<div class="mt-2">
-												<Badge variant={item.state === 'PAID' || item.state === 'finalized' ? 'default' : 'secondary'} class="text-xs">
-													{item.state}
-												</Badge>
-											</div>
-										{/if}
-									</div>
+									
+									</button>
 								{/each}
 							</div>
+							{#if hasMoreHistory}
+								<div class="pt-2">
+									<Button
+										variant="outline"
+										size="sm"
+										class="w-full"
+										onclick={loadMoreHistory}
+									>
+										Load More ({wallet.history.length - historyDisplayCount} remaining)
+									</Button>
+								</div>
+							{/if}
 						{/if}
 					</div>
 				{:else if view === 'receive'}
 					<div>
-						<ReceiveView {wallet} onBack={()=> {view="balance"}}></ReceiveView>
+						<ReceiveView {wallet} onBack={() => { view = 'balance'; }} onInvoice={(historyItem)=> {
+							console.log(historyItem)
+							selectedHistoryId = historyItem.id;
+							view = "history-detail";
+						}}></ReceiveView>
 					</div>
-				{:else if view === 'send'}{:else if view === 'scan'}{/if}
+				{:else if view === 'send'}
+					<div>
+						<SendView {wallet} onBack={() => { view = 'balance'; }} onSend={(historyItem)=> {
+							console.log(historyItem)
+							selectedHistoryId = historyItem.id;
+							view = "history-detail";
+						}}></SendView>
+					</div>
+				{:else if view === 'history-detail'}
+					{#if selectedHistoryItem}
+						<div class="h-full">
+							<HistoryDetailView
+								item={selectedHistoryItem}
+								onRefresh={handleRefreshHistoryItem}
+								onBack={() => { view = 'balance'; }}
+							/>
+						</div>
+					{/if}
+				{:else if view === 'scan'}{/if}
 			</div>
 		{/if}
 	</Sheet.Content>

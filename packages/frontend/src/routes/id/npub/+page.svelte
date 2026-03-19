@@ -8,6 +8,7 @@
 	import { copyTextToClipboard } from '$lib/utils';
 	import { ensureError } from 'common/errors';
 	import { registerUser, checkUserStatus } from '$lib/interface/rest/user.service';
+	import QR from '$lib/elements/qr/QR.svelte';
 
 	let isRegistering = $state(false);
 	let isConnecting = $state(false);
@@ -83,7 +84,7 @@
 		<!-- QR Code and npub Display -->
 		<div class="flex flex-col items-center space-y-4">
 			<div class="w-64 bg-white rounded-lg p-4 shadow-lg">
-				{@html encodeQR(idKeys.getNpub(), 'svg')}
+				<QR data={idKeys.getNpub()}></QR>
 			</div>
 
 			<div class="flex items-center gap-2 bg-muted p-3 rounded-lg max-w-md">

@@ -43,6 +43,31 @@ export class CocoWallet {
         return quote
     }
 
+    async sendEcash(amount: number) {
+        if (!this.mint) {
+            throw new Error("Mint not initialized yet");
+        }
+        const result = await this.coco.send.prepareSend(this.mint.mintUrl, amount);
+        const executed = await this.coco.send.executePreparedSend(result.id)
+        return executed;
+    }
+
+    async sendLn(invoice: string) {
+        if (!this.mint) {
+            throw new Error("Mint not initialized yet");
+        }
+        // Create melt quote
+        const operation = await this.coco.quotes.prepareMeltBolt11(this.mint.mintUrl, invoice);
+        // Execute melt (pay the invoice)
+        const result = await this.coco.quotes.executeMelt(operation.id);
+        return result;
+    }
+
+    async receiveEcash(token: string) {
+        const result = await this.coco.wallet.receive(token);
+        return result;
+    }
+
     async refreshBalance(coco: Manager) {
         try {
             const bal = await coco.wallet.getBalances();

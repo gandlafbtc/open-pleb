@@ -25,6 +25,7 @@
 		"@noble/hashes": "catalog:crypto",
 		"@scure/bip32": "catalog:crypto",
 		"@scure/bip39": "catalog:crypto",
+		"bech32": "catalog:crypto",
 		"@sveltejs/adapter-auto": "catalog:sveltekit-dev",
 		"@sveltejs/kit": "catalog:sveltekit-dev",
 		"@sveltejs/vite-plugin-svelte": "catalog:sveltekit-dev",
@@ -59,6 +60,7 @@
 		"coco-cashu-indexeddb": "catalog:cashu"
 	},
 	"dependencies": {
+		"@gandlaf21/bc-ur": "^1.1.12",
 		"@noble/ciphers": "catalog:crypto",
 		"mode-watcher": "^1.1.0"
 	}

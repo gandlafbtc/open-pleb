@@ -4,6 +4,7 @@
 	import encodeQR from 'qr';
 	import { Copy } from '@lucide/svelte';
 	import { toast } from 'svelte-sonner';
+	import QR from '../qr/QR.svelte';
 
 	function handleCopy() {
 		copyTextToClipboard(idKeys.getNpub());
@@ -16,8 +17,7 @@
 	<div class="flex flex-col gap-2 items-center">
 		<div class=" max-w-40 flex flex-col gap-2">
 			<div class="bg-white rounded-md">
-				
-				{@html encodeQR(idKeys.getNpub(),"svg")}
+				<QR data={idKeys.getNpub()}></QR>
 			</div>
 			<div class="flex items-center gap-2">
 				
