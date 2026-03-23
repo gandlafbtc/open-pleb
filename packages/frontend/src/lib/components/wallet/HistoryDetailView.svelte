@@ -13,11 +13,10 @@
 
 	interface Props {
 		item: HistoryEntry;
-		onRefresh: () => Promise<void>;
 		onBack: () => void;
 	}
 
-	let { item, onRefresh, onBack }: Props = $props();
+	let { item, onBack }: Props = $props();
 
 	const typeConfig = $derived.by(() => {
 		switch (item.type) {
@@ -106,28 +105,28 @@
 					{#if isCompleted}
 						<MintCompletedActions {item} />
 					{:else}
-						<MintPendingActions {item} {onRefresh} />
+						<MintPendingActions {item}/>
 					{/if}
 				{:else if item.type === 'melt'}
 					<!-- Melt -->
 					{#if isCompleted}
 						<MeltCompletedActions {item} />
 					{:else}
-						<MeltPendingActions {item} {onRefresh} />
+						<MeltPendingActions {item} />
 					{/if}
 				{:else if item.type === 'receive'}
 					<!-- Receive -->
 					{#if isCompleted}
 						<ReceiveCompletedActions {item} />
 					{:else}
-						<ReceivePendingActions {item} {onRefresh} />
+						<ReceivePendingActions {item}  />
 					{/if}
 				{:else if item.type === 'send'}
 					<!-- Send -->
 					{#if isCompleted}
 						<SendCompletedActions {item} />
 					{:else}
-						<SendPendingActions {item} {onRefresh} />
+						<SendPendingActions {item}  />
 					{/if}
 				{/if}
 			</div>

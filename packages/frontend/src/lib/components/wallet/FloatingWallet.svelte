@@ -61,18 +61,6 @@
 		view = 'history-detail';
 	}
 
-	async function handleRefreshHistoryItem() {
-		if (!wallet) return;
-		
-		// Refresh the history - the wallet will automatically update
-		// This will re-fetch all history items including updated states
-		toast.info('Checking transaction status...');
-		// The wallet's refreshHistory is private, but we can trigger it indirectly
-		// by just waiting a moment - the coco library should handle state updates
-		// For now, just show a message
-		toast.success('Status refreshed');
-	}
-
 	function loadMoreHistory() {
 		historyDisplayCount += 5;
 	}
@@ -229,7 +217,7 @@
 										class="w-full"
 										onclick={loadMoreHistory}
 									>
-										Load More ({wallet.history.length - historyDisplayCount} remaining)
+										Load More ({wallet.history.length - historyDisplayCount})
 									</Button>
 								</div>
 							{/if}
@@ -256,7 +244,6 @@
 						<div class="h-full">
 							<HistoryDetailView
 								item={selectedHistoryItem}
-								onRefresh={handleRefreshHistoryItem}
 								onBack={() => { view = 'balance'; }}
 							/>
 						</div>

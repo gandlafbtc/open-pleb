@@ -2,19 +2,20 @@
 	import { ArrowLeft, QrCode, Download } from '@lucide/svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import type { CocoWallet } from '$lib/state/wallet/wallet.svelte';
-	import type { HistoryEntry } from 'coco-cashu-core';
+	import type { MintHistoryEntry, ReceiveHistoryEntry } from 'coco-cashu-core';
+	import { ensureError } from 'common/errors';
 
 	interface Props {
 		wallet: CocoWallet;
 		onBack: () => void;
-		onInvoice: (historyItem: HistoryEntry)=> void;
+		onInvoice: (historyItem: MintHistoryEntry)=> void;
+		onReceive: (historyItem: ReceiveHistoryEntry)=> void;
 	}
 
-	let { wallet, onBack, onInvoice }: Props = $props();
+	let { wallet, onBack, onInvoice, onReceive }: Props = $props();
 
 	let amount = $state('');
 	let tokenInput = $state('');
-	let invoice = $state<string | null>(null);
 	let isGenerating = $state(false);
 	let isRedeeming = $state(false);
 	let error = $state<string | null>(null);
@@ -39,12 +40,10 @@
 		isGenerating = true;
 		error = null;
 		try {
-			const mintQuote = await wallet.receiveLn(parseInt(amount));
-			console.log(mintQuote)
-			setTimeout(()=> {
-				const historyItem = wallet.history.find(h=>h.quoteId===mintQuote.quote)
-				onInvoice(historyItem!)
-			},100)
+			await wallet.receiveLn(parseInt(amount));
+			await wallet.waitForHistoryUpdate()
+			const historyItem = wallet.history.find(h => h.type === 'mint');
+			onInvoice(historyItem!)
 		} catch (err) {
 			console.error('Failed to generate receive token:', err);
 			error = 'Failed to create invoice. Please try again.';
@@ -59,18 +58,16 @@
 		isRedeeming = true;
 		error = null;
 		try {
-			await wallet.receiveEcash(tokenInput);
-			// Wait a bit for history to update
-			setTimeout(() => {
-				// Find the most recent receive history entry
-				const historyItem = wallet.history.find(h => h.type === 'receive');
-				if (historyItem) {
-					onInvoice(historyItem);
-				}
-			}, 100);
+			await wallet.receiveEcash(tokenInput);			
+			await wallet.waitForHistoryUpdate()
+			const historyItem = wallet.history.find(h => h.type === 'receive');
+			if (historyItem) {
+				onReceive(historyItem);
+			}
 		} catch (err) {
+			const e = ensureError(err)
 			console.error('Failed to redeem token:', err);
-			error = 'Failed to redeem token. Please check the token and try again.';
+			error = 'Failed to redeem token: ' +e.message;
 		} finally {
 			isRedeeming = false;
 		}
@@ -127,6 +124,9 @@
 		</Button>
 	</div>
 
+	{#if (amount || tokenInput)}
+	
+	
 	<!-- Divider -->
 	<div class="relative mb-6">
 		<div class="absolute inset-0 flex items-center">
@@ -136,7 +136,8 @@
 			<span class="bg-background px-2 text-muted-foreground">Or</span>
 		</div>
 	</div>
-
+	{/if}
+	
 	<!-- Token Input Section -->
 	<div class="mb-4">
 		<label for="token" class="mb-2 block text-sm font-medium">Paste Ecash Token</label>

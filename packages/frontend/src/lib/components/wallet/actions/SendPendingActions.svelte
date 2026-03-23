@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { RefreshCw, Copy } from '@lucide/svelte';
+	import { Copy } from '@lucide/svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { getEncodedToken, type SendHistoryEntry } from 'coco-cashu-core';
 	import { copyTextToClipboard } from '$lib/utils';
@@ -7,23 +7,13 @@
 
 	interface Props {
 		item: SendHistoryEntry;
-		onRefresh: () => Promise<void>;
 	}
 
-	let { item, onRefresh }: Props = $props();
-	let isRefreshing = $state(false);
+	let { item }: Props = $props();
 
 	// Compute token string once to avoid state mutation i
 	const tokenString = item.token ? getEncodedToken(item.token) : null
 
-	async function handleRefresh() {
-		isRefreshing = true;
-		try {
-			await onRefresh();
-		} finally {
-			isRefreshing = false;
-		}
-	}
 
 </script>
 
@@ -51,12 +41,6 @@
 		</div>
 	{/if}
 
-	<div class="flex gap-2">
-		<Button onclick={handleRefresh} disabled={isRefreshing} class="w-full" variant="outline">
-			<RefreshCw class={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-			{isRefreshing ? 'Checking...' : 'Refresh Status'}
-		</Button>
-	</div>
 
 	<div class="rounded-lg bg-muted p-3 text-sm text-muted-foreground">
 		<p>Share this token with the recipient. They can redeem it to receive the sats.</p>

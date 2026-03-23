@@ -33,7 +33,22 @@ export class CocoWallet {
         coco.on("history:updated", ()=> this.refreshHistory(coco))
     }
 
-    
+        // In CocoWallet class
+    async waitForHistoryUpdate(): Promise<void> {
+        return new Promise((resolve) => {
+            const handler = () => {
+                this.coco.off('history:updated', handler);
+                resolve();
+            };
+            this.coco.on('history:updated', handler);
+            // Add timeout as safety
+            setTimeout(() => {
+                this.coco.off('history:updated', handler);
+                resolve();
+            }, 100);
+        });
+    }
+
 
     async receiveLn(amount: number) {
         if (!this.mint) {
@@ -47,8 +62,8 @@ export class CocoWallet {
         if (!this.mint) {
             throw new Error("Mint not initialized yet");
         }
-        const result = await this.coco.send.prepareSend(this.mint.mintUrl, amount);
-        const executed = await this.coco.send.executePreparedSend(result.id)
+        const result = await this.coco.ops.send.prepare({amount, mintUrl: this.mint.mintUrl});
+        const executed = await this.coco.ops.send.execute(result)
         return executed;
     }
 
@@ -57,9 +72,9 @@ export class CocoWallet {
             throw new Error("Mint not initialized yet");
         }
         // Create melt quote
-        const operation = await this.coco.quotes.prepareMeltBolt11(this.mint.mintUrl, invoice);
+        const operation = await this.coco.ops.melt.prepare({method: "bolt11", mintUrl: this.mint.mintUrl, methodData: {invoice}});
         // Execute melt (pay the invoice)
-        const result = await this.coco.quotes.executeMelt(operation.id);
+        const result = await this.coco.ops.melt.execute(operation)
         return result;
     }
 
@@ -79,7 +94,7 @@ export class CocoWallet {
     }
         async refreshHistory(coco: Manager) {
         try {
-            const history = await coco.history.getPaginatedHistory();
+            const history = await coco.history.getPaginatedHistory(0,9999);
             this.history = history;
         } catch (error) {
             console.error(error);

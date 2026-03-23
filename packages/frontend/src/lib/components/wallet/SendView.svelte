@@ -6,14 +6,16 @@
 	import type { CocoWallet } from '$lib/state/wallet/wallet.svelte';
 	import { toast } from 'svelte-sonner';
 	import { ensureError } from 'common/errors';
-	import type { HistoryEntry } from 'coco-cashu-core';
+	import type {  MeltHistoryEntry, SendHistoryEntry } from 'coco-cashu-core';
 	import { isLightningInvoice, parseInvoice } from '$lib/utils/invoice';
 	import { validateLnAddress, getInvoiceForLNURLAddress } from 'common/lnurl';
+	import { delay } from 'common/util';
 
 	interface Props {
 		wallet: CocoWallet;
 		onBack: () => void;
-		onSend: (historyItem: HistoryEntry) => void;
+		onSend: (historyItem: SendHistoryEntry) => void;
+		onMelt: (historyItem: MeltHistoryEntry) => void;
 	}
 
 	let { wallet, onBack, onSend }: Props = $props();
@@ -58,6 +60,12 @@
 		detectedType = null;
 		detectedAmount = null;
 	}
+	// Handle amount input - only allow numbers
+	function handleAmountInput(e: Event) {
+		const input = e.target as HTMLInputElement;
+		const value = input.value.replace(/[^0-9]/g, '');
+		amount = value;
+	}
 
 	async function handleSendEcash() {
 		const amountNum = parseInt(amount);
@@ -74,10 +82,10 @@
 
 		isLoading = true;
 		try {
-			const result = await wallet.sendEcash(amountNum);
+			await wallet.sendEcash(amountNum);
 			toast.success('Ecash token created successfully!');
 			setTimeout(() => {
-				const historyItem = wallet.history.find(h => h.id === result.id);
+				const historyItem = wallet.history.find(h => h.type === "send");
 				if (historyItem) onSend(historyItem);
 			}, 100);
 		} catch (error) {
@@ -112,12 +120,11 @@
 
 		isLoading = true;
 		try {
-			const result = await wallet.sendLn(invoice);
+			await wallet.sendLn(invoice);
 			toast.success('Lightning payment sent successfully!');
-			setTimeout(() => {
-				const historyItem = wallet.history.find(h => h.operationId === result.operation.id);
-				if (historyItem) onSend(historyItem);
-			}, 100);
+			await wallet.waitForHistoryUpdate();
+			const historyItem = wallet.history.find(h => h.type === "melt");
+			if (historyItem) onSend(historyItem);
 		} catch (error) {
 			const err = ensureError(error);
 			console.error('Failed to send Lightning payment:', err);
@@ -153,11 +160,11 @@
 			
 			// Pay the invoice
 			const result = await wallet.sendLn(invoice);
+			await wallet.waitForHistoryUpdate();
+			await delay(100)
+			const historyItem = wallet.history.find(h => h.id === result.id);
+			if (historyItem) onSend(historyItem);
 			toast.success('Lightning payment sent successfully!');
-			setTimeout(() => {
-				const historyItem = wallet.history.find(h => h.id === result.id);
-				if (historyItem) onSend(historyItem);
-			}, 100);
 		} catch (error) {
 			const err = ensureError(error);
 			console.error('Failed to send Lightning payment:', err);
@@ -209,14 +216,16 @@
 		<ArrowLeft class="h-4 w-4 mr-1" />
 		Back
 	</Button>
+	<div class="rounded-lg flex items-center justify-between">
 	<p class="font-bold text-xl">
 		Send
 	</p>
 	<!-- Balance Display -->
-	<div class="rounded-lg border bg-card p-2 text-center">
-		<p class="mb-2 text-sm text-muted-foreground">Balance</p>
-		<p class="text-4xl font-bold">{formatBalance(wallet.balance)}</p>
-		<p class="mt-1 text-sm text-muted-foreground">sats</p>
+	 <div class="rounded-lg flex items-end p-2 gap-2 bg-card border">
+
+		<p class="text-2xl font-bold">{formatBalance(wallet.balance)}</p>
+		<p class="text-sm text-muted-foreground">sats</p>
+	</div>
 	</div>
 
 	<!-- Mode Indicator -->
@@ -243,19 +252,6 @@
 			class="font-mono text-sm"
 			disabled={isLoading}
 		/>
-		{#if detectedType}
-			<p class="text-xs text-muted-foreground mt-2">
-				Detected: {detectedType === 'invoice' ? 'Lightning Invoice' : 'Lightning Address'}
-			</p>
-		{:else if lightningInput && !detectedType}
-			<p class="text-xs text-destructive mt-2">
-				Invalid Lightning invoice or address
-			</p>
-		{:else}
-			<p class="text-xs text-muted-foreground mt-2">
-				Leave empty to generate an ecash token
-			</p>
-		{/if}
 	</div>
 
 	<!-- Amount Display (if detected from invoice) -->
@@ -268,17 +264,19 @@
 
 	<!-- Amount Input (conditional) -->
 	{#if showAmountInput}
-		<div class="rounded-lg border bg-card p-4">
-			<Label for="amount" class="text-sm font-medium mb-2 block">Amount</Label>
+		<div class="rounded-lg p-4">
 			<div class="flex items-baseline gap-2">
-				<Input
+				<input
 					id="amount"
-					type="number"
+					type="text"
 					placeholder="0"
-					bind:value={amount}
 					min="1"
 					max={wallet.balance}
-					class="text-2xl font-bold text-center flex-1"
+				inputmode="numeric"
+				value={amount}
+				oninput={handleAmountInput}
+				class="w-full border-0 bg-transparent text-center text-6xl font-bold outline-none ring-0 focus:ring-0 focus-visible:ring-0"
+				style="min-width: 200px;"
 					disabled={isLoading}
 				/>
 				<span class="text-sm text-muted-foreground whitespace-nowrap">sats</span>
@@ -301,14 +299,4 @@
 		{buttonText()}
 	</Button>
 
-	<!-- Info Text -->
-	<div class="rounded-lg bg-muted p-3 text-sm text-muted-foreground text-center">
-		{#if detectedType === 'invoice'}
-			<p>Pay a Lightning invoice directly from your ecash balance</p>
-		{:else if detectedType === 'address'}
-			<p>Send to a Lightning address (user@domain.com)</p>
-		{:else}
-			<p>Generate an ecash token to share with others</p>
-		{/if}
-	</div>
 </div>
