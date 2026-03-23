@@ -3,7 +3,10 @@
 	import { exchangeRate } from "$lib/state/dynamic/exchangerate.svelte";
 	import { Card } from "$lib/components/ui/card";
 	import * as Accordion from "$lib/components/ui/accordion";
-	import { TrendingUp } from "@lucide/svelte";
+	import { Info, TrendingUp } from "@lucide/svelte";
+
+	// Track accordion state
+	let accordionValue = $state<string | undefined>(undefined);
 
 	// Calculate fees (excluding bonds)
 	let totalFeePercentage = $derived.by(() => {
@@ -49,23 +52,32 @@
 		</div>
 	</div>
 
-	<Accordion.Root type="single" class="w-full">
+	<Accordion.Root type="single" class="w-full" bind:value={accordionValue}>
 		<Accordion.Item value="fees">
 			<Accordion.Trigger class="text-sm">
 				<div class="flex gap-1 flex-col items-start w-full">
 					<div class="flex items-center gap-2">
-						<span>Fees</span>
+						<span class="w-16">Fees</span>
 						<span class="font-semibold">
 							{totalFeePercentage}% + {totalFlatFee} sats
 						</span>
 					</div>
 					<div class="flex items-center gap-2 text-xs text-muted-foreground">
-						<span>Bonds</span>
+						<span class="w-16">Bonds</span>
 						<span class="font-medium">
 							{totalBondPercentage}% + {totalBondFlat} sats
 						</span>
 					</div>
 				</div>
+
+				{#if accordionValue !== "fees"}
+					<div class="flex gap-1 items-center right-0 bottom-1 text-xs text-muted-foreground absolute">
+						<p>
+							Click for more info
+						</p>
+						<Info class="w-3"></Info>
+					</div>
+				{/if}
 			</Accordion.Trigger>
 			<Accordion.Content>
 				<div class="space-y-1 pt-1">

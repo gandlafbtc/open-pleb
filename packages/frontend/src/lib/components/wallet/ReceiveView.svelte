@@ -4,6 +4,15 @@
 	import type { CocoWallet } from '$lib/state/wallet/wallet.svelte';
 	import type { MintHistoryEntry, ReceiveHistoryEntry } from 'coco-cashu-core';
 	import { ensureError } from 'common/errors';
+	import { onMount } from 'svelte';
+	import { lastScan } from '$lib/state/cache/lastScan.svelte';
+
+	onMount(()=> {
+		if (lastScan.scan.startsWith("cashu")) {
+			tokenInput=lastScan.scan
+			lastScan.scan = ""
+		}
+	})
 
 	interface Props {
 		wallet: CocoWallet;
@@ -89,6 +98,8 @@
 		<h2 class="text-xl font-semibold">Receive</h2>
 	</div>
 
+	{#if !tokenInput}
+	
 	<!-- Amount Input Section -->
 	<div class="mb-8 flex flex-col items-center justify-center space-y-2">
 		<label for="amount" class="text-sm text-muted-foreground">Amount</label>
@@ -106,7 +117,7 @@
 		</div>
 		<p class="text-sm text-muted-foreground">sats</p>
 	</div>
-
+	
 	<!-- Generate Button -->
 	<div class="mb-6">
 		<Button
@@ -116,15 +127,16 @@
 			size="lg"
 		>
 			{#if isGenerating}
-				Creating Invoice...
+			Creating Invoice...
 			{:else}
 				<QrCode class="mr-2 h-5 w-5" />
 				Create Invoice
 			{/if}
 		</Button>
 	</div>
+	{/if}
 
-	{#if (amount || tokenInput)}
+	{#if !(amount || tokenInput)}
 	
 	
 	<!-- Divider -->
@@ -137,6 +149,8 @@
 		</div>
 	</div>
 	{/if}
+	
+	{#if !amount}
 	
 	<!-- Token Input Section -->
 	<div class="mb-4">
@@ -168,7 +182,8 @@
 			{/if}
 		</Button>
 	</div>
-
+	
+	{/if}
 	<!-- Error Message -->
 	{#if error}
 		<div class="rounded-md bg-destructive/15 p-3 text-sm text-destructive">

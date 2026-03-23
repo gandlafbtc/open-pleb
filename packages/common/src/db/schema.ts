@@ -67,9 +67,9 @@ export const sessionTable = pgTable("sessions", {
 	id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
 	// Blind auth token
 	bat: text("bat").unique().notNull(),
-	userId: text("user_id").references(() => userTable.id),
 	expiresAt: integer("expires_at"),
-	createdAt: integer("created_at").notNull()
+	createdAt: integer("created_at").notNull(),
+	isMaker: boolean("is_maker").notNull() // session is either maker or taker
 })
 
 export const subscriptionTable = pgTable('subscriptions', {

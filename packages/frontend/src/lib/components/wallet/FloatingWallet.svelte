@@ -1,12 +1,5 @@
 <script lang="ts">
-	import {
-		Download,
-		Landmark,
-		LoaderCircle,
-		ScanQrCode,
-		Upload,
-		Wallet
-	} from '@lucide/svelte';
+	import { ArrowLeft, Download, Landmark, LoaderCircle, ScanQrCode, Upload, Wallet } from '@lucide/svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import * as Sheet from '$lib/components/ui/sheet';
@@ -19,17 +12,17 @@
 	import SendView from './SendView.svelte';
 	import HistoryDetailView from './HistoryDetailView.svelte';
 	import type { HistoryEntry } from 'coco-cashu-core';
+	import Scanner from '$lib/elements/qr/Scanner.svelte';
+	import { walletView } from '$lib/state/walletView.svelte';
 
 	let wallet: CocoWallet | undefined = $state(undefined);
 
-	let view: 'balance' | 'receive' | 'send' | 'scan' | 'history-detail' = $state('balance');
-	let selectedHistoryId: string | undefined = $state(undefined);
 	let historyDisplayCount = $state(5);
 
 	// Derive the actual history item from wallet history (reactive!)
 	const selectedHistoryItem = $derived.by(() => {
-		if (!selectedHistoryId || !wallet) return undefined;
-		return wallet.history.find(h => h.id === selectedHistoryId);
+		if (!walletView.selectedHistoryId || !wallet) return undefined;
+		return wallet.history.find((h) => h.id === walletView.selectedHistoryId);
 	});
 
 	onMount(async () => {
@@ -49,16 +42,13 @@
 		}
 	});
 
-	let isOpen = $state(true);
-
 	// Format balance with thousands separator
 	function formatBalance(balance: number): string {
 		return balance.toLocaleString();
 	}
 
 	function handleHistoryItemClick(item: HistoryEntry) {
-		selectedHistoryId = item.id;
-		view = 'history-detail';
+		walletView.selectHistory(item);
 	}
 
 	function loadMoreHistory() {
@@ -69,14 +59,14 @@
 		if (!wallet) return [];
 		return wallet.history.slice(0, historyDisplayCount);
 	});
-	
+
 	const hasMoreHistory = $derived.by(() => {
 		if (!wallet) return false;
 		return wallet.history.length > historyDisplayCount;
 	});
 </script>
 
-<Sheet.Root bind:open={isOpen}>
+<Sheet.Root bind:open={walletView.isOpen}>
 	<div class="fixed bottom-4 left-4 z-50">
 		<Sheet.Trigger disabled={!wallet}>
 			<Button
@@ -108,7 +98,7 @@
 		</Sheet.Header>
 		{#if wallet}
 			<div class="space-y-6 p-2">
-				{#if view === 'balance'}
+				{#if walletView.view === 'balance'}
 					<!-- Balance Display -->
 					<div
 						class="flex items-center justify-center gap-2 rounded-lg border bg-card p-6 text-center"
@@ -136,7 +126,7 @@
 							variant="outline"
 							class="grow"
 							onclick={() => {
-								view = 'receive';
+								walletView.setView('receive');
 							}}
 						>
 							<Download></Download> Receive
@@ -144,17 +134,19 @@
 						<Button
 							size="lg"
 							onclick={() => {
-								view = 'receive';
+								walletView.setView('scan');
 							}}
 						>
-							<ScanQrCode></ScanQrCode>
+							<ScanQrCode
+								
+							></ScanQrCode>
 						</Button>
 						<Button
 							size="lg"
 							variant="outline"
 							class="grow"
 							onclick={() => {
-								view = 'send';
+								walletView.setView('send');
 							}}
 						>
 							<Upload></Upload> Send
@@ -164,12 +156,12 @@
 					<div class="space-y-2">
 						<p class="text-center font-bold">History</p>
 						{#if wallet.history.length === 0}
-							<p class="text-center text-sm text-muted-foreground py-4">No transactions yet</p>
+							<p class="py-4 text-center text-sm text-muted-foreground">No transactions yet</p>
 						{:else}
-							<div class="max-h-[400px] overflow-y-auto space-y-2 pr-1">
+							<div class="max-h-[400px] space-y-2 overflow-y-auto pr-1">
 								{#each displayedHistory as item, index (index)}
 									<button
-										class="w-full rounded-lg border bg-card p-3 hover:bg-accent/50 transition-colors cursor-pointer text-left"
+										class="w-full cursor-pointer rounded-lg border bg-card p-3 text-left transition-colors hover:bg-accent/50"
 										onclick={() => handleHistoryItemClick(item)}
 									>
 										<div class="flex items-center justify-between">
@@ -186,13 +178,29 @@
 														{new Date(item.createdAt).toLocaleString()}
 													</p>
 												</div>
-													{#if 'state' in item && item.state}
-											<div>
-												<Badge variant={item.state === 'ISSUED' || item.state === 'finalized' ? 'default' : 'secondary'} class="text-xs">
-													{item.state}
-												</Badge>
-											</div>
-										{/if}
+												{#if 'state' in item && item.state}
+													<div>
+														<Badge
+															variant={item.state === 'ISSUED' || item.state === 'finalized'
+																? 'default'
+																: 'secondary'}
+															class="text-xs"
+														>
+															{item.state}
+														</Badge>
+													</div>
+												{/if}
+
+												{#if item.type==="receive"}
+													<div>
+														<Badge
+															variant='default'
+															class="text-xs"
+														>
+															finalized
+														</Badge>
+													</div>
+												{/if}
 											</div>
 											<div class="text-right">
 												<p class="text-sm font-semibold">
@@ -205,50 +213,73 @@
 												<p class="text-xs text-muted-foreground">{item.unit || 'sat'}</p>
 											</div>
 										</div>
-									
 									</button>
 								{/each}
 							</div>
 							{#if hasMoreHistory}
 								<div class="pt-2">
-									<Button
-										variant="outline"
-										size="sm"
-										class="w-full"
-										onclick={loadMoreHistory}
-									>
+									<Button variant="outline" size="sm" class="w-full" onclick={loadMoreHistory}>
 										Load More ({wallet.history.length - historyDisplayCount})
 									</Button>
 								</div>
 							{/if}
 						{/if}
 					</div>
-				{:else if view === 'receive'}
+				{:else if walletView.view === 'receive'}
 					<div>
-						<ReceiveView {wallet} onBack={() => { view = 'balance'; }} onInvoice={(historyItem)=> {
-							console.log(historyItem)
-							selectedHistoryId = historyItem.id;
-							view = "history-detail";
-						}}></ReceiveView>
+						<ReceiveView
+							{wallet}
+							onBack={() => {
+								walletView.goToBalance();
+							}}
+							onInvoice={(historyItem) => {
+								console.log(historyItem);
+								walletView.selectHistory(historyItem);
+							}}
+							onReceive={(historyItem) => {
+								console.log(historyItem);
+								walletView.selectHistory(historyItem);
+							}}
+						></ReceiveView>
 					</div>
-				{:else if view === 'send'}
+				{:else if walletView.view === 'send'}
 					<div>
-						<SendView {wallet} onBack={() => { view = 'balance'; }} onSend={(historyItem)=> {
-							console.log(historyItem)
-							selectedHistoryId = historyItem.id;
-							view = "history-detail";
-						}}></SendView>
+						<SendView
+							{wallet}
+							onBack={() => {
+								walletView.goToBalance();
+							}}
+							onSend={(historyItem) => {
+								console.log(historyItem);
+								walletView.selectHistory(historyItem);
+							}}
+							onMelt={(historyItem) => {
+								console.log(historyItem);
+								walletView.selectHistory(historyItem);
+							}}
+						></SendView>
 					</div>
-				{:else if view === 'history-detail'}
+				{:else if walletView.view === 'history-detail'}
 					{#if selectedHistoryItem}
 						<div class="h-full">
 							<HistoryDetailView
 								item={selectedHistoryItem}
-								onBack={() => { view = 'balance'; }}
+								onBack={() => {
+									walletView.goToBalance();
+								}}
 							/>
 						</div>
 					{/if}
-				{:else if view === 'scan'}{/if}
+				{:else if walletView.view === 'scan'}
+										<!-- Back Button -->
+				<div class="mb-2">
+					<Button variant="ghost" size="sm" onclick={()=> walletView.goToBalance()}>
+						<ArrowLeft class="h-4 w-4 mr-1" />
+						Back
+					</Button>
+				</div>
+				<Scanner/>
+				{/if}
 			</div>
 		{/if}
 	</Sheet.Content>

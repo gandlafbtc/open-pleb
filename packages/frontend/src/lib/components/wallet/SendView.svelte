@@ -18,7 +18,7 @@
 		onMelt: (historyItem: MeltHistoryEntry) => void;
 	}
 
-	let { wallet, onBack, onSend }: Props = $props();
+	let { wallet, onBack, onSend, onMelt }: Props = $props();
 
 	let lightningInput = $state('');
 	let amount = $state('');
@@ -124,7 +124,7 @@
 			toast.success('Lightning payment sent successfully!');
 			await wallet.waitForHistoryUpdate();
 			const historyItem = wallet.history.find(h => h.type === "melt");
-			if (historyItem) onSend(historyItem);
+			if (historyItem) onMelt(historyItem);
 		} catch (error) {
 			const err = ensureError(error);
 			console.error('Failed to send Lightning payment:', err);
@@ -163,7 +163,7 @@
 			await wallet.waitForHistoryUpdate();
 			await delay(100)
 			const historyItem = wallet.history.find(h => h.id === result.id);
-			if (historyItem) onSend(historyItem);
+			if (historyItem) onMelt(historyItem);
 			toast.success('Lightning payment sent successfully!');
 		} catch (error) {
 			const err = ensureError(error);
@@ -228,16 +228,6 @@
 	</div>
 	</div>
 
-	<!-- Mode Indicator -->
-	{#if detectedType}
-		<div class="flex items-center justify-center gap-2 rounded-lg bg-primary/10 p-3 text-sm">
-			<Zap class="h-4 w-4 text-primary" />
-			<span class="text-primary font-medium">
-				{detectedType === 'invoice' ? 'Lightning Invoice Detected' : 'Lightning Address Detected'}
-			</span>
-		</div>
-	{/if}
-
 	<!-- Lightning Invoice/Address Input -->
 	<div class="rounded-lg border bg-card p-4">
 		<Label for="lightning-input" class="text-sm font-medium mb-2 block">
@@ -262,9 +252,19 @@
 		</div>
 	{/if}
 
+		<!-- Divider -->
+	<div class="relative mb-6">
+		<div class="absolute inset-0 flex items-center">
+			<span class="w-full border-t"></span>
+		</div>
+		<div class="relative flex justify-center text-xs uppercase">
+			<span class="bg-background px-2 text-muted-foreground">Or</span>
+		</div>
+	</div>
+
 	<!-- Amount Input (conditional) -->
 	{#if showAmountInput}
-		<div class="rounded-lg p-4">
+		<div class="rounded-lg p-4 flex flex-col justify-center items-center">
 			<div class="flex items-baseline gap-2">
 				<input
 					id="amount"
@@ -279,8 +279,8 @@
 				style="min-width: 200px;"
 					disabled={isLoading}
 				/>
-				<span class="text-sm text-muted-foreground whitespace-nowrap">sats</span>
 			</div>
+			<span class="text-sm text-muted-foreground whitespace-nowrap text-center ">sats</span>
 		</div>
 	{/if}
 
@@ -288,6 +288,7 @@
 	<Button
 		size="lg"
 		class="w-full"
+		variant='secondary'
 		onclick={handleSend}
 		disabled={isLoading || (showAmountInput && (!amount || parseInt(amount) <= 0))}
 	>
