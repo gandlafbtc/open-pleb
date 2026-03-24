@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Upload, Zap, ArrowLeft } from '@lucide/svelte';
+	import { Upload, Zap, ArrowLeft, ScanLine } from '@lucide/svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
@@ -10,6 +10,9 @@
 	import { isLightningInvoice, parseInvoice } from '$lib/utils/invoice';
 	import { validateLnAddress, getInvoiceForLNURLAddress } from 'common/lnurl';
 	import { delay } from 'common/util';
+	import { onMount } from 'svelte';
+	import { lastScan } from '$lib/state/cache/lastScan.svelte';
+	import { walletView } from '$lib/state/walletView.svelte';
 
 	interface Props {
 		wallet: CocoWallet;
@@ -17,6 +20,19 @@
 		onSend: (historyItem: SendHistoryEntry) => void;
 		onMelt: (historyItem: MeltHistoryEntry) => void;
 	}
+
+	onMount(() => {
+		if (lastScan.scan) {
+			const scanned = lastScan.scan.trim();
+			// Check if it's a lightning invoice or LNURL address
+			if (scanned.startsWith('lnbc') || scanned.includes('@')) {
+				lightningInput = scanned;
+				handleLightningInput();
+				// Clear the scan after using it
+				lastScan.scan = '';
+			}
+		}
+	});
 
 	let { wallet, onBack, onSend, onMelt }: Props = $props();
 
@@ -42,15 +58,16 @@
 		}
 
 		// Check if it's a Lightning invoice
-		if (isLightningInvoice(trimmed)) {
+		else if (isLightningInvoice(trimmed)) {
 			detectedType = 'invoice';
 			const invoiceData = parseInvoice(trimmed);
 			detectedAmount = invoiceData?.amount || null;
+			amount = ""+detectedAmount
 			return;
 		}
 
 		// Check if it's a Lightning address
-		if (validateLnAddress(trimmed)) {
+		else if (validateLnAddress(trimmed)) {
 			detectedType = 'address';
 			detectedAmount = null; // Lightning address requires user to enter amount
 			return;
@@ -184,12 +201,7 @@
 		}
 	}
 
-	// Determine if amount input should be shown
-	const showAmountInput = $derived(
-		!detectedType || 
-		detectedType === 'address' || 
-		(detectedType === 'invoice' && !detectedAmount)
-	);
+
 
 	// Get button text based on mode
 	const buttonText = $derived(() => {
@@ -221,38 +233,48 @@
 		Send
 	</p>
 	<!-- Balance Display -->
-	 <div class="rounded-lg flex items-end p-2 gap-2 bg-card border">
-
-		<p class="text-2xl font-bold">{formatBalance(wallet.balance)}</p>
-		<p class="text-sm text-muted-foreground">sats</p>
+	 <div class="rounded-lg flex flex-col  p-2 gap-1 bg-card border">
+		
+		<p class="text-xs text-muted-foreground">available</p>
+		<div class="flex gap-1 items-end">
+			<p class="text-2xl font-bold">{formatBalance(wallet.balance)}</p>
+			<p class="text-sm text-muted-foreground">sats</p>
+		</div>
 	</div>
 	</div>
 
 	<!-- Lightning Invoice/Address Input -->
 	<div class="rounded-lg border bg-card p-4">
 		<Label for="lightning-input" class="text-sm font-medium mb-2 block">
-			Lightning Invoice or Address (optional)
+			Lightning Invoice or Address
 		</Label>
-		<Input
-			id="lightning-input"
-			type="text"
-			placeholder="lnbc... or user@domain.com"
-			bind:value={lightningInput}
-			oninput={handleLightningInput}
-			class="font-mono text-sm"
-			disabled={isLoading}
-		/>
+		<div class="relative">
+			<Input
+				id="lightning-input"
+				type="text"
+				placeholder="lnbc... or user@domain.com"
+				bind:value={lightningInput}
+				oninput={handleLightningInput}
+				class="font-mono text-sm pr-10"
+				disabled={isLoading}
+			/>
+			<button
+				type="button"
+				onclick={() => walletView.setView('scan')}
+				class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-accent transition-colors"
+				disabled={isLoading}
+				aria-label="Scan QR code"
+			>
+				<ScanLine class="h-4 w-4 text-muted-foreground" />
+			</button>
+		</div>
 	</div>
 
-	<!-- Amount Display (if detected from invoice) -->
-	{#if detectedAmount}
-		<div class="rounded-lg border bg-card p-4">
-			<p class="text-sm text-muted-foreground mb-1">Invoice Amount</p>
-			<p class="text-2xl font-bold">{formatBalance(detectedAmount)} sats</p>
-		</div>
-	{/if}
 
-		<!-- Divider -->
+
+	{#if !detectedType}
+	
+	<!-- Divider -->
 	<div class="relative mb-6">
 		<div class="absolute inset-0 flex items-center">
 			<span class="w-full border-t"></span>
@@ -261,9 +283,17 @@
 			<span class="bg-background px-2 text-muted-foreground">Or</span>
 		</div>
 	</div>
+	{/if}
 
+	<!-- Amount Display (if detected from invoice) -->
+	{#if detectedAmount}
+		<div class="rounded-lg border bg-card p-4">
+			<p class="text-sm text-muted-foreground mb-1">Invoice Amount</p>
+			<p class="text-2xl font-bold">{formatBalance(detectedAmount)} sats</p>
+		</div>
+	{/if}
 	<!-- Amount Input (conditional) -->
-	{#if showAmountInput}
+	{#if !detectedAmount}
 		<div class="rounded-lg p-4 flex flex-col justify-center items-center">
 			<div class="flex items-baseline gap-2">
 				<input
@@ -288,9 +318,9 @@
 	<Button
 		size="lg"
 		class="w-full"
-		variant='secondary'
+		variant={buttonText()==="Generate Ecash Token" || buttonText()==="Creating Token..."?'secondary':'default'}
 		onclick={handleSend}
-		disabled={isLoading || (showAmountInput && (!amount || parseInt(amount) <= 0))}
+		disabled={isLoading || (!amount || parseInt(amount) <= 0)}
 	>
 		{#if isLoading}
 			<span class="animate-spin mr-2">⏳</span>

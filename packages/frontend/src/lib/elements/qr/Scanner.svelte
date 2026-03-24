@@ -22,6 +22,43 @@
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let DecoderClass: any = null;
 
+	type ScanResult = {
+		data: string;
+		view: 'send' | 'receive';
+	} | null;
+
+	function processScanData(raw: string): ScanResult {
+		const trimmed = raw.trim();
+		let normalized = trimmed;
+
+		// Remove deep link prefixes
+		if (trimmed.startsWith('cashu://')) {
+			normalized = trimmed.substring(8);
+		} else if (trimmed.startsWith('cashu:')) {
+			normalized = trimmed.substring(6);
+		} else if (trimmed.startsWith('lightning://')) {
+			normalized = trimmed.substring(12);
+		} else if (trimmed.startsWith('lightning:')) {
+			normalized = trimmed.substring(10);
+		}
+
+		// Determine view based on content type
+		if (normalized.startsWith('cashu')) {
+			return { data: normalized, view: 'receive' };
+		}
+
+		if (normalized.startsWith('lnbc')) {
+			return { data: normalized, view: 'send' };
+		}
+
+		if (normalized.includes('@')) {
+			// LNURL address pattern
+			return { data: normalized, view: 'send' };
+		}
+
+		return null; // Not a recognized format
+	}
+
 	onMount(async () => {
 		// Dynamically import bc-ur only in browser environment
 		const bcUrModule = await import('@gandlaf21/bc-ur');
@@ -89,14 +126,12 @@
 				if (decoded.startsWith('ur:')) {
 					const chunkProcess = decoded.split('/')[2];
 					if (!decoder) {
-							decoder = new DecoderClass();
-						}
-						scanProcess = chunkProcess;
-						decoder.receivePart(decoded);
-						
-						completion = Math.floor(decoder.estimatedPercentComplete() * 100);
-						console.error(error)
+						decoder = new DecoderClass();
 					}
+					scanProcess = chunkProcess;
+					decoder.receivePart(decoded);
+
+					completion = Math.floor(decoder.estimatedPercentComplete() * 100);
 					if (!decoder.isComplete()) {
 						requestScan();
 						return;
@@ -104,16 +139,26 @@
 					if (!decoder.isSuccess()) {
 						throw new Error(`${decoder.resultError()}`);
 					}
-					
+
 					const ur = decoder.resultUR();
 					const decodedUR = ur.decodeCBOR();
 					const scannedToken = decodedUR.toString();
-					console.log()
 					lastScan.scan = scannedToken;
-					scanning=false
-					walletView.setView("receive")
+					scanning = false;
+					walletView.setView('receive');
+					return;
+				} else {
+					// Handle all other formats (cashu, lightning, lnurl)
+					const result = processScanData(decoded);
+					if (result) {
+						lastScan.scan = result.data;
+						scanning = false;
+						walletView.setView(result.view);
+						return;
+					}
 				}
-		} catch (e){
+			}
+		} catch {
 			// No QR found in this frame, continue scanning
 		}
 		requestScan();

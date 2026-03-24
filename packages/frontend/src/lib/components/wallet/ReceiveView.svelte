@@ -1,11 +1,12 @@
 <script lang="ts">
-	import { ArrowLeft, QrCode, Download } from '@lucide/svelte';
+	import { ArrowLeft, QrCode, Download, ScanLine } from '@lucide/svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import type { CocoWallet } from '$lib/state/wallet/wallet.svelte';
 	import type { MintHistoryEntry, ReceiveHistoryEntry } from 'coco-cashu-core';
 	import { ensureError } from 'common/errors';
 	import { onMount } from 'svelte';
 	import { lastScan } from '$lib/state/cache/lastScan.svelte';
+	import { walletView } from '$lib/state/walletView.svelte';
 
 	onMount(()=> {
 		if (lastScan.scan.startsWith("cashu")) {
@@ -155,14 +156,25 @@
 	<!-- Token Input Section -->
 	<div class="mb-4">
 		<label for="token" class="mb-2 block text-sm font-medium">Paste Ecash Token</label>
-		<textarea
-			id="token"
-			value={tokenInput}
-			oninput={handleTokenInput}
-			placeholder="cashuA..."
-			rows="3"
-			class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-		></textarea>
+		<div class="relative">
+			<textarea
+				id="token"
+				value={tokenInput}
+				oninput={handleTokenInput}
+				placeholder="cashuA..."
+				rows="3"
+				class="w-full rounded-md border border-input bg-background px-3 py-2 pr-10 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+			></textarea>
+			<button
+				type="button"
+				onclick={() => walletView.setView('scan')}
+				class="absolute right-2 top-2 p-1.5 rounded-md hover:bg-accent transition-colors"
+				disabled={isRedeeming}
+				aria-label="Scan QR code"
+			>
+				<ScanLine class="h-4 w-4 text-muted-foreground" />
+			</button>
+		</div>
 	</div>
 
 	<!-- Redeem Button -->
