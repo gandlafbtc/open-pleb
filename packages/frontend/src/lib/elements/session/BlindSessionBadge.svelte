@@ -6,7 +6,9 @@
 	import { toast } from 'svelte-sonner';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Button } from '$lib/components/ui/button';
+	import type { CocoWallet } from '$lib/state/wallet/wallet.svelte';
 
+	let wallet: CocoWallet | undefined = $state(undefined);
 	let timeRemaining = $state('');
 	let intervalId: number | undefined;
 	let showRoleSelector = $state(false);
@@ -23,7 +25,9 @@
 		blindSessionService.checkSessionValidity();
 	}
 
-	onMount(() => {
+	onMount(async () => {
+		const { wallet: w } = await import('$lib/state/wallet/wallet.svelte');
+		wallet = w;
 		updateTimer();
 		intervalId = window.setInterval(updateTimer, 1000);
 	});
@@ -48,11 +52,24 @@
 	}
 
 	async function selectRole(selectedRole: 'maker' | 'taker') {
+		if (!wallet) {
+			toast.error('Wallet not initialized');
+			return;
+		}
+
 		isLoading = true;
 		closeRoleSelector();
 		try {
-			await blindSessionService.openSession(selectedRole);
-			toast.success(`Blind session opened as ${selectedRole}`);
+			// Consume a BAT from the wallet
+			const authProof = await wallet.consumeBat();
+			
+			if (!authProof) {
+				toast.error('No BAT available. Please top up your BAT balance.');
+				return;
+			}
+
+			// Open session with the consumed BAT
+			await blindSessionService.openSession(selectedRole, authProof);
 		} catch (error) {
 			toast.error('Failed to open blind session');
 			console.error(error);

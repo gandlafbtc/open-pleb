@@ -2,6 +2,8 @@ import { blindSessionState } from '$lib/state/dynamic/blindSession.svelte';
 import { sessionStore } from '$lib/state/persistent/db/repos/session';
 import type { BlindSession } from '$lib/state/persistent/db/models/types';
 import { toast } from 'svelte-sonner';
+import { getAppApiBaseUrl } from './const';
+import type { Proof } from '@cashu/cashu-ts';
 
 export class BlindSessionService {
 	/**
@@ -32,7 +34,7 @@ export class BlindSessionService {
 	 * Open a new blind session with the specified role
 	 * Consumes a blind auth token from the wallet
 	 */
-	async openSession(role: 'maker' | 'taker'): Promise<boolean> {
+	async openSession(role: 'maker' | 'taker', authProof: Proof): Promise<boolean> {
 		try {
 			blindSessionState.setLoading(true);
 
@@ -42,20 +44,34 @@ export class BlindSessionService {
 				return false;
 			}
 
-			// TODO: Consume a blind auth token from wallet
-			// This will be implemented when the blind auth token flow is ready
-			// For now, we'll create a mock session
-			
-			const sessionId = crypto.randomUUID();
-			const now = Date.now();
-			const expiresAt = now + (30 * 60 * 1000); // 30 minutes from now
+			// Call backend to create session
+			const baseUrl = getAppApiBaseUrl();
+			const response = await fetch(`${baseUrl}/auth/bat`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					auth_proof: authProof,
+					role,
+				}),
+			});
 
+			if (!response.ok) {
+				const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+				throw new Error(errorData.error || 'Failed to create session');
+			}
+
+			const data = await response.json();
+			const { session } = data;
+
+			// Create local session object
 			const newSession: BlindSession = {
-				sessionId,
+				sessionId: session.sessionId,
 				role,
-				createdAt: now,
-				expiresAt,
-				BAT: 'mock-token' // TODO: Replace with actual token
+				createdAt: session.createdAt,
+				expiresAt: session.expiresAt,
+				BAT: authProof.secret,
 			};
 
 			// Save to storage
@@ -63,12 +79,12 @@ export class BlindSessionService {
 
 			// Update state
 			blindSessionState.setSession(newSession);
-
-			toast.success(`Blind session opened as ${role}`);
+			toast.info(`Opened new ${role} session`)
 			return true;
 		} catch (error) {
 			console.error('Failed to open blind session:', error);
-			toast.error('Failed to open blind session');
+			const errorMessage = error instanceof Error ? error.message : 'Failed to open blind session';
+			toast.error(errorMessage);
 			return false;
 		} finally {
 			blindSessionState.setLoading(false);

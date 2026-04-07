@@ -1,6 +1,8 @@
 import { DefaultStore } from '../helper/storeHelper.svelte';
 import { createEncryptionHelper } from '../helper/encryptionHelper';
 import type { BlindSession } from '../models/types';
+import { clock } from '$lib/state/clock.svelte';
+import { getUnixNow } from 'common/util';
 
 const encryptionHelper = createEncryptionHelper<BlindSession>('encrypted-sessions');
 
@@ -11,7 +13,7 @@ class SessionStore extends DefaultStore<BlindSession> {
 
 	getActiveSession(): BlindSession | undefined {
 		const sessions = this.data;
-		const now = Date.now();
+		const now = getUnixNow();
 		
 		// Find first non-expired session
 		return sessions.find((session: BlindSession) => session.expiresAt > now);
@@ -27,7 +29,7 @@ class SessionStore extends DefaultStore<BlindSession> {
 
 	async clearExpiredSessions(): Promise<void> {
 		const sessions = this.data;
-		const now = Date.now();
+		const now = getUnixNow();
 		
 		for (const session of sessions) {
 			if (session.expiresAt <= now) {

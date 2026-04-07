@@ -8,10 +8,12 @@ import { lnurl } from "$lib/state/persistent/db/repos/lnurl";
 import { seedPhrase } from "$lib/state/persistent/db/repos/seedPhrase";
 import { settings } from "$lib/state/persistent/db/repos/settings";
 import { DEFAULT_PASS } from "$lib/state/static/pass";
+import { blindSessionService } from "$lib/interface/rest/blindSession.service";
 
 export const init = async () => {
 	await key.initKeyFromPass(new TextEncoder().encode(DEFAULT_PASS))
 	await initStores()
+	await blindSessionService.init()
 };
 
 const initStores = async () => {

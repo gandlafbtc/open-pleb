@@ -1,4 +1,5 @@
 import type { BlindSession } from '../persistent/db/models/types';
+import { clock } from '../clock.svelte';
 
 class BlindSessionState {
 	private _currentSession: BlindSession | null = $state(null);
@@ -10,7 +11,8 @@ class BlindSessionState {
 
 	get isActive(): boolean {
 		if (!this._currentSession) return false;
-		return this._currentSession.expiresAt > Date.now();
+		// Both expiresAt and clock.time are in seconds
+		return this._currentSession.expiresAt > clock.time;
 	}
 
 	get isLoading(): boolean {
@@ -19,8 +21,9 @@ class BlindSessionState {
 
 	get timeRemaining(): number {
 		if (!this._currentSession) return 0;
-		const remaining = this._currentSession.expiresAt - Date.now();
-		return Math.max(0, remaining);
+		// Both expiresAt and clock.time are in seconds, convert to milliseconds
+		const remainingSeconds = this._currentSession.expiresAt - clock.time;
+		return Math.max(0, remainingSeconds * 1000);
 	}
 
 	get role(): 'maker' | 'taker' | null {

@@ -5,6 +5,8 @@ import { finalizeEvent, type EventTemplate, type VerifiedEvent } from "@nostr/to
 import { getOriginFromUrl, getUnixNow } from 'common/util';
 import { idKeys } from '../dynamic/id.svelte';
 import { SvelteSet } from 'svelte/reactivity';
+import { type Proof } from '@cashu/cashu-ts';
+
 
 export class CocoWallet {
     private static instance: CocoWallet | null = null;
@@ -56,11 +58,12 @@ export class CocoWallet {
         }
     }
 
-    async consumeBat(): Promise<string> {
+    async consumeBat(): Promise<Proof> {
         if (!this.mint)  {
             throw new Error("Mint not initialized yet");
         }
-        const bat = await this.coco.auth.consumeBat(this.mint?.mintUrl)
+        const bat = await this.coco.auth.consumeBat(this.mint?.mintUrl, true)
+        this.refreshBatBalance(this.coco)
         if (!bat) {
             throw new Error("No BAT found in BATpool")
         }
