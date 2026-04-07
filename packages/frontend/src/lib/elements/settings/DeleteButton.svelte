@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { DB } from "$lib/state/persistent/db/db";
-	import { toast } from "svelte-sonner";
     import { delay } from "common/util";
+	import { toast } from "svelte-sonner";
+
     const confirm = async () => {
-        DB.deleteDatabase();
+        await DB.deleteDatabase();
 		toast.promise(delay(1000), {
 				loading: "Deleting...",
 				success: "Restarting..."

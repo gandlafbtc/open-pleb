@@ -11,7 +11,7 @@
 <div class="container mx-auto p-2 pt-0">
 		<!-- Online Status Badges -->
 		<div class="flex flex-wrap gap-4 items-center justify-center">
-			<Badge variant="outline" class="border-primary px-4 py-2 text-sm flex items-center gap-2">
+			<Badge variant="outline" class="px-4 py-2 text-sm flex items-center gap-2">
 				<UserPlus class="w-4 h-4" />
 				<span class="font-semibold">Makers</span>
 				<span class="relative flex h-2 w-2">
@@ -25,7 +25,7 @@
 				<span>{onlineMakers}</span>
 			</Badge>
 			
-			<Badge variant="outline" class="border-accent px-4 py-2 text-sm flex items-center gap-2">
+			<Badge variant="outline" class="px-4 py-2 text-sm flex items-center gap-2">
 				<UserMinus class="w-4 h-4" />
 				<span class="font-semibold">Takers</span>
 				<span class="relative flex h-2 w-2">

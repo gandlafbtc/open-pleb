@@ -59,6 +59,7 @@
 		"vitest-browser-svelte": "^2.0.2"
 	},
 	"dependencies": {
+		"@nostr/tools": "catalog:crypto",
 		"@gandlaf21/bc-ur": "^1.1.12",
 		"@noble/ciphers": "catalog:crypto",
 		"mode-watcher": "^1.1.0"

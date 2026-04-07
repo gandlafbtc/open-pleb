@@ -1,4 +1,6 @@
+import { pubkeyToNpub } from "common/encoding"
 import * as repo from "../../repository/app/user.repository"
+import { hexToBytes } from "@noble/hashes/utils.js"
 
 /**
  * Validates that a pubkey is exactly 64 hexadecimal characters
@@ -30,28 +32,52 @@ const isValidInviteCode = async (inviteCode: string): Promise<boolean> => {
         return false
     }
 
-    if(!(await repo.verifyInviteCode(inviteCode))){
+    if (!(await repo.verifyInviteCode(inviteCode))) {
         return false
     }
 
     return true
 }
 
-export const isUserInvited = async (pubkey:string) =>{
+export const isUserInvited = async (pubkey: string) => {
     if (!isValidPubkey(pubkey)) {
-        throw new Error("Invalid pubkey. Should be 64 hex char, got: "+pubkey);
+        throw new Error("Invalid pubkey. Should be 64 hex char, got: " + pubkey);
     }
     return await repo.isUserInvited(pubkey)
 }
 
-export const registerUser = async (pubkey:string, inviteCode:string) => {
+export const registerUser = async (pubkey: string, inviteCode: string) => {
     if (!isValidPubkey(pubkey)) {
-        throw new Error("Invalid pubkey. Should be 64 hex char, got: "+pubkey);
+        throw new Error("Invalid pubkey. Should be 64 hex char, got: " + pubkey);
     }
 
     if (!await isValidInviteCode(inviteCode)) {
         throw new Error("Invalid invite code.");
     }
 
-    return await repo.registerUser(pubkey, inviteCode)
+    if (await repo.isUserInvited(pubkey)) {
+        throw new Error("User already invited.");
+    }
+
+    const isRegisteredUser = await repo.registerUser(pubkey, inviteCode)
+    if (isRegisteredUser) {
+        const res = await fetch(`${Bun.env.OPENPLEB_NOSTR_OIDC_HOST}/api/admin/users`, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${Bun.env.OPENPLEB_NOSTR_OIDC_ADMIN_TOKEN}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                    npub: pubkeyToNpub(hexToBytes(pubkey)),
+                    preferredLanguage: 'en',
+                    isAdmin: false,
+                    active: true
+            })
+        })
+        if (!res.ok) {
+            throw new Error(`error ${res.status} when creating user on oidc service: ${await res.text()}`);
+        }
+        
+    }
+    return
 }

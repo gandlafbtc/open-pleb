@@ -55,8 +55,9 @@
 			const historyItem = wallet.history.find(h => h.type === 'mint');
 			onInvoice(historyItem!)
 		} catch (err) {
+			const e = ensureError(err)
 			console.error('Failed to generate receive token:', err);
-			error = 'Failed to create invoice. Please try again.';
+			error = 'Failed to create invoice: ' +e.message;
 		} finally {
 			isGenerating = false;
 		}

@@ -22,3 +22,11 @@ export type Setting = {
 	key: string;
 	value: string;
 };
+
+export type BlindSession = {
+	sessionId: string;
+	role: 'maker' | 'taker';
+	expiresAt: number;
+	createdAt: number;
+	BAT: string;
+};

@@ -19,7 +19,8 @@ class SeedStore extends DefaultStore<SeedPhrase> {
 		if (!validateMnemonic(seedPhrase.seedPhrase, wordlist)) {
 			throw new Error("Could not replace seed: invalid seed");
 		}
-		this.data[0] = seedPhrase
+		this.clear()
+		this.add(seedPhrase)
 	}
 }
 

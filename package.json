@@ -64,14 +64,15 @@
       "@logtape/logtape": "^2.0.2",
       "@logtape/file": "^2.0.2",
       "qr": "^0.5.4"
-
     },
     "crypto": {
       "@noble/curves": "^2.0.1",
       "@noble/hashes": "^2.0.1",
       "@noble/ciphers": "^2.1.1",
       "@scure/bip32": "^2.0.1",
-      "@scure/bip39": "^2.0.1"
+      "@scure/bip39": "^2.0.1",
+      "@nostr/tools": "npm:@jsr/nostr__tools"
+
     },
     "cashu": {
       "coco-cashu-core": "../coco/packages/core",
@@ -95,7 +96,5 @@
       "@std/encoding": "npm:@jsr/std__encoding@0.224.0/base64url",
       "postgres": "^3.4.8"
     }
-  },
-  "dependencies": {
   }
 }

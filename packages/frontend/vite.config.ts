@@ -11,7 +11,8 @@ export default defineConfig({
 		paraglideVitePlugin({ project: './project.inlang', outdir: './src/lib/paraglide' })
 	],
 	server: {
-		port: 5173 
+		port: 5173,
+		// allowedHosts: ["bff16964c1f983.lhr.life"]
 	},
 	test: {
 		expect: { requireAssertions: true },

@@ -20,5 +20,11 @@
 	"register_id_info": "First-time setup. Registers your ID with the Open Pleb instance.",
 	"connect_existing_id_info": "Use this if you've already registered this ID on another device.",
 	"invite_code": "Invite Code",
-	"invite_code_placeholder": "Enter invite code if you have one"
+	"invite_code_placeholder": "Enter invite code if you have one",
+	"session_selectRole": "Select Role",
+	"session_maker": "Maker",
+	"session_taker": "Taker",
+	"session_createAuth": "Create Auth Session",
+	"session_topUpBAT": "Top Up BAT",
+	"session_authOptions": "Auth Options"
 }

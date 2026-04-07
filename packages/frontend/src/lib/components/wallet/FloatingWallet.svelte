@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ArrowLeft, Download, Landmark, LoaderCircle, ScanQrCode, Upload, Wallet } from '@lucide/svelte';
+	import { ArrowLeft, Download, LoaderCircle, ScanQrCode, Upload, Wallet } from '@lucide/svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import * as Sheet from '$lib/components/ui/sheet';
@@ -11,12 +11,13 @@
 	import ReceiveView from './ReceiveView.svelte';
 	import SendView from './SendView.svelte';
 	import HistoryDetailView from './HistoryDetailView.svelte';
+	import BalanceDelta from './BalanceDelta.svelte';
 	import type { HistoryEntry } from 'coco-cashu-core';
 	import Scanner from '$lib/elements/qr/Scanner.svelte';
 	import { walletView } from '$lib/state/walletView.svelte';
-
+	import * as Avatar from '$lib/components/ui/avatar/index.js';
+	import ClearAuthBadge from '$lib/elements/session/ClearAuthBadge.svelte';
 	let wallet: CocoWallet | undefined = $state(undefined);
-
 	let historyDisplayCount = $state(5);
 
 	// Derive the actual history item from wallet history (reactive!)
@@ -33,7 +34,6 @@
 	// Reactive effect to initialize mint when env is loaded
 	$effect(() => {
 		if (wallet && env.settings?.OPENPLEB_MINT_URL) {
-			console.log('init mint');
 			wallet.initMint(env.settings.OPENPLEB_MINT_URL).catch((error) => {
 				const err = ensureError(error);
 				console.error('Failed to initialize mint:', err);
@@ -43,8 +43,8 @@
 	});
 
 	// Format balance with thousands separator
-	function formatBalance(balance: number): string {
-		return balance.toLocaleString();
+	function formatBalance(balance: number, isShort = false): string {
+		return balance.toLocaleString(undefined, {notation: isShort?"compact":"standard",compactDisplay: isShort?'short':"long"});
 	}
 
 	function handleHistoryItemClick(item: HistoryEntry) {
@@ -68,32 +68,41 @@
 
 <Sheet.Root bind:open={walletView.isOpen}>
 	<div class="fixed bottom-4 left-4 z-50">
-		<Sheet.Trigger disabled={!wallet}>
-			<Button
-				size="icon-lg"
-				class="relative h-14 w-14 rounded-full shadow-lg transition-shadow hover:shadow-xl"
-				aria-label="Open wallet"
-			>
-				{#if wallet}
-					<Wallet class="h-6 w-6" />
-					{#if wallet.balance > 0}
-						<Badge
-							variant="secondary"
-							class="absolute -top-1 -right-1 min-w-[2rem] justify-center px-1.5 py-0.5 text-xs font-semibold"
-						>
-							{formatBalance(wallet.balance)}
-						</Badge>
+		<div class="relative">
+			<div class="absolute -top-16 left-1/2 -translate-x-1/2">
+				<BalanceDelta />
+			</div>
+			<Sheet.Trigger disabled={!wallet}>
+				<Button
+					size="icon-lg"
+					class="relative h-14 w-14 rounded-full shadow-lg transition-shadow hover:shadow-xl"
+					aria-label="Open wallet"
+				>
+					{#if wallet}
+						<Wallet class="h-6 w-6" />
+						{#if wallet.balance > 0}
+							<Badge
+								variant="secondary"
+								class="absolute -top-1 -right-1 min-w-[2rem] justify-center px-1.5 py-0.5 text-xs font-semibold"
+							>
+								{formatBalance(wallet.balance, true)}
+							</Badge>
+						{/if}
+					{:else}
+						<LoaderCircle class="animate-spin"></LoaderCircle>
 					{/if}
-				{:else}
-					<LoaderCircle class="animate-spin"></LoaderCircle>
-				{/if}
-			</Button>
-		</Sheet.Trigger>
+				</Button>
+			</Sheet.Trigger>
+		</div>
 	</div>
 
 	<Sheet.Content side="left" class="w-[400px] sm:w-[540px]">
 		<Sheet.Header>
-			<Sheet.Title>Wallet</Sheet.Title>
+			<Sheet.Title class="flex gap-1 items-center">
+				<Wallet></Wallet>
+				Wallet
+				<ClearAuthBadge></ClearAuthBadge>
+			</Sheet.Title>
 			<Sheet.Description></Sheet.Description>
 		</Sheet.Header>
 		{#if wallet}
@@ -103,20 +112,27 @@
 					<div
 						class="flex items-center justify-center gap-2 rounded-lg border bg-card p-6 text-center"
 					>
-						<Landmark class="w-4 text-muted-foreground"></Landmark>
+						<Avatar.Root>
+							<Avatar.Image src="/logo/maskable/maskable_icon.png" alt="@openPleb" />
+							<Avatar.Fallback>OP</Avatar.Fallback>
+						</Avatar.Root>
 						{#if wallet.mint}
-							<p class="text-sm text-muted-foreground">
+							<div class="flex flex-col text-start">
 								{wallet.mint.mintUrl}
-							</p>
+								<p class="text-sm text-muted-foreground">
+									{wallet.mint.mintInfo.version}
+								</p>
+							</div>
 						{:else}
 							<LoaderCircle class="w-4 animate-spin text-muted-foreground" />
 						{/if}
 					</div>
 
-					<div class="rounded-lg border bg-card p-6 text-center">
+					<div class="relative rounded-lg border bg-card p-6 text-center">
 						<p class="mb-2 text-sm text-muted-foreground">Balance</p>
 						<p class="text-4xl font-bold">{formatBalance(wallet.balance)}</p>
 						<p class="mt-1 text-sm text-muted-foreground">sats</p>
+						<BalanceDelta />
 					</div>
 
 					<!-- Wallet Actions Placeholder -->
@@ -137,9 +153,7 @@
 								walletView.setView('scan');
 							}}
 						>
-							<ScanQrCode
-								
-							></ScanQrCode>
+							<ScanQrCode></ScanQrCode>
 						</Button>
 						<Button
 							size="lg"
@@ -191,14 +205,9 @@
 													</div>
 												{/if}
 
-												{#if item.type==="receive"}
+												{#if item.type === 'receive'}
 													<div>
-														<Badge
-															variant='default'
-															class="text-xs"
-														>
-															finalized
-														</Badge>
+														<Badge variant="default" class="text-xs">finalized</Badge>
 													</div>
 												{/if}
 											</div>
@@ -271,14 +280,14 @@
 						</div>
 					{/if}
 				{:else if walletView.view === 'scan'}
-										<!-- Back Button -->
-				<div class="mb-2">
-					<Button variant="ghost" size="sm" onclick={()=> walletView.goToBalance()}>
-						<ArrowLeft class="h-4 w-4 mr-1" />
-						Back
-					</Button>
-				</div>
-				<Scanner/>
+					<!-- Back Button -->
+					<div class="mb-2">
+						<Button variant="ghost" size="sm" onclick={() => walletView.goToBalance()}>
+							<ArrowLeft class="mr-1 h-4 w-4" />
+							Back
+						</Button>
+					</div>
+					<Scanner />
 				{/if}
 			</div>
 		{/if}
