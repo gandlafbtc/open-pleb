@@ -50,6 +50,8 @@ export const offerTable = pgTable('offers', {
 	makerFeedback: text('maker_feedback'),
 	takerFeedback: text('taker_feedback'),
 	resolutionReason: text('resolution_reason'),
+
+	//Other
 	description: text('description'),
 	
 	// rewards and refunds

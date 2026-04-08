@@ -37,8 +37,8 @@
 	});
 </script>
 
-<Card class="p-3">
-	<div class="flex items-center gap-2 mb-1">
+<Card class="p-3 py-2 gap-0 pb-0">
+	<div class="flex items-center gap-2">
 		<TrendingUp class="w-4 h-4 text-primary" />
 		<div>
 			<h3 class="text-sm font-semibold">Exchange Rate</h3>

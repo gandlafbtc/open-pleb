@@ -1,5 +1,6 @@
 <script>
 	import { goto } from "$app/navigation";
+	import { resolve } from "$app/paths";
 	import Button from "$lib/components/ui/button/button.svelte";
 	import DisplaySeed from "$lib/elements/onboarding/idcreation/DisplaySeed.svelte";
 	import { seedPhrase } from "$lib/state/persistent/db/repos/seedPhrase";
@@ -14,11 +15,11 @@
 		</div>
 
 		<div class="flex w-full flex-col space-y-5">
-			<Button disabled={!isDisplay} onclick={()=> {goto('/id/npub')}} size="lg">
+			<Button disabled={!isDisplay} onclick={()=> {goto(resolve('/id/npub'))}} size="lg">
 				I have stored it securely
 			</Button>
 
-			<Button variant="link" disabled={!isDisplay} onclick={()=>copyTextToClipboard(seedPhrase.data[0]?.seedPhrase??"")} size="lg">
+			<Button variant="link" disabled={!isDisplay} onclick={()=>copyTextToClipboard(seedPhrase.data[0]?.seedPhrase??"", "seed dangerously")} size="lg">
 				dangerously copy
 			</Button>
 		</div>

@@ -42,10 +42,10 @@ export class CocoWallet {
         coco.on('proofs:reserved', () => this.refreshBalance(coco));
         coco.on('proofs:released', () => this.refreshBalance(coco));
         coco.on("history:updated", () => this.refreshHistory(coco))
-        coco.on("history:updated", () => this.refreshBatBalance(coco))
+        coco.on("history:updated", () => this.refreshBatBalance())
     }
 
-    async refreshBatBalance(coco: Manager) {
+    async refreshBatBalance() {
         if (!this.mint)  {
             throw new Error("Mint not initialized yet");
         }
@@ -63,7 +63,7 @@ export class CocoWallet {
             throw new Error("Mint not initialized yet");
         }
         const bat = await this.coco.auth.consumeBat(this.mint?.mintUrl, true)
-        this.refreshBatBalance(this.coco)
+        await this.refreshBatBalance()
         if (!bat) {
             throw new Error("No BAT found in BATpool")
         }
@@ -336,7 +336,7 @@ export class CocoWallet {
         try {
             await this.coco.auth.restore(this.mint.mintUrl)
             this._loginSession = await this.coco.auth.getSession(this.mint.mintUrl)
-            await this.refreshBatBalance(this.coco)
+            await this.refreshBatBalance()
         } catch (error) {
             console.log("could not restore auth session:", error)            
         }

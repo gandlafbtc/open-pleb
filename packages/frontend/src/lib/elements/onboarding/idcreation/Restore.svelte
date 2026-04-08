@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { afterNavigate, goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { initSeedAndKeys } from '$lib/app/init';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
@@ -35,7 +36,7 @@
 
 	const handleRestore =async () => {
 		try {
-			goto("/id/npub")
+			goto(resolve("/id/npub"))
 		} catch (error) {
 			const err = ensureError(error)
 			console.error(err)

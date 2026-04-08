@@ -2,15 +2,15 @@
 	import { afterNavigate, goto } from '$app/navigation';
 	import { Button } from '$lib/components/ui/button';
 	import { seedPhrase } from '$lib/state/persistent/db/repos/seedPhrase';
-	import { delay } from 'common/util';
 	import Restore from './Restore.svelte';
 	import { initSeedAndKeys } from '$lib/app/init';
+	import { resolve } from '$app/paths';
 
 	let showRestoreScreen = $state(false);
 
 	// Event handlers for the buttons
 	const handleCreateID = async () => {
-        goto('/id')
+        goto(resolve('/id'))
 	};
 	afterNavigate(async (n)=> {
 		if (n.to?.url.pathname==="/id") {

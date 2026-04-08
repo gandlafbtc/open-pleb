@@ -9,6 +9,7 @@
 	import { ensureError } from 'common/errors';
 	import { registerUser, checkUserStatus } from '$lib/interface/rest/user.service';
 	import QR from '$lib/elements/qr/QR.svelte';
+	import { resolve } from '$app/paths';
 
 	let isRegistering = $state(false);
 	let isConnecting = $state(false);
@@ -35,7 +36,7 @@
 			toast.success('Successfully registered your Open Pleb ID!');
 
 			// Redirect to main page after successful registration
-			goto('/');
+			goto(resolve('/'));
 		} catch (error) {
 			console.error('Registration error:', error);
 			registrationStatus = 'error';
@@ -59,7 +60,7 @@
 				throw new Error('ID is not yet invited. Register with invite code.');
 			}
 			toast.success('Welcome back!');
-			goto('/');
+			goto(resolve('/'));
 		} catch (error) {
 			const err = ensureError(error);
 			console.error('Connection error:', error);

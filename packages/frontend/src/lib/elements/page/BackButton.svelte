@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { goto, afterNavigate } from '$app/navigation';
+    import { goto} from '$app/navigation';
     import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import Button from '$lib/components/ui/button/button.svelte';
@@ -12,7 +12,8 @@
   const goBack = () => {
     const route = page.url.pathname.split("/")
     route.pop()
-    goto("/"+route.join("/"))
+    const path = "/"+route.join("/")
+    goto(resolve(path))
   }
 </script>
 <Button variant='ghost' onclick={goBack}>
