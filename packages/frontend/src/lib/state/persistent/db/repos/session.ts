@@ -1,7 +1,6 @@
 import { DefaultStore } from '../helper/storeHelper.svelte';
 import { createEncryptionHelper } from '../helper/encryptionHelper';
 import type { BlindSession } from '../models/types';
-import { clock } from '$lib/state/clock.svelte';
 import { getUnixNow } from 'common/util';
 
 const encryptionHelper = createEncryptionHelper<BlindSession>('encrypted-sessions');

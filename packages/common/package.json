@@ -37,7 +37,8 @@
     "./payloads": "./src/payloads.ts",
     "./encryption": "./src/encryption.ts",
     "./util": "./src/util.ts",
-    "./encoding": "./src/encoding.ts"
+    "./encoding": "./src/encoding.ts",
+    "./const": "./src/const.ts"
     
   }
 }

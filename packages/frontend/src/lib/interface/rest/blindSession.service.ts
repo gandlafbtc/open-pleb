@@ -14,7 +14,6 @@ export class BlindSessionService {
 		try {
 			await sessionStore.init();
 			await this.loadActiveSession();
-			await sessionStore.clearExpiredSessions();
 		} catch (error) {
 			console.error('Failed to initialize blind session service:', error);
 		}

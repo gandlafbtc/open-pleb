@@ -8,7 +8,7 @@
 
 </script>
 
-    <div class="w-full flex justify-between h-16 p-2">
+    <div class="w-full flex items-center justify-between h-16 p-1">
         <BackOrLogo></BackOrLogo>
         <SessionManager></SessionManager>
         <div>

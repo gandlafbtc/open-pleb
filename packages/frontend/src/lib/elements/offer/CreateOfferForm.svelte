@@ -1,21 +1,29 @@
 <script lang="ts">
 	import { blindSessionState } from '$lib/state/dynamic/blindSession.svelte';
-	import { createOffer } from '$lib/interface/rest/offer.api';
 	import { toast } from 'svelte-sonner';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Textarea } from '$lib/components/ui/textarea';
+	import { Card, CardContent } from '$lib/components/ui/card';
+	import { Tabs, TabsContent, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
 	import SessionCreator from '$lib/elements/session/SessionCreator.svelte';
+	import OfferPreview from '$lib/elements/offer/OfferPreview.svelte';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { env } from '$lib/state/dynamic/env.svelte';
 
-	let isLoading = $state(false);
+	interface Props {
+		showPreview?: boolean;
+	}
+
+	let { showPreview = $bindable(false) }: Props = $props();
+
 	let fiatAmountCents = $state<string>(''); // Store as smallest unit (cents/pennies/etc)
 	let fiatAddress = $state('');
 	let fiatProviderId = $state<string>('');
 	let description = $state('');
+	let activeTab = $state<string>('scan');
 
 	// Mock fiat providers - will be fetched from backend later
 	const fiatProviders = [
@@ -63,12 +71,8 @@
 		fiatAmountCents = value;
 	}
 
-	async function handleSubmit() {
-		if (!sessionId) {
-			toast.error('No active session');
-			return;
-		}
-
+	function handlePreview() {
+		// Validate before showing preview
 		const amountCents = parseInt(fiatAmountCents);
 		if (!amountCents || amountCents <= 0) {
 			toast.error('Fiat amount must be greater than 0');
@@ -80,32 +84,7 @@
 			return;
 		}
 
-		isLoading = true;
-		try {
-			// Convert to currency unit based on whether it uses decimals
-			const fiatAmount = currencyUsesDecimals ? amountCents / 100 : amountCents;
-			
-			const response = await createOffer({
-				sessionId,
-				fiatAmount,
-				fiatProviderId: fiatProviderId ? parseInt(fiatProviderId) : null,
-				fiatAddress: fiatAddress.trim(),
-				description: description.trim() || undefined
-			});
-
-			if (response.success) {
-				toast.success('Offer created successfully!');
-				goto(resolve('/'));
-			} else {
-				toast.error(response.error || 'Failed to create offer');
-			}
-		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : 'Failed to create offer';
-			toast.error(errorMessage);
-			console.error(error);
-		} finally {
-			isLoading = false;
-		}
+		showPreview = true;
 	}
 
 	function handleCancel() {
@@ -130,97 +109,119 @@
 			/>
 		</div>
 	</div>
+{:else if showPreview}
+	<div class="max-w-2xl mx-auto">
+		<OfferPreview
+			fiatAmountCents={fiatAmountCents}
+			fiatAddress={fiatAddress}
+			fiatProviderId={fiatProviderId}
+			description={description}
+			sessionId={sessionId || ''}
+			onBack={() => showPreview = false}
+		/>
+	</div>
 {:else}
 	<div class="max-w-2xl mx-auto ">
-		<div class="mb-6">
+		<div class="my-6">
 			<h1 class="text-2xl font-bold">Create New Offer</h1>
-			<p class="text-muted-foreground mt-2">
-				Fill in the details to create a new offer.
-			</p>
 		</div>
 
-		<form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }} class="space-y-6">
-			<!-- Fiat Amount Input (styled like SendView) -->
-			<div class="space-y-2">
-				<Label for="fiatAmount">Amount *</Label>
-				<div class="rounded-lg border bg-card p-4 flex flex-col justify-center items-center">
-					<div class="flex items-baseline gap-2">
-						<input
-							id="fiatAmount"
-							type="text"
-							placeholder="0"
-							inputmode="numeric"
-							value={fiatAmountCents}
-							oninput={handleAmountInput}
-							class="w-full border-0 bg-transparent text-center text-6xl font-bold outline-none ring-0 focus:ring-0 focus-visible:ring-0"
-							style="min-width: 200px;"
-							disabled={isLoading}
-						/>
-					</div>
-					<div class="flex flex-col items-center gap-1">
-						<span class="text-sm text-muted-foreground whitespace-nowrap text-center">
-							{env.settings?.OPENPLEB_CURRENCY || 'USD'}
-						</span>
-						{#if displayAmount && currencyUsesDecimals}
-							<span class="text-xs text-muted-foreground">
-								≈ {displayAmount} {env.settings?.OPENPLEB_CURRENCY || 'USD'}
-							</span>
-						{/if}
-					</div>
-				</div>
-			</div>
-			<!-- Fiat Address -->
-			<div class="space-y-2 flex gap-2 items-baseline">
-				<Label for="fiatAddress" class="text-nowrap">Payment Address *</Label>
-				<Input
-					id="fiatAddress"
-					type="text"
-					bind:value={fiatAddress}
-					placeholder="Enter payment address"
-					required
-					disabled={isLoading}
-				/>
-			</div>
+		<Card>
+			<CardContent>
+				<Tabs bind:value={activeTab}>
+					<TabsList class="grid w-full grid-cols-2">
+						<TabsTrigger value="scan">Scan</TabsTrigger>
+						<TabsTrigger value="input">Input</TabsTrigger>
+					</TabsList>
+					
+					<TabsContent value="scan" class="mt-6">
+						<div class="flex flex-col items-center justify-center py-12 text-center">
+							<p class="text-muted-foreground">QR Scanner coming soon...</p>
+						</div>
+					</TabsContent>
+					
+					<TabsContent value="input" class="mt-6">
+						<form onsubmit={(e) => { e.preventDefault(); handlePreview(); }} class="space-y-6">
+							<!-- Fiat Amount Input (styled like SendView) -->
+							<div class="">
+								<div class="rounded-lg border bg-card p-2 flex flex-col justify-center items-center">
+									<div class="flex items-baseline gap-2">
+										<input
+											id="fiatAmount"
+											type="text"
+											placeholder="0"
+											inputmode="numeric"
+											value={fiatAmountCents}
+											oninput={handleAmountInput}
+											class="w-full border-0 bg-transparent text-center text-6xl font-bold outline-none ring-0 focus:ring-0 focus-visible:ring-0"
+											style="min-width: 200px;"
+										/>
+									</div>
+									<div class="flex flex-col items-center gap-1">
+										<span class="text-sm text-muted-foreground whitespace-nowrap text-center">
+											{env.settings?.OPENPLEB_CURRENCY || 'USD'}
+										</span>
+										{#if displayAmount && currencyUsesDecimals}
+											<span class="text-xs text-muted-foreground">
+												≈ {displayAmount} {env.settings?.OPENPLEB_CURRENCY || 'USD'}
+											</span>
+										{/if}
+									</div>
+								</div>
+							</div>
+							<!-- Fiat Address -->
+							<div class="space-y-2 flex gap-2 items-baseline">
+								<Label for="fiatAddress" class="text-nowrap">Payment Address *</Label>
+								<Input
+									id="fiatAddress"
+									type="text"
+									bind:value={fiatAddress}
+									placeholder="Enter payment address"
+									required
+								/>
+							</div>
 
-			<!-- Fiat Provider Dropdown -->
-			<div class="space-y-2 flex gap-2 items-baseline">
-				<Label for="provider" class="text-nowrap">Method Provider</Label>
-				<select
-					id="provider"
-					bind:value={fiatProviderId}
-					class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-					disabled={isLoading}
-				>
-					<option value="">Select payment method (optional)</option>
-					{#each fiatProviders as provider (provider.value)}
-						<option value={provider.value}>{provider.label}</option>
-					{/each}
-				</select>
-			</div>
+							<!-- Fiat Provider Dropdown -->
+							<div class="space-y-2 flex gap-2 items-baseline">
+								<Label for="provider" class="text-nowrap">Method Provider</Label>
+								<select
+									id="provider"
+									bind:value={fiatProviderId}
+									class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+								>
+									<option value="">Select payment method (optional)</option>
+									{#each fiatProviders as provider (provider.value)}
+										<option value={provider.value}>{provider.label}</option>
+									{/each}
+								</select>
+							</div>
 
 
 
-			<!-- Description -->
-			<div class="space-y-2">
-				<Label for="description">Description (Optional)</Label>
-				<Textarea
-					id="description"
-					bind:value={description}
-					placeholder="Add any additional details about your offer"
-					disabled={isLoading}
-					rows={3}
-				/>
-			</div>
+							<!-- Description -->
+							<div class="space-y-2">
+								<Label for="description">Description (Optional)</Label>
+								<Textarea
+									id="description"
+									bind:value={description}
+									placeholder="Add any additional details about your offer"
+									rows={3}
+								/>
+							</div>
 
-			<!-- Action Buttons -->
-			<div class="flex gap-3 justify-end">
-				<Button type="button" variant="outline" onclick={handleCancel} disabled={isLoading}>
-					Cancel
-				</Button>
-				<Button type="submit" disabled={isLoading || !fiatAmountCents || !fiatAddress.trim()}>
-					{isLoading ? 'Creating...' : 'Create Offer'}
-				</Button>
-			</div>
-		</form>
+							<!-- Action Buttons -->
+							<div class="flex gap-3 justify-end">
+								<Button type="button" variant="outline" onclick={handleCancel}>
+									Cancel
+								</Button>
+								<Button type="submit" disabled={!fiatAmountCents || !fiatAddress.trim()}>
+									Preview Offer
+								</Button>
+							</div>
+						</form>
+					</TabsContent>
+				</Tabs>
+			</CardContent>
+		</Card>
 	</div>
 {/if}

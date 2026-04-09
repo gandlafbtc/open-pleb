@@ -36,6 +36,5 @@ export async function createOffer(offerData: InsertOffer) {
 		.insert(offerTable)
 		.values(offerData)
 		.returning();
-	
 	return offer;
 }

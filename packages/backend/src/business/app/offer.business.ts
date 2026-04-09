@@ -5,6 +5,8 @@ import * as sessionRepository from "../../repository/app/session.repository";
 import * as offerRepository from "../../repository/app/offer.repository";
 import { log } from "../../util/logger";
 import { getConversionRate } from "../../util/conversion";
+import { SATS_PER_BTC } from "common/const";
+
 type CreateOfferInput = {
 	sessionId: string;
 	fiatAmount: number;
@@ -45,7 +47,7 @@ function calculateFees(satsAmount: number): CalculatedFees {
  * Calculate sats amount from fiat amount using conversion rate
  */
 function calculateSatsAmount(fiatAmount: number, conversionRate: number): number {
-	return Math.floor(fiatAmount / conversionRate);
+	return Math.floor((fiatAmount / conversionRate)*SATS_PER_BTC);
 }
 
 /**

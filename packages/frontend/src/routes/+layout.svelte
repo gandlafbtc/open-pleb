@@ -43,7 +43,7 @@
 	{#if !page.url.pathname.startsWith("/id")}
 		<Header></Header>
 	{/if}
-	<div class="m-2">
+	<div class="m-2 pb-20">
 		{@render children()}
 	</div>
 

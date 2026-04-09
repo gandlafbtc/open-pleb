@@ -1,3 +1,4 @@
+
 const getInitialValue = () => {
 	let value = 100_000;
 	switch (Bun.env.OPENPLEB_CURRENCY) {
