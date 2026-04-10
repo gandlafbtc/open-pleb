@@ -40,6 +40,8 @@
 	import TakerDisputed from '$lib/elements/offer/taker/Disputed.svelte';
 	import TakerResolved from '$lib/elements/offer/taker/Resolved.svelte';
 	import TakerError from '$lib/elements/offer/taker/Error.svelte';
+	import { providerStore } from '$lib/state/persistent/db/repos/provider';
+	import { UNKNOWN_PROVIDER } from '$lib/utils/const';
 
 	// Get offer ID from URL params
 	const offerId = $derived(parseInt($page.params.id || '0'));
@@ -49,6 +51,7 @@
 	const isLoading = $derived(offerState.isLoading);
 	const currency = $derived(env.settings?.OPENPLEB_CURRENCY || 'USD');
 	const sessions = $derived(sessionStore.data);
+	const provider = $derived(providerStore.getProviderById(offer?.fiatProviderId??0)??UNKNOWN_PROVIDER)
 
 	// Determine user role
 	type UserRole = 'maker' | 'taker' | 'observer';
@@ -157,8 +160,10 @@
 						{formatFiatAmount(offer.fiatAmount)} {offer.fiatCurrency}
 					</span>
 					<p>via</p>
-					<p>
-						{offer.fiatProviderId}
+					<p class="flex gap-2 items-center">
+						<img src={provider.icon} alt={provider.label} class="w-4
+						h-4"/>
+						{provider.label}
 					</p>
 				</div>
 

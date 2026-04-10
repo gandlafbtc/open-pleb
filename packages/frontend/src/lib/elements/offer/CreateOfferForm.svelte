@@ -7,11 +7,13 @@
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { Card, CardContent } from '$lib/components/ui/card';
 	import { Tabs, TabsContent, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
+	import * as Select from '$lib/components/ui/select';
 	import SessionCreator from '$lib/elements/session/SessionCreator.svelte';
 	import OfferPreview from '$lib/elements/offer/OfferPreview.svelte';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { env } from '$lib/state/dynamic/env.svelte';
+	import { providerStore } from '$lib/state/persistent/db/repos/provider';
 
 	interface Props {
 		showPreview?: boolean;
@@ -25,14 +27,7 @@
 	let description = $state('');
 	let activeTab = $state<string>('scan');
 
-	// Mock fiat providers - will be fetched from backend later
-	const fiatProviders = [
-		{ value: '1', label: 'PayPal' },
-		{ value: '2', label: 'Bank Transfer' },
-		{ value: '3', label: 'Venmo' },
-		{ value: '4', label: 'Cash App' },
-		{ value: '5', label: 'Zelle' }
-	];
+	
 
 	const { isActive, role, sessionId } = $derived({
 		isActive: blindSessionState.isActive,
@@ -183,17 +178,38 @@
 
 							<!-- Fiat Provider Dropdown -->
 							<div class="space-y-2 flex gap-2 items-baseline">
-								<Label for="provider" class="text-nowrap">Method Provider</Label>
-								<select
-									id="provider"
-									bind:value={fiatProviderId}
-									class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-								>
-									<option value="">Select payment method (optional)</option>
-									{#each fiatProviders as provider (provider.value)}
-										<option value={provider.value}>{provider.label}</option>
-									{/each}
-								</select>
+								<Label for="provider" class="text-nowrap">Payment Provider</Label>
+								<Select.Root type='single'  bind:value={fiatProviderId}>
+									<Select.Trigger class="w-full">
+										{#if fiatProviderId}
+											{@const selectedProvider = providerStore.data.find(p => p.id.toString() === fiatProviderId)}
+											{#if selectedProvider}
+												<div class="flex items-center gap-2">
+													{#if selectedProvider.icon}
+														<img src={selectedProvider.icon} alt={selectedProvider.label} class="w-4 h-4" />
+													{/if}
+													{selectedProvider.label}
+												</div>
+											{:else}
+												<span class="text-muted-foreground">Select payment provider (optional)</span>
+											{/if}
+										{:else}
+											<span class="text-muted-foreground">Select payment provider (optional)</span>
+										{/if}
+									</Select.Trigger>
+									<Select.Content>
+										{#each providerStore.data as provider (provider.id)}
+											<Select.Item value={provider.id.toString()} label={provider.label}>
+												<div class="flex items-center gap-2">
+													{#if provider.icon}
+														<img src={provider.icon} alt={provider.label} class="w-4 h-4" />
+													{/if}
+													{provider.label}
+												</div>
+											</Select.Item>
+										{/each}
+									</Select.Content>
+								</Select.Root>
 							</div>
 
 

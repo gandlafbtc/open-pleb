@@ -10,6 +10,7 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { ChevronLeft } from '@lucide/svelte';
+	import { providerStore } from '$lib/state/persistent/db/repos/provider';
 
 	interface Props {
 		fiatAmountCents: string;
@@ -24,14 +25,7 @@
 
 	let isLoading = $state(false);
 
-	// Mock fiat providers - will be fetched from backend later
-	const fiatProviders = [
-		{ value: '1', label: 'PayPal' },
-		{ value: '2', label: 'Bank Transfer' },
-		{ value: '3', label: 'Venmo' },
-		{ value: '4', label: 'Cash App' },
-		{ value: '5', label: 'Zelle' }
-	];
+
 
 	// Determine if currency uses decimals (most do, except KRW, JPY, etc.)
 	const currencyUsesDecimals = $derived.by(() => {
@@ -59,7 +53,7 @@
 
 	const providerLabel = $derived.by(() => {
 		if (!fiatProviderId) return 'Not specified';
-		const provider = fiatProviders.find(p => p.value === fiatProviderId);
+		const provider = providerStore.data.find(p => p.id === parseInt(fiatProviderId));
 		return provider ? provider.label : 'Unknown';
 	});
 
@@ -116,7 +110,7 @@
 			const offer = await offerService.createOffer({
 				sessionId,
 				fiatAmount,
-				fiatProviderId: fiatProviderId ? parseInt(fiatProviderId) : null,
+				fiatProviderId: parseInt(fiatProviderId),
 				fiatAddress: fiatAddress.trim(),
 				description: description.trim() || undefined
 			});
@@ -158,7 +152,9 @@
 			<!-- Payment Method Provider -->
 			<div class="space-y-1">
 				<p class="text-sm font-medium text-muted-foreground">Payment Method</p>
-				<p class="text-base">{providerLabel}</p>
+				<p class="flex gap-2 items-center text-base">
+					<img src={providerStore.getProviderById(parseInt(fiatProviderId))?.icon} class="w-4 h-4" alt="">
+					{providerLabel}</p>
 			</div>
 
 			<!-- Description -->

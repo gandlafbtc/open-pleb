@@ -2,8 +2,63 @@ import { offerState } from '$lib/state/dynamic/offer.svelte';
 import { offerStore } from '$lib/state/persistent/db/repos/offer';
 import { blindSessionState } from '$lib/state/dynamic/blindSession.svelte';
 import { toast } from 'svelte-sonner';
-import { createOffer, type CreateOfferRequest, type CreateOfferResponse } from './offer.api';
+import { getAppApiBaseUrl } from './const';
 import type { Offer } from 'common/db/schema';
+
+// API Types
+export interface CreateOfferRequest {
+	sessionId: string;
+	fiatAmount: number;
+	fiatProviderId: number | null;
+	fiatAddress: string;
+	description?: string;
+}
+
+export interface CreateOfferResponse {
+	success: boolean;
+	offer?: {
+		id: number;
+		status: string;
+		fiatCurrency: string;
+		fiatAmount: number;
+		fiatProviderId: number | null;
+		fiatAddress: string;
+		conversionRate: number;
+		satsAmount: number;
+		platformFeeFlatRate: number;
+		platformFeePercentage: number;
+		takerFeeFlatRate: number;
+		takerFeePercentage: number;
+		makerBondFlatRate: number;
+		makerBondPercentage: number;
+		takerBondFlatRate: number;
+		takerBondPercentage: number;
+		makerSessionId: string;
+		updatedAt: number;
+		expiresAt: number;
+		description: string | null;
+		receiptImg: string;
+	};
+	error?: string;
+}
+
+// API Functions
+async function createOfferApi(request: CreateOfferRequest): Promise<CreateOfferResponse> {
+	const response = await fetch(`${getAppApiBaseUrl()}/offer`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(request),
+	});
+
+	if (!response.ok) {
+		const errorData = await response.json();
+		throw new Error(errorData.error || "Failed to create offer");
+	}
+
+	return response.json();
+}
 
 export class OfferService {
 	/**
@@ -32,7 +87,7 @@ export class OfferService {
 	 * Create a new offer
 	 */
 	async createOffer(request: CreateOfferRequest): Promise<Offer> {
-			const response: CreateOfferResponse = await createOffer(request);
+			const response: CreateOfferResponse = await createOfferApi(request);
 
 			if (!response.success || !response.offer) {
 				throw new Error(response.error || 'Failed to create offer');

@@ -22,4 +22,8 @@ export interface OpenPlebDB extends DBSchema {
 		key: string;
 		value: EncryptedStore;
 	};
+	'encrypted-providers': {
+		key: string;
+		value: EncryptedStore;
+	};
 }
