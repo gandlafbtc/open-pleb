@@ -1,8 +1,28 @@
+import type { Offer } from './db/schema';
+
 export type PingData = {
    takers: number
    makers: number
    price: number
 }
+
+export type PublicOffer = Omit<Offer, 
+	| 'fiatAddress' 
+	| 'makerSessionId' 
+	| 'takerSessionId' 
+	| 'makerBondAndEscrow' 
+	| 'takerBond' 
+	| 'receiptImg' 
+	| 'makerFeedback' 
+	| 'takerFeedback' 
+	| 'resolutionReason' 
+	| 'takerRewardToken' 
+	| 'makerRefundToken' 
+	| 'makerReputationToken' 
+	| 'takerReputationToken' 
+	| 'takerRewardPubkeyLock' 
+	| 'makerRefundPubkeyLock'
+>;
 
 export const OFFER_STATE = {
 	CREATED: 'CREATED',

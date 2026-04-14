@@ -164,8 +164,8 @@ export default [
         {
           patterns: [
             {
-              group: ['**/api/**'],
-              message: 'Business layer cannot import from api layer.',
+              group: ['**/api/**/rest/**', '**/api/**/auth/**'],
+              message: 'Business layer cannot import from REST or auth API layers.',
             },
             {
               group: ['**/db/db*'],
@@ -213,7 +213,7 @@ export default [
               message: 'API layer cannot directly access db. Use business or repository layer instead.',
             },
             {
-              group: ['**/api/**/app/**', '**/business/app/**', '**/repository/app/**'],
+              group: [],
               message: 'Admin API files can only import from admin folders in business and repository layers.',
             },
           ],

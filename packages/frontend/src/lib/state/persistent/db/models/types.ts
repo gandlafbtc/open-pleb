@@ -29,4 +29,5 @@ export type BlindSession = {
 	expiresAt: number;
 	createdAt: number;
 	BAT: string;
+	isActive: boolean;
 };

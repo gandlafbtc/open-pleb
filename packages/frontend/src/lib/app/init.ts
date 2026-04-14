@@ -10,6 +10,7 @@ import { settings } from "$lib/state/persistent/db/repos/settings";
 import { DEFAULT_PASS } from "$lib/state/static/pass";
 import { blindSessionService } from "$lib/interface/rest/blindSession.service";
 import { offerService } from "$lib/interface/rest/offer.service";
+import { offerListService } from "$lib/interface/rest/offerList.service";
 import { providerService } from "$lib/interface/rest/provider.service";
 
 export const init = async () => {
@@ -17,6 +18,7 @@ export const init = async () => {
 	await initStores()
 	await blindSessionService.init()
 	await offerService.init()
+	await offerListService.init()
 	await providerService.init()
 	afterInit()
 };

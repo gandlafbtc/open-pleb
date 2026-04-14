@@ -1,8 +1,7 @@
 import { initializeCoco, Manager, type AuthSession, type HistoryEntry, type Mint, } from 'coco-cashu-core';
 import { IndexedDbRepositories } from 'coco-cashu-indexeddb';
 import { seed } from '../dynamic/seed.svelte';
-import { finalizeEvent, type EventTemplate, type VerifiedEvent } from "@nostr/tools";
-import { getOriginFromUrl, getUnixNow } from 'common/util';
+import { restoreOrCreateSession, ensureAuthSession } from 'common/auth';
 import { idKeys } from '../dynamic/id.svelte';
 import { SvelteSet } from 'svelte/reactivity';
 import { type Proof } from '@cashu/cashu-ts';
@@ -114,99 +113,25 @@ export class CocoWallet {
         if (!this.mint) {
             throw new Error("Mint not initialized yet");
         }
-        
-        try {
-            const isSuccess = await this.coco.auth.restore(this.mint.mintUrl)
-            
-            if (isSuccess) {
-                // Check if the restored session is still valid
-                const session = await this.coco.auth.getSession(this.mint.mintUrl)
-                if (session && session.expiresAt < getUnixNow()) {
-                    console.log('Using existing valid session, expires at:', session.expiresAt)
-                    console.log('current time:', session.expiresAt<getUnixNow())
-                    return session
-                }
-                console.log('Session expired or invalid, creating new one')
-            }
-        } catch (error) {
-            console.log('Failed to restore session, creating new one:', error)
+        if (!idKeys.privkey) {
+            throw new Error("Keys not initialized yet");
         }
-        
-        // If restore failed or session is expired, create a new one
-        return await this.createClearAuthSession()
+        return await restoreOrCreateSession(this.coco, this.mint.mintUrl, idKeys.privkey);
     }
 
     async refreshAuthSession() {
         if (!this.mint) {
             throw new Error("Mint not initialized yet");
         }
-        // Ensure we have a valid session first and store it
-        this.loginSession = await this.createLoginSession();
-        
-        const provider = await this.coco.auth.getAuthProvider(this.mint.mintUrl)
-        if (!provider) {
-            throw new Error("Could not get provider");
+        if (!idKeys.privkey) {
+            throw new Error("Keys not initialized yet");
         }
-        await provider.ensure?.(50)
-        this.loginSession = await this.coco.auth.getSession(this.mint.mintUrl)
-        await this.refreshBatBalance(this.coco)
-
+        this.loginSession = await ensureAuthSession(this.coco, this.mint.mintUrl, idKeys.privkey, 50);
+        await this.refreshBatBalance();
     }
 
 
 
-    private async createClearAuthSession() {
-        if (!this.mint) {
-            throw new Error("Mint not initialized yet");
-        }
-        console.log("deviceAuth")
-        const deviceAuth = await this.coco.auth.startDeviceAuth(this.mint.mintUrl)
-
-        const code = deviceAuth.user_code.replaceAll("-", "")
-        const origin = getOriginFromUrl(deviceAuth.verification_uri)
-
-        const event: EventTemplate =
-
-        {
-            "kind": 22242,
-            "created_at": getUnixNow(),
-            "tags": [
-                [
-                    "user_code",
-                    code
-                ],
-                [
-                    "purpose",
-                    "device_auth"
-                ],
-                [
-                    "relay",
-                    origin
-                ]
-            ],
-            "content": `Authorize device with code ${code}`
-        }
-        const signedEvent: VerifiedEvent = finalizeEvent(event, idKeys.privkey)
-        const formData = new FormData();
-        formData.append('user_code', code);
-        formData.append('event', JSON.stringify(signedEvent));
-
-        await fetch(origin + "/device?/approve=", {
-            method: "POST",
-            body: formData
-        })
-
-        let pollResult
-
-        do {
-            const res = await deviceAuth.poll()
-            if (res?.access_token) {
-                pollResult = res
-            }
-        } while (!pollResult)
-        console.log('authed')
-        return await this.coco.auth.login(this.mint.mintUrl, { access_token: pollResult.access_token! })
-    }
 
     async receiveLn(amount: number) {
         if (!this.mint) {

@@ -44,6 +44,11 @@ class WalletView {
 		this._view = 'history-detail';
 	}
 
+	public selectHistoryById(historyItemId: string|undefined): void {
+		this._selectedHistoryId = historyItemId;
+		this._view = 'history-detail';
+	}
+
 	public goToBalance(): void {
 		this._view = 'balance';
 		this._selectedHistoryId = undefined;

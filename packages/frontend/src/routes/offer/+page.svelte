@@ -114,7 +114,7 @@
 	{:else}
 		<!-- Offers List -->
 		<div class="grid gap-4">
-			{#each offers as offer (offer.id)}
+			{#each offers as offer}
 				<Card 
 					class="cursor-pointer hover:shadow-lg transition-shadow"
 					onclick={() => handleOfferClick(offer.id)}

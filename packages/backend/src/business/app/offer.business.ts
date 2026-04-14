@@ -1,12 +1,16 @@
 import { environment } from "../../env";
 import { getUnixNow } from "common/util";
-import { OFFER_STATE } from "common/types";
+import { OFFER_STATE, type PublicOffer } from "common/types";
 import * as sessionRepository from "../../repository/app/session.repository";
 import * as offerRepository from "../../repository/app/offer.repository";
 import { log } from "../../util/logger";
 import { getConversionRate } from "../../util/conversion";
 import { SATS_PER_BTC } from "common/const";
-
+import { createOfferWallet, claimAndVerifyToken } from '../../util/offer-wallet';
+import { calcMakerTotalForOffer } from "common/calc";
+import { broadcastToRoom } from "../../api/v1/app/socket/v1";
+import { WS_COMMAND, RoomIds } from "common/ws-types";
+import { Offer } from "common/db/schema";
 type CreateOfferInput = {
 	sessionId: string;
 	fiatAmount: number;
@@ -27,9 +31,9 @@ interface CalculatedFees {
 }
 
 /**
- * Calculate fees based on sats amount and environment configuration
+ * Calculate fees based on environment configuration
  */
-function calculateFees(satsAmount: number): CalculatedFees {
+function calculateFees(): CalculatedFees {
 	return {
 		platformFeeFlatRate: environment.OPENPLEB_PLATFORM_FEE_FLAT_RATE,
 		platformFeePercentage: environment.OPENPLEB_PLATFORM_FEE_PERCENTAGE,
@@ -117,7 +121,7 @@ export async function createOffer(input: CreateOfferInput) {
 	const satsAmount = calculateSatsAmount(input.fiatAmount, conversionRate);
 
 	// Calculate fees
-	const fees = calculateFees(satsAmount);
+	const fees = calculateFees();
 
 	// Set expiry time (5 minutes from now)
 	const expiresAt = now + 5 * 60;
@@ -142,4 +146,100 @@ export async function createOffer(input: CreateOfferInput) {
 	log.info(`Created offer: ${offer.id} for session: ${input.sessionId}`);
 
 	return offer;
+}
+
+/**
+ * Pay and list an offer (maker pays bond + escrow with ecash)
+ */
+export async function payAndListOffer(offerId: number, ecashToken: string, sessionId: string) {
+	// Get the offer
+	const offer = await offerRepository.getOfferById(offerId);
+	if (!offer) {
+		throw new Error("Offer not found");
+	}
+
+	// Verify offer is in CREATED state
+	if (offer.status !== OFFER_STATE.CREATED) {
+		throw new Error(`Offer must be in CREATED state, current state: ${offer.status}`);
+	}
+
+	// Verify the session owns this offer
+	if (offer.makerSessionId !== sessionId) {
+		throw new Error("Session does not own this offer");
+	}
+
+	const expectedAmount = calcMakerTotalForOffer(offer)
+
+	log.info(`Processing payment for offer ${offerId}: expecting ${expectedAmount} sats`);
+
+	// Create wallet for this offer
+	const wallet = await createOfferWallet(offerId);
+
+	// Claim and verify the ecash token
+	const receivedAmount = await claimAndVerifyToken(wallet, ecashToken, expectedAmount);
+
+	// Update offer in database
+	const now = getUnixNow();
+	const updatedOffer = await offerRepository.updateOfferPayment(
+		offerId,
+		ecashToken,
+		OFFER_STATE.INVOICE_PAID,
+		now,
+	);
+
+	log.info(`Offer ${offerId} paid and listed successfully with ${receivedAmount} sats`);
+
+	// Broadcast the new offer to all connected clients
+	try {
+		const publicOffer = stripSensitiveFields(updatedOffer);
+		broadcastToRoom(RoomIds.global(), {
+			type: WS_COMMAND.OFFER_LISTED,
+			data: { offer: publicOffer }
+		});
+		log.debug(`Broadcasted offer ${offerId} to global room`);
+	} catch (error) {
+		log.error(`Failed to broadcast offer ${offerId}: ${error}`);
+		// Don't fail the whole operation if broadcast fails
+	}
+
+	return updatedOffer;
+}
+
+/**
+ * Strip sensitive fields from an offer to create a PublicOffer
+ */
+function stripSensitiveFields(offer: Offer): PublicOffer {
+	return {
+		id: offer.id,
+		status: offer.status,
+		fiatCurrency: offer.fiatCurrency,
+		fiatAmount: offer.fiatAmount,
+		fiatProviderId: offer.fiatProviderId,
+		conversionRate: offer.conversionRate,
+		satsAmount: offer.satsAmount,
+		platformFeeFlatRate: offer.platformFeeFlatRate,
+		platformFeePercentage: offer.platformFeePercentage,
+		takerFeeFlatRate: offer.takerFeeFlatRate,
+		takerFeePercentage: offer.takerFeePercentage,
+		makerBondFlatRate: offer.makerBondFlatRate,
+		makerBondPercentage: offer.makerBondPercentage,
+		takerBondFlatRate: offer.takerBondFlatRate,
+		takerBondPercentage: offer.takerBondPercentage,
+		updatedAt: offer.updatedAt,
+		expiresAt: offer.expiresAt,
+		description: offer.description,
+		claimedAt: null,
+		completedAt: null,
+		makerReputationStake: null,
+		paidAt: null,
+		takerReputationStake: null
+	};
+}
+
+/**
+ * Get all listed offers (public view)
+ */
+export async function getListedOffers(): Promise<PublicOffer[]> {
+	const offers = await offerRepository.getListedOffers();
+	return offers.map(stripSensitiveFields);
 }

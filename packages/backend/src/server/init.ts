@@ -1,5 +1,6 @@
 import { log } from "../util/logger";
 import { MigrationRepository } from "../repository/migration.repository";
+import { ensureBackendPubkeyRegistered } from "../util/oidc-registration";
 // import * as webpush from "@negrel/webpush";
 // import { subscribers } from "../dynamic/subscribers";
 // import { VapidKeys } from "../dynamic/vapidKeys";
@@ -8,6 +9,7 @@ import { MigrationRepository } from "../repository/migration.repository";
 export const init = async () => {
 	checkEnv();
 	await migrateDb();
+	await ensureBackendPubkeyRegistered();
 	// await setUpVapid();
 };
 

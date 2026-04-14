@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { offerState } from '$lib/state/dynamic/offer.svelte';
 	import { env } from '$lib/state/dynamic/env.svelte';
 	import { sessionStore } from '$lib/state/persistent/db/repos/session';
@@ -44,7 +44,7 @@
 	import { UNKNOWN_PROVIDER } from '$lib/utils/const';
 
 	// Get offer ID from URL params
-	const offerId = $derived(parseInt($page.params.id || '0'));
+	const offerId = $derived(parseInt(page.params.id || '0'));
 	
 	// Find the offer from state
 	const offer = $derived(offerState.offers.find(o => o.id === offerId));
@@ -220,7 +220,9 @@
 		<Card>
 			<CardContent class="pt-6 space-y-3">
 				{#if userRole === 'maker'}
-					{#if offer.status === OFFER_STATE.CREATED}
+					{#if offer.status === OFFER_STATE.EXPIRED || (offer.expiresAt??0) < clock.time}
+						<MakerExpired {offer} />
+					{:else if offer.status === OFFER_STATE.CREATED}
 						<MakerCreated {offer} />
 					{:else if offer.status === OFFER_STATE.INVOICE_CREATED}
 						<MakerInvoiceCreated {offer} />
@@ -232,8 +234,6 @@
 						<MakerReceiptSubmitted {offer} />
 					{:else if offer.status === OFFER_STATE.COMPLETED}
 						<MakerCompleted {offer} />
-					{:else if offer.status === OFFER_STATE.EXPIRED}
-						<MakerExpired {offer} />
 					{:else if offer.status === OFFER_STATE.MARKED_WITH_ISSUE}
 						<MakerMarkedWithIssue {offer} />
 					{:else if offer.status === OFFER_STATE.FOREFEIT}
@@ -250,7 +250,9 @@
 						</div>
 					{/if}
 				{:else if userRole === 'taker'}
-					{#if offer.status === OFFER_STATE.CREATED}
+					{#if offer.status === OFFER_STATE.EXPIRED || (offer.expiresAt??0) < clock.time}
+						<TakerExpired {offer} />
+					{:else if offer.status === OFFER_STATE.CREATED}
 						<TakerCreated {offer} />
 					{:else if offer.status === OFFER_STATE.INVOICE_CREATED}
 						<TakerInvoiceCreated {offer} />
@@ -262,8 +264,6 @@
 						<TakerReceiptSubmitted {offer} />
 					{:else if offer.status === OFFER_STATE.COMPLETED}
 						<TakerCompleted {offer} />
-					{:else if offer.status === OFFER_STATE.EXPIRED}
-						<TakerExpired {offer} />
 					{:else if offer.status === OFFER_STATE.MARKED_WITH_ISSUE}
 						<TakerMarkedWithIssue {offer} />
 					{:else if offer.status === OFFER_STATE.FOREFEIT}

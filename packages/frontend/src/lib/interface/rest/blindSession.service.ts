@@ -64,14 +64,15 @@ export class BlindSessionService {
 			const data = await response.json();
 			const { session } = data;
 
-			// Create local session object
-			const newSession: BlindSession = {
-				sessionId: session.sessionId,
-				role,
-				createdAt: session.createdAt,
-				expiresAt: session.expiresAt,
-				BAT: authProof.secret,
-			};
+		// Create local session object
+		const newSession: BlindSession = {
+			sessionId: session.sessionId,
+			role,
+			createdAt: session.createdAt,
+			expiresAt: session.expiresAt,
+			BAT: authProof.secret,
+			isActive: true,
+		};
 
 			// Save to storage
 			await sessionStore.saveSession(newSession);

@@ -18,6 +18,7 @@ export const WS_COMMAND = {
 	// Events (server -> client)
 	OFFER_UPDATED: 'offer:updated',
 	OFFER_CREATED: 'offer:created',
+	OFFER_LISTED: 'offer:listed',
 	OFFER_CLAIMED: 'offer:claimed',
 	OFFER_COMPLETED: 'offer:completed',
 	OFFER_DISPUTED: 'offer:disputed',
@@ -110,6 +111,11 @@ export interface OfferCreatedData {
 	timestamp: number;
 }
 
+export interface OfferListedData {
+	offer: import('./types').PublicOffer;
+	timestamp: number;
+}
+
 export interface ErrorData {
 	code: WSErrorCode;
 	message: string;
@@ -128,6 +134,7 @@ export type WSData =
 	| SubscriptionsData
 	| OfferUpdatedData
 	| OfferCreatedData
+	| OfferListedData
 	| ErrorData;
 
 // ============================================================================

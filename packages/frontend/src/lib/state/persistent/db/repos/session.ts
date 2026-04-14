@@ -14,8 +14,10 @@ class SessionStore extends DefaultStore<BlindSession> {
 		const sessions = this.data;
 		const now = getUnixNow();
 		
-		// Find first non-expired session
-		return sessions.find((session: BlindSession) => session.expiresAt > now);
+		// Find first non-expired and active session
+		return sessions.find((session: BlindSession) => 
+			session.expiresAt > now && session.isActive
+		);
 	}
 
 	async saveSession(session: BlindSession): Promise<void> {
@@ -23,15 +25,20 @@ class SessionStore extends DefaultStore<BlindSession> {
 	}
 
 	async clearSession(sessionId: string): Promise<void> {
-		await this.remove(sessionId, 'sessionId');
+		// Soft delete: set isActive to false instead of removing
+		const sessions = this.data;
+		const session = sessions.find((s: BlindSession) => s.sessionId === sessionId);
+		if (session) {
+			session.isActive = false;
+			await this.addOrUpdate(sessionId, session, 'sessionId');
+		}
 	}
 
 	async clearExpiredSessions(): Promise<void> {
 		const sessions = this.data;
 		const now = getUnixNow();
-		
 		for (const session of sessions) {
-			if (session.expiresAt <= now) {
+			if (session.expiresAt <= now && session.isActive) {
 				await this.clearSession(session.sessionId);
 			}
 		}

@@ -6,7 +6,7 @@
 <div class="container mx-auto space-y-8 py-8">
 	<Card.Root>
 		<Card.Header>
-			<Card.Title>Manage Open pleb</Card.Title>
+			<Card.Title>Manage users and invites</Card.Title>
 			<Card.Description>
 			</Card.Description>
 			<Button href="/user">
@@ -14,5 +14,14 @@
 			</Button>
 		</Card.Header>
 	</Card.Root>
-
+	<Card.Root>
+		<Card.Header>
+			<Card.Title>Manage providers</Card.Title>
+			<Card.Description>
+			</Card.Description>
+			<Button href="/providers">
+				Manage providers
+			</Button>
+		</Card.Header>
+	</Card.Root>
 </div>

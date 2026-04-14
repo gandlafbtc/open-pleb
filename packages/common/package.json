@@ -18,6 +18,8 @@
     "@noble/curves": "catalog:crypto",
     "@noble/hashes": "catalog:crypto",
     "@noble/ciphers": "catalog:crypto",
+    "coco-cashu-core": "catalog:cashu",
+    "@nostr/tools": "catalog:crypto",
     "dotenv": "catalog:utils",
     "drizzle-orm": "catalog:db"
   },
@@ -38,7 +40,9 @@
     "./encryption": "./src/encryption.ts",
     "./util": "./src/util.ts",
     "./encoding": "./src/encoding.ts",
-    "./const": "./src/const.ts"
-    
+    "./const": "./src/const.ts",
+    "./auth": "./src/auth.ts",
+    "./nostr-keys": "./src/nostr-keys.ts",
+    "./calc": "./src/calc.ts"
   }
 }

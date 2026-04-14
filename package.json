@@ -76,8 +76,9 @@
     },
     "cashu": {
       "coco-cashu-core": "../coco/packages/core",
-      "coco-cashu-sqlite3": "../coco/packages/sqlite3",
-      "coco-cashu-indexeddb": "../coco/packages/indexeddb"
+      "coco-cashu-indexeddb": "../coco/packages/indexeddb",
+      "coco-sqlite-bun": "../coco/packages/sqlite-bun"
+      
     },
     "server": {
       "@elysiajs/cookie": "^0.8.0",

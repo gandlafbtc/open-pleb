@@ -60,6 +60,23 @@ async function createOfferApi(request: CreateOfferRequest): Promise<CreateOfferR
 	return response.json();
 }
 
+async function payAndListOfferApi(offerId: number, ecashToken: string, sessionId: string): Promise<CreateOfferResponse> {
+	const response = await fetch(`${getAppApiBaseUrl()}/offer/${offerId}/pay`, {
+		method: "PUT",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({ ecashToken, sessionId }),
+	});
+
+	if (!response.ok) {
+		const errorData = await response.json();
+		throw new Error(errorData.error || "Failed to pay and list offer");
+	}
+
+	return response.json();
+}
+
 export class OfferService {
 	/**
 	 * Initialize the offer service
@@ -141,6 +158,44 @@ export class OfferService {
 			// Update state
 			offerState.addOffer(offer);
 			return offer;
+	}
+
+	/**
+	 * Pay and list an offer (maker pays bond + escrow with ecash)
+	 */
+	async payAndListOffer(offerId: number, ecashToken: string): Promise<Offer> {
+		const sessionId = blindSessionState.currentSession?.sessionId;
+		if (!sessionId) {
+			throw new Error('No active session');
+		}
+
+		const response: CreateOfferResponse = await payAndListOfferApi(offerId, ecashToken, sessionId);
+
+		if (!response.success || !response.offer) {
+			throw new Error(response.error || 'Failed to pay and list offer');
+		}
+
+		// Get the existing offer and update it
+		const existingOffer = this.getOfferById(offerId);
+		if (!existingOffer) {
+			throw new Error('Offer not found in local storage');
+		}
+
+		// Update the offer with new data
+		const updatedOffer: Offer = {
+			...existingOffer,
+			status: response.offer.status,
+			makerBondAndEscrow: ecashToken,
+			paidAt: response.offer.updatedAt,
+			updatedAt: response.offer.updatedAt,
+		};
+
+		// Save to storage
+		await offerStore.saveOffer(updatedOffer);
+		// Update state
+		offerState.updateOffer(updatedOffer);
+
+		return updatedOffer;
 	}
 
 	/**

@@ -1,8 +1,6 @@
-import { HDKey } from "@scure/bip32";
 import { seed } from "./seed.svelte";
-import { schnorr } from "@noble/curves/secp256k1.js";
+import { deriveNostrKeysFromSeed, pubkeyToNpub } from "common/nostr-keys";
 import { bytesToHex } from "@noble/ciphers/utils.js";
-import { bech32 } from "@scure/base";
 class IDKeys {
     private _pubkey: Uint8Array | undefined = $state();
     private _privkey: Uint8Array | undefined = $state();
@@ -28,27 +26,22 @@ class IDKeys {
         if (!seed.seed) {
             throw new Error("Could not init ID keys: No seed set.")
         }
-        const hdKey = HDKey.fromMasterSeed(seed.seed)
-        const privkey = hdKey.derive("m/44'/1237'/0'/0/0")
-        if (!privkey.privateKey) {
-            throw new Error("Could not get key from seed")
-        }
-        this.privkey = privkey.privateKey
-        this.pubkey = schnorr.getPublicKey(this.privkey)
+        const keys = deriveNostrKeysFromSeed(seed.seed);
+        this.privkey = keys.privkey;
+        this.pubkey = keys.pubkey;
     }
 
     getNpub() {
         if (!this.pubkey) {
             throw new Error("Could not get pubkey: pubkey not set")
         }
-        const words = bech32.toWords(this.pubkey);
-        return bech32.encode("npub", words);
+        return pubkeyToNpub(this.pubkey);
     }
     getHexPubKey() {
         if (!this.pubkey) {
             throw new Error("Could not get pubkey: pubkey not set")
         }
-        return bytesToHex(this.pubkey)
+        return bytesToHex(this.pubkey);
     }
 };
 
