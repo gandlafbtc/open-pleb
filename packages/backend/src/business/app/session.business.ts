@@ -2,6 +2,8 @@ import { environment } from "../../env";
 import { getUnixNow } from "common/util";
 import * as sessionRepository from "../../repository/app/session.repository";
 import { log } from "../../util/logger";
+import { broadcastToRoom } from "../../api/v1/app/socket/v1";
+import { RoomIds, WS_COMMAND } from "common/ws-types";
 
 interface AuthProof {
 	id: string;
@@ -88,7 +90,7 @@ async function checkBatState(authProof: AuthProof): Promise<boolean> {
 		// State should be "UNSPENT" for a valid, unspent BAT
 		return data.state.state === "UNSPENT";
 	} catch (error) {
-		log.error("Error checking BAT state with mint:", error);
+		log.error("Error checking BAT state with mint: {error}", {error});
 		throw new Error("Failed to validate BAT with mint");
 	}
 }
@@ -119,7 +121,7 @@ async function spendBat(authProof: AuthProof): Promise<boolean> {
 		const data: MintStateResponse = await response.json();
 		return data.state.state === "SPENT";
 	} catch (error) {
-		log.error("Error spending BAT with mint:", error);
+		log.error("Error spending BAT with mint: {error}", {error});
 		throw new Error("Failed to spend BAT with mint");
 	}
 }
@@ -182,6 +184,19 @@ export async function createBlindSession(
 	});
 
 	log.info(`Created blind session: ${session.id} (${role})`);
+
+	// Broadcast updated session counts to all clients
+	try {
+		const sessionCounts = await sessionRepository.getActiveSessionCounts();
+		broadcastToRoom(RoomIds.global(), {
+			type: WS_COMMAND.SESSIONS_UPDATE,
+			data: {...sessionCounts, timestamp: getUnixNow()}
+		});
+		log.debug(`Broadcasted session update: ${JSON.stringify(sessionCounts)}`);
+	} catch (error) {
+		log.error("Failed to broadcast session update: {error}", {error});
+		// Don't fail the session creation if broadcast fails
+	}
 
 	return {
 		sessionId: session.id,

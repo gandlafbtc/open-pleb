@@ -48,6 +48,7 @@ export async function updateOfferPayment(
 	makerBondAndEscrow: string,
 	status: string,
 	paidAt: number,
+	newExpiry: number
 ) {
 	const [offer] = await db
 		.update(offerTable)
@@ -55,6 +56,7 @@ export async function updateOfferPayment(
 			makerBondAndEscrow,
 			status,
 			paidAt,
+			expiresAt: newExpiry
 		})
 		.where(eq(offerTable.id, offerId))
 		.returning();

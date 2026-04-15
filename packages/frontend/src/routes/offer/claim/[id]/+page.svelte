@@ -76,31 +76,7 @@
 		isClaimingOffer = true;
 
 		try {
-			// Call the claim API endpoint
-			const response = await fetch(`${getAppApiBaseUrl()}/offer/${offerId}/claim`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					sessionId: blindSessionState.currentSession?.sessionId,
-				}),
-			});
-
-			if (!response.ok) {
-				const errorData = await response.json();
-				throw new Error(errorData.error || 'Failed to claim offer');
-			}
-
-			const result = await response.json();
-			
-			if (result.success) {
-				toast.success('Offer claimed successfully!');
-				// Navigate to the offer detail page where they can continue the flow
-				goto(resolve(`/offer/${offerId}`));
-			} else {
-				throw new Error(result.error || 'Failed to claim offer');
-			}
+			console.log('todo resume implementation')
 		} catch (error) {
 			console.error('Error claiming offer:', error);
 			toast.error(error instanceof Error ? error.message : 'Failed to claim offer');

@@ -1,6 +1,6 @@
 import { sessionTable, type InsertSession } from "common/db/schema";
 import { db } from "../../db/db";
-import { eq, lt } from "drizzle-orm";
+import { eq, lt, gt, and, count } from "drizzle-orm";
 import { getUnixNow } from "common/util";
 
 /**
@@ -44,4 +44,49 @@ export const isSessionValid = async (sessionId: string): Promise<boolean> => {
 	
 	const now = getUnixNow();
 	return session.expiresAt ? session.expiresAt > now : true;
+};
+
+/**
+ * Count active maker sessions (non-expired)
+ */
+export const countActiveMakerSessions = async (): Promise<number> => {
+	const now = getUnixNow();
+	const result = await db
+		.select({ count: count() })
+		.from(sessionTable)
+		.where(
+			and(
+				eq(sessionTable.isMaker, true),
+				gt(sessionTable.expiresAt, now)
+			)
+		);
+	return result[0]?.count || 0;
+};
+
+/**
+ * Count active taker sessions (non-expired)
+ */
+export const countActiveTakerSessions = async (): Promise<number> => {
+	const now = getUnixNow();
+	const result = await db
+		.select({ count: count() })
+		.from(sessionTable)
+		.where(
+			and(
+				eq(sessionTable.isMaker, false),
+				gt(sessionTable.expiresAt, now)
+			)
+		);
+	return result[0]?.count || 0;
+};
+
+/**
+ * Get counts of active maker and taker sessions
+ */
+export const getActiveSessionCounts = async (): Promise<{ makerCount: number; takerCount: number }> => {
+	const [makerCount, takerCount] = await Promise.all([
+		countActiveMakerSessions(),
+		countActiveTakerSessions()
+	]);
+	return { makerCount, takerCount };
 };

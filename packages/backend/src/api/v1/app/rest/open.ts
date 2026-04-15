@@ -5,6 +5,7 @@ import { getConversionRate } from "./general/conversion-rate.api";
 import { authApi } from "./auth/auth";
 import { offerApi } from "./offer/offer.api";
 import { providersApi } from "./provider/provider.api";
+import { sessionApi } from "./session/session.api";
 
 export const open = (app: Elysia) =>
 	app
@@ -13,5 +14,6 @@ export const open = (app: Elysia) =>
 		.use(authApi)
 		.use(offerApi)
 		.use(providersApi)
+		.use(sessionApi)
 		.group("/user", (app)=> app.use(userApi))
 	;

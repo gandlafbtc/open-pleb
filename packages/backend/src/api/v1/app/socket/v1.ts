@@ -3,7 +3,7 @@ import { log } from "../../../../util/logger";
 import { RoomManager } from "./rooms/manager";
 import { createCommandRegistry } from "./handlers";
 import { WSErrorHandler, WSError } from "./errors/handler";
-import { WS_ERROR_CODE, type WSClientMessage } from "common/ws-types";
+import { WS_ERROR_CODE, WSMessage, type WSClientMessage } from "common/ws-types";
 import type { ElysiaWS } from "elysia/ws";
 import type { ServerWebSocket } from "bun";
 import type { WSData } from "./types";
@@ -90,6 +90,6 @@ export const v1WS = new Elysia()
   });
 
 // Export for broadcasting
-export function broadcastToRoom(roomId: string, message: unknown): void {
+export function broadcastToRoom(roomId: string, message: WSMessage): void {
   roomManager.broadcast(roomId, message);
 }

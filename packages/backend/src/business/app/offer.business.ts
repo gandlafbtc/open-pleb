@@ -180,11 +180,13 @@ export async function payAndListOffer(offerId: number, ecashToken: string, sessi
 
 	// Update offer in database
 	const now = getUnixNow();
+	const newExpiry = now + (5 * 60)
 	const updatedOffer = await offerRepository.updateOfferPayment(
 		offerId,
 		ecashToken,
 		OFFER_STATE.INVOICE_PAID,
 		now,
+		newExpiry
 	);
 
 	log.info(`Offer ${offerId} paid and listed successfully with ${receivedAmount} sats`);
@@ -194,7 +196,7 @@ export async function payAndListOffer(offerId: number, ecashToken: string, sessi
 		const publicOffer = stripSensitiveFields(updatedOffer);
 		broadcastToRoom(RoomIds.global(), {
 			type: WS_COMMAND.OFFER_LISTED,
-			data: { offer: publicOffer }
+			data: { offer: publicOffer, timestamp: getUnixNow() }
 		});
 		log.debug(`Broadcasted offer ${offerId} to global room`);
 	} catch (error) {

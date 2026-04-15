@@ -23,6 +23,7 @@ export const WS_COMMAND = {
 	OFFER_COMPLETED: 'offer:completed',
 	OFFER_DISPUTED: 'offer:disputed',
 	OFFER_RESOLVED: 'offer:resolved',
+	SESSIONS_UPDATE: 'sessions:update',
 	
 	// Errors
 	ERROR: 'error',
@@ -116,6 +117,12 @@ export interface OfferListedData {
 	timestamp: number;
 }
 
+export interface SessionsUpdateData {
+	makerCount: number;
+	takerCount: number;
+	timestamp: number;
+}
+
 export interface ErrorData {
 	code: WSErrorCode;
 	message: string;
@@ -135,6 +142,7 @@ export type WSData =
 	| OfferUpdatedData
 	| OfferCreatedData
 	| OfferListedData
+	| SessionsUpdateData
 	| ErrorData;
 
 // ============================================================================
