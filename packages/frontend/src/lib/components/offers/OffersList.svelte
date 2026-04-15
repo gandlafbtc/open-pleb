@@ -1,17 +1,19 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { Card } from '$lib/components/ui/card';
 	import CountdownCircle from '$lib/elements/offer/CountdownCircle.svelte';
 	import { offerListState } from '$lib/state/dynamic/offerList.svelte';
 	import { offerFilterState } from '$lib/state/persistent/local/offerFilter.svelte';
 	import { providerState } from '$lib/state/dynamic/provider.svelte';
 	import { calcTakerFee } from 'common/calc';
-	import { SlidersVertical, X, Trash2, BrushCleaning } from '@lucide/svelte';
+	import { SlidersVertical, X, BrushCleaning } from '@lucide/svelte';
 	import Button from '../ui/button/button.svelte';
 	import OffersFilterDrawer from './OffersFilterDrawer.svelte';
 	import Badge from '../ui/badge/badge.svelte';
 
-	// Get active offers from state
-	const activeOffers = $derived(offerListState.offers);
+	// Get active offers from state (already filtered for expiration)
+	const activeOffers = $derived(offerListState.activeOffers);
 	
 	// Apply filters in the view
 	const displayOffers = $derived.by(() => {
@@ -37,7 +39,7 @@
 	}
 
 	function handleOfferClick(offerId: number) {
-		console.log('handle claim prompt' + offerId);
+		goto(resolve(`/offer/claim/${offerId}`));
 	}
 
 	function showFilters() {
@@ -91,23 +93,14 @@
 	</div>
 	<div class="space-y-3">
 		{#each displayOffers as offer (offer.id)}
-			{@const isDisabled=!offerListState.activeOffers.find(o=>o.id===offer.id)}
 			<button
-				disabled={isDisabled}
 				class="w-full transition-all active:scale-[0.995]"
 				onclick={() => handleOfferClick(offer.id)}
 			>
-				<Card class="border p-2 px-3 transition-colors hover:border-primary/50 {isDisabled?"opacity-50":""}">
+				<Card class="border p-2 px-3 transition-colors hover:border-primary/50">
 					<div class="flex items-center gap-4">
 					<!-- Timer Badge with Donut Circle -->
-					 {#if isDisabled}
-					   <p class="text-destructive font-bold">
-						EXP
-					   </p>
-					 {:else}
-					 	<CountdownCircle expiresAt={offer.expiresAt ?? 0} />
-					   
-					 {/if}
+					<CountdownCircle expiresAt={offer.expiresAt ?? 0} />
 
 					
 
