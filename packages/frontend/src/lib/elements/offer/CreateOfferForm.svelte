@@ -191,10 +191,10 @@
 													{selectedProvider.label}
 												</div>
 											{:else}
-												<span class="text-muted-foreground">Select payment provider (optional)</span>
+												<span class="text-muted-foreground">Unknown</span>
 											{/if}
 										{:else}
-											<span class="text-muted-foreground">Select payment provider (optional)</span>
+											<span class="text-muted-foreground">Unknown</span>
 										{/if}
 									</Select.Trigger>
 									<Select.Content>

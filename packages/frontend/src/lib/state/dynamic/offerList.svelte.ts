@@ -1,4 +1,5 @@
 import type { PublicOffer } from 'common/types';
+import { OFFER_STATE } from 'common/types';
 import { clock } from '../clock.svelte';
 
 class OfferListState {
@@ -15,6 +16,9 @@ class OfferListState {
 
 	get activeOffers(): PublicOffer[] {
 		return this._offers.filter((offer) => {
+			// Must be in INVOICE_PAID status to be claimable
+			if (offer.status !== OFFER_STATE.INVOICE_PAID) return false;
+			// Must not be expired
 			if (!offer.expiresAt) return true;
 			return offer.expiresAt > clock.time;
 		});
@@ -54,6 +58,12 @@ class OfferListState {
 
 	clearOffers(): void {
 		this._offers = [];
+	}
+
+	purgeInactiveOffers(): void {
+		// Keep only active offers (uses the same logic as activeOffers getter)
+		const activeOfferIds = new Set(this.activeOffers.map(offer => offer.id));
+		this._offers = this._offers.filter((offer) => activeOfferIds.has(offer.id));
 	}
 }
 

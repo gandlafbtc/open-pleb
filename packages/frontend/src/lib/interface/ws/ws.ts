@@ -167,6 +167,10 @@ class ReconnectingWebSocket implements WSClient {
 		return this.registry.onOfferListed(handler);
 	}
 
+	onSessionsUpdate(handler: Parameters<MessageHandlerRegistry["onSessionsUpdate"]>[0]) {
+		return this.registry.onSessionsUpdate(handler);
+	}
+
 	onOpen(handler: ConnectionHandler) {
 		this.openHandlers.add(handler);
 		return () => this.openHandlers.delete(handler);

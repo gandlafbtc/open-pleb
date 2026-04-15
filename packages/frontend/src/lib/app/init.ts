@@ -12,6 +12,7 @@ import { blindSessionService } from "$lib/interface/rest/blindSession.service";
 import { offerService } from "$lib/interface/rest/offer.service";
 import { offerListService } from "$lib/interface/rest/offerList.service";
 import { providerService } from "$lib/interface/rest/provider.service";
+import { sessionCountService } from "$lib/interface/rest/sessionCount.service";
 
 export const init = async () => {
 	await key.initKeyFromPass(new TextEncoder().encode(DEFAULT_PASS))
@@ -20,6 +21,7 @@ export const init = async () => {
 	await offerService.init()
 	await offerListService.init()
 	await providerService.init()
+	await sessionCountService.init()
 	afterInit()
 };
 

@@ -9,7 +9,8 @@ import type {
 	UnsubscribedData,
 	ErrorData,
 	OfferUpdatedData,
-	OfferListedData
+	OfferListedData,
+	SessionsUpdateData
 } from "common/ws-types";
 
 /**
@@ -21,6 +22,7 @@ export type UnsubscribedHandler = (data: UnsubscribedData) => void;
 export type ErrorHandler = (data: ErrorData) => void;
 export type UpdateHandler = (data: OfferUpdatedData) => void;
 export type OfferListedHandler = (data: OfferListedData) => void;
+export type SessionsUpdateHandler = (data: SessionsUpdateData) => void;
 
 /**
  * Connection event handlers
@@ -48,6 +50,7 @@ export interface WSClient {
 	onError(handler: ErrorHandler): () => void;
 	onUpdate(handler: UpdateHandler): () => void;
 	onOfferListed(handler: OfferListedHandler): () => void;
+	onSessionsUpdate(handler: SessionsUpdateHandler): () => void;
 	onOpen(handler: ConnectionHandler): () => void;
 	onClose(handler: ConnectionHandler): () => void;
 	

@@ -30,7 +30,7 @@
 <svelte:head><link rel="icon" href="/logo/logo-mark-prim.svg" /></svelte:head>
 <ModeWatcher />
 <SplashScreen></SplashScreen>
-<Toaster richColors />
+<Toaster richColors closeButton position="bottom-center" />
 <!-- If not onboarded, show onboarding -->
 {#if !localstore.isOnboarded}
 	<Onboarding></Onboarding>

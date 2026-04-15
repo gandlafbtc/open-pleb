@@ -11,7 +11,8 @@ import {
 	type ErrorData,
 	type WSMessage, 
 	type OfferUpdatedData,
-	type OfferListedData
+	type OfferListedData,
+	type SessionsUpdateData
 } from "common/ws-types";
 import type {
 	PongHandler,
@@ -19,7 +20,8 @@ import type {
 	UnsubscribedHandler,
 	ErrorHandler,
 	UpdateHandler,
-	OfferListedHandler
+	OfferListedHandler,
+	SessionsUpdateHandler
 } from "../types";
 
 export class MessageHandlerRegistry {
@@ -29,6 +31,7 @@ export class MessageHandlerRegistry {
 	private errorHandlers = new Set<ErrorHandler>();
 	private updateHandlers = new Set<UpdateHandler>();
 	private offerListedHandlers = new Set<OfferListedHandler>();
+	private sessionsUpdateHandlers = new Set<SessionsUpdateHandler>();
 
 	/**
 	 * Handle incoming server message
@@ -113,6 +116,18 @@ export class MessageHandlerRegistry {
 				break;
 			}
 
+			case WS_COMMAND.SESSIONS_UPDATE: {
+				const payload = message.data as SessionsUpdateData;
+				this.sessionsUpdateHandlers.forEach(handler => {
+					try {
+						handler(payload);
+					} catch (error) {
+						console.error("Error in sessions update handler:", error);
+					}
+				});
+				break;
+			}
+
 			default:
 				console.warn("Unknown message type:", message.type);
 		}
@@ -151,6 +166,11 @@ export class MessageHandlerRegistry {
 		return () => this.offerListedHandlers.delete(handler);
 	}
 
+	onSessionsUpdate(handler: SessionsUpdateHandler): () => void {
+		this.sessionsUpdateHandlers.add(handler);
+		return () => this.sessionsUpdateHandlers.delete(handler);
+	}
+
 	/**
 	 * Clear all handlers
 	 */
@@ -161,5 +181,6 @@ export class MessageHandlerRegistry {
 		this.errorHandlers.clear();
 		this.updateHandlers.clear();
 		this.offerListedHandlers.clear();
+		this.sessionsUpdateHandlers.clear();
 	}
 }
